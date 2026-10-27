@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0)navigator.serviceWorker.register((document.currentScript.src.replace(/reg\.js.*/,''))+'sw.js').catch(function(){});
