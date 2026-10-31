@@ -1,4 +1,4 @@
-var __SIB=[{"slug": "geometry", "brand": "Axiom", "tag": "Algebra 1 \u2192 Geometry Honors", "acc": "#5b4bff"}, {"slug": "apex", "brand": "Apex", "tag": "Algebra 2 \u2192 Calculus", "acc": "#b4410a"}, {"slug": "quanta", "brand": "Quanta", "tag": "Electrical engineering and physics", "acc": "#0a6e8a"}];
+var __SIB=[{"slug": "geometry", "brand": "Vertex", "tag": "Algebra 1 \u2192 Geometry Honors", "acc": "#5b4bff"}, {"slug": "apex", "brand": "Apex", "tag": "Algebra 2 \u2192 Calculus", "acc": "#b4410a"}, {"slug": "quanta", "brand": "Quanta", "tag": "Electrical engineering and physics", "acc": "#0a6e8a"}];
 /* Open-mode storage: no passcode. Tamper-EVIDENT checksum (casual edits are discarded), not tamper-proof. */
 var __SEC=(function(){
 var K='scioly:'+"apex-math-2027", SALT='cl|'+"apex-math-2027"+'|v1';
@@ -151,6 +151,7 @@ var BT={
 Voltaic:{dk:'#06251a',bg:'#0f6b44',p:{hood:['#12a35e','#7dffc0'],wizard:['#e0a100','#ffe27a'],drake:['#ffb02e','#fff0a0'],knight:['#2fbf86','#d6fff0'],nova:['#19e3a0','#f4ffb0']},mo:function(c){return '<path d="M24 2l-7 12h5l-3 10 9-13h-6z" fill="'+c+'" opacity=".18"/><path d="M6 20l-3 6h3l-1 6 5-8H7z" fill="'+c+'" opacity=".18" class="twk"/>'}},
 Axiom:{dk:'#17104d',bg:'#3a2fc4',p:{hood:['#6c5bff','#c9c2ff'],wizard:['#7c3aed','#ffd45a'],drake:['#8a5cf6','#ffe08a'],knight:['#5b4bff','#ffd45a'],nova:['#a78bfa','#fff3b8']},mo:function(c){return '<path d="M20 4L34 30H6z" fill="none" stroke="'+c+'" stroke-width="1" opacity=".25"/><path d="M6 30a8 8 0 0 1 4-7" stroke="'+c+'" fill="none" opacity=".35"/>'}},
 Stratus:{dk:'#0b2a4d',bg:'#1c6fc4',p:{hood:['#3aa0ff','#d3ecff'],wizard:['#2a7fdc','#ffe7a3'],drake:['#47a8ff','#ffffff'],knight:['#6fb7ff','#e7f4ff'],nova:['#7fd2ff','#fff6c9']},mo:function(c){return '<path d="M5 18q0-5 5-5 1-4 6-3 4 0 5 4 5-1 6 4z" fill="'+c+'" opacity=".2"/><path d="M29 24l-1 4M33 26l-1 4M25 27l-1 4" stroke="'+c+'" stroke-width="1.2" opacity=".35" class="twk"/>'}}};
+BT.Vertex=BT.Axiom;
 function avOf(id){return AV.filter(function(x){return x[0]===id})[0]||AV[0]}
 function mascot(id,mood,s,hat){
  var a=avOf(id),m=a[3],l=a[4],k=a[5];s=s||40;hat=hat===undefined?(S.cos&&S.cos.on.ac):hat;
@@ -234,6 +235,7 @@ RB.Apex={k:'p',dk:'#3a1500',bg:['#b4410a','#3a1500'],mk:'sig',ro:_derive(RB.Axio
 RB.Quanta={k:'q',dk:'#032a36',bg:['#0a6e8a','#032a36'],mk:'atom',ro:_derive(RB.Voltaic.ro,['Qubit','Joule','Newt','Hertz','Tesla','Gauss','Watt','Ohmi','Coulomb','Farady','Henrik','Kelvin','Pascal','Bohr','Curie','Planck','Maxwell','Lenz','Quark','Photon','Neutrino','Boson','Higgs'],_PC.slice().reverse())};
 function _hx(c){c=c.replace('#','');return[parseInt(c.substr(0,2),16),parseInt(c.substr(2,2),16),parseInt(c.substr(4,2),16)]}
 function _mx(a,b,t){var x=_hx(a),y=_hx(b);return '#'+[0,1,2].map(function(i){var v=Math.round(x[i]+(y[i]-x[i])*t);return (v<16?'0':'')+v.toString(16)}).join('')}
+RB.Vertex=RB.Axiom;
 function rbrand(){var b=(P&&P.meta&&P.meta.brand)||'Axiom';return RB[b]?b:'Axiom'}
 function rmk(){var b=RB[rbrand()],AVL=[];b.ro.forEach(function(r){AVL.push([b.k+r[0],r[1],0,r[4],r[5],r[3],r[2],r[6]])});return AVL}
 /* AV rows keep the old shape: [id,name,price,main,light,kind] plus [6]=rarity index (-1 starter), [7]=gear */
@@ -824,6 +826,7 @@ Stratus:['Clear Sky','Cumulus Drift','Squall Line','Sunset Front','Supercell','A
 Apex:['Slope Field','Parabola','Asymptote','Unit Circle','Polar Rose','Limit Horizon','Tangent Line','Riemann Sum'],
 Quanta:['Lab Bench','Free Fall','Standing Wave','Field Lines','Orbit','Spectrum','Photon Burst','Superposition'],
 Axiom:['Graph Paper','Golden Ratio','Proof Lines','Tessellation','Fractal Bloom','Euclid Dusk','Infinite Series','Q.E.D.']};
+BNS.Vertex=BNS.Axiom;
 var BNP=[0,60,90,120,160,220,300,400],BNK=['grid','dots','waves','rays','tri','clouds','bolts','stars'];
 var BNC=[['#0f6b44','#06251a'],['#1b8f6a','#0a3b4d'],['#5b4bff','#12104a'],['#e8582a','#4a1230'],['#0f8fd8','#0b2a4d'],['#c43b8a','#2a1252'],['#f0a000','#4a2a00'],['#9be7ff','#7c5cff']];
 var TIS={
@@ -832,6 +835,7 @@ Stratus:['Rookie','Cloud Spotter','Front Watcher','Isobar Scout','Storm Chaser',
 Apex:['Rookie','Function Fan','Root Finder','Log Roller','Unit Circle Pro','Limit Breaker','Derivative Duke','Integral Ace'],
 Quanta:['Rookie','Meter Reader','Circuit Solver','Wave Rider','Field Theorist','Energy Expert','Signal Sage','Quantum Leaper'],
 Axiom:['Rookie','Angle Ace','Proof Apprentice','Triangle Tamer','Theorem Hunter','Locus Lord','Proof Master','Honors Hero']};
+TIS.Vertex=TIS.Axiom;
 var TIP=[0,50,120,200,300,450,700,1000];
 var TI=TIS[rbrand()].map(function(n,i){return['i'+i,n,TIP[i],1]});
 var BN=BNS[rbrand()].map(function(n,i){return['b'+i,n,BNP[i],BNC[i][0],BNC[i][1],BNK[i]]});

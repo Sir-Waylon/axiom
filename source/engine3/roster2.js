@@ -6,6 +6,7 @@ Stratus:['Clear Sky','Cumulus Drift','Squall Line','Sunset Front','Supercell','A
 Apex:['Slope Field','Parabola','Asymptote','Unit Circle','Polar Rose','Limit Horizon','Tangent Line','Riemann Sum'],
 Quanta:['Lab Bench','Free Fall','Standing Wave','Field Lines','Orbit','Spectrum','Photon Burst','Superposition'],
 Axiom:['Graph Paper','Golden Ratio','Proof Lines','Tessellation','Fractal Bloom','Euclid Dusk','Infinite Series','Q.E.D.']};
+BNS.Vertex=BNS.Axiom;
 var BNP=[0,60,90,120,160,220,300,400],BNK=['grid','dots','waves','rays','tri','clouds','bolts','stars'];
 var BNC=[['#0f6b44','#06251a'],['#1b8f6a','#0a3b4d'],['#5b4bff','#12104a'],['#e8582a','#4a1230'],['#0f8fd8','#0b2a4d'],['#c43b8a','#2a1252'],['#f0a000','#4a2a00'],['#9be7ff','#7c5cff']];
 var TIS={
@@ -14,6 +15,7 @@ Stratus:['Rookie','Cloud Spotter','Front Watcher','Isobar Scout','Storm Chaser',
 Apex:['Rookie','Function Fan','Root Finder','Log Roller','Unit Circle Pro','Limit Breaker','Derivative Duke','Integral Ace'],
 Quanta:['Rookie','Meter Reader','Circuit Solver','Wave Rider','Field Theorist','Energy Expert','Signal Sage','Quantum Leaper'],
 Axiom:['Rookie','Angle Ace','Proof Apprentice','Triangle Tamer','Theorem Hunter','Locus Lord','Proof Master','Honors Hero']};
+TIS.Vertex=TIS.Axiom;
 var TIP=[0,50,120,200,300,450,700,1000];
 var TI=TIS[rbrand()].map(function(n,i){return['i'+i,n,TIP[i],1]});
 var BN=BNS[rbrand()].map(function(n,i){return['b'+i,n,BNP[i],BNC[i][0],BNC[i][1],BNK[i]]});

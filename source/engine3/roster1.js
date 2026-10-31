@@ -40,6 +40,7 @@ RB.Apex={k:'p',dk:'#3a1500',bg:['#b4410a','#3a1500'],mk:'sig',ro:_derive(RB.Axio
 RB.Quanta={k:'q',dk:'#032a36',bg:['#0a6e8a','#032a36'],mk:'atom',ro:_derive(RB.Voltaic.ro,['Qubit','Joule','Newt','Hertz','Tesla','Gauss','Watt','Ohmi','Coulomb','Farady','Henrik','Kelvin','Pascal','Bohr','Curie','Planck','Maxwell','Lenz','Quark','Photon','Neutrino','Boson','Higgs'],_PC.slice().reverse())};
 function _hx(c){c=c.replace('#','');return[parseInt(c.substr(0,2),16),parseInt(c.substr(2,2),16),parseInt(c.substr(4,2),16)]}
 function _mx(a,b,t){var x=_hx(a),y=_hx(b);return '#'+[0,1,2].map(function(i){var v=Math.round(x[i]+(y[i]-x[i])*t);return (v<16?'0':'')+v.toString(16)}).join('')}
+RB.Vertex=RB.Axiom;
 function rbrand(){var b=(P&&P.meta&&P.meta.brand)||'Axiom';return RB[b]?b:'Axiom'}
 function rmk(){var b=RB[rbrand()],AVL=[];b.ro.forEach(function(r){AVL.push([b.k+r[0],r[1],0,r[4],r[5],r[3],r[2],r[6]])});return AVL}
 /* AV rows keep the old shape: [id,name,price,main,light,kind] plus [6]=rarity index (-1 starter), [7]=gear */

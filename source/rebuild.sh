@@ -6,7 +6,7 @@ python3 src_geo/mkgeo.py events/geometry-readiness/pack.json >/dev/null; python3
 python3 - <<'P'
 import json
 N={'circuit-lab-b':['Wattson','Ohmega','Ohwl','Faradox','Capacitat','Dinode','Arc Rider','Faraday','Thundra','Tesla Guard','Quasar'],'geometry-readiness':['Theo Rem','Piper','Euclid','Vertex','Tangent','Pythagorex','Vertex Shade','Conjecture','Pythagodrake','Axiom Prime','QED'],'meteorology-b':['Cumulo','Nimbus','Isobar','Gale','Cirrus','Twister','Cirrus Ghost','Stormcaller','Supercell','Stormwarden','Aurora']}
-for f,b,t,a in [('circuit-lab-b','Voltaic','Circuit Lab B · Science Olympiad',['#0b7a45','#dff6e9']),('geometry-readiness','Axiom','Algebra 1 → Geometry Honors',['#5b4bff','#eceaff'])]:
+for f,b,t,a in [('circuit-lab-b','Voltaic','Circuit Lab B · Science Olympiad',['#0b7a45','#dff6e9']),('geometry-readiness','Vertex','Algebra 1 → Geometry Honors',['#5b4bff','#eceaff'])]:
     p=json.load(open('events/'+f+'/pack.json'));p['meta'].update(brand=b,tagline=t,accent=a,names=N[f])
     if f=='circuit-lab-b':p['meta']['stations']='circ'
     if f=='geometry-readiness':p['meta'].update(refresh={'eq':['bas','par'],'lin':['crd'],'sys':['crd'],'exp':['area','sol'],'fac':['sim','rt'],'rad':['rt'],'qdr':['rt','area']},target='2027-03-31')

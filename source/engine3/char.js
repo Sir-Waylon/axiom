@@ -10,6 +10,7 @@ var BT={
 Voltaic:{dk:'#06251a',bg:'#0f6b44',p:{hood:['#12a35e','#7dffc0'],wizard:['#e0a100','#ffe27a'],drake:['#ffb02e','#fff0a0'],knight:['#2fbf86','#d6fff0'],nova:['#19e3a0','#f4ffb0']},mo:function(c){return '<path d="M24 2l-7 12h5l-3 10 9-13h-6z" fill="'+c+'" opacity=".18"/><path d="M6 20l-3 6h3l-1 6 5-8H7z" fill="'+c+'" opacity=".18" class="twk"/>'}},
 Axiom:{dk:'#17104d',bg:'#3a2fc4',p:{hood:['#6c5bff','#c9c2ff'],wizard:['#7c3aed','#ffd45a'],drake:['#8a5cf6','#ffe08a'],knight:['#5b4bff','#ffd45a'],nova:['#a78bfa','#fff3b8']},mo:function(c){return '<path d="M20 4L34 30H6z" fill="none" stroke="'+c+'" stroke-width="1" opacity=".25"/><path d="M6 30a8 8 0 0 1 4-7" stroke="'+c+'" fill="none" opacity=".35"/>'}},
 Stratus:{dk:'#0b2a4d',bg:'#1c6fc4',p:{hood:['#3aa0ff','#d3ecff'],wizard:['#2a7fdc','#ffe7a3'],drake:['#47a8ff','#ffffff'],knight:['#6fb7ff','#e7f4ff'],nova:['#7fd2ff','#fff6c9']},mo:function(c){return '<path d="M5 18q0-5 5-5 1-4 6-3 4 0 5 4 5-1 6 4z" fill="'+c+'" opacity=".2"/><path d="M29 24l-1 4M33 26l-1 4M25 27l-1 4" stroke="'+c+'" stroke-width="1.2" opacity=".35" class="twk"/>'}}};
+BT.Vertex=BT.Axiom;
 function avOf(id){return AV.filter(function(x){return x[0]===id})[0]||AV[0]}
 function mascot(id,mood,s,hat){
  var a=avOf(id),m=a[3],l=a[4],k=a[5];s=s||40;hat=hat===undefined?(S.cos&&S.cos.on.ac):hat;

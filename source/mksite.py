@@ -30,7 +30,7 @@ else:
     B=dict(name='Axiom',pri='#4b3bd9',pri_d='#a99dff',acc='#8a5a00',acc_d='#ffd23f',gold='#ffd23f',
         h1='Math, engineering and physics, one small win at a time.',
         sub='Short interactive lessons start with ideas a 5th grader already knows and climb to high-school exam level. Three tracks: Geometry readiness, Algebra 2 through Calculus, and electrical engineering with physics.',
-        tracks=[('Axiom Geometry','Algebra 1 → Geometry Honors','#4b3bd9',[t['name'] for t in packs[0]['topics']]),('Apex','Algebra 2 → Calculus','#b4410a',[t['name'] for t in packs[1]['topics']]),('Quanta','Electrical engineering and physics','#0a6e8a',[t['name'] for t in packs[2]['topics']])],
+        tracks=[('Vertex','Algebra 1 → Geometry Honors','#4b3bd9',[t['name'] for t in packs[0]['topics']]),('Apex','Algebra 2 → Calculus','#b4410a',[t['name'] for t in packs[1]['topics']]),('Quanta','Electrical engineering and physics','#0a6e8a',[t['name'] for t in packs[2]['topics']])],
         what='equations, proofs, similarity, polynomials, logarithms, trigonometry, limits, derivatives, circuits, motion, energy and waves',stations=False,
         exam='a high-school math or physics exam written by a mathematician, physicist or electrical engineer')
 for a,b_,m in [(B['pri'],'#ffffff',4.5),('#14213d','#fbfbf8',7),('#46506b','#fbfbf8',4.5),(B['acc'],'#fbfbf8',4.5),('#eef0fb','#10142b',7),(B['pri_d'],'#10142b',4.5),(B['acc_d'],'#10142b',4.5)]:
