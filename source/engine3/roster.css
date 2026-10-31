@@ -1,0 +1,68 @@
+
+/* ===== roster, boxes, banners ===== */
+.mas.rf{overflow:visible}
+.rf .rbob{animation:rbob 2.6s ease-in-out infinite}@keyframes rbob{50%{transform:translateY(-1.6px)}}
+.rf .raura{animation:raura 3s ease-in-out infinite;transform-origin:32px 52px}@keyframes raura{50%{opacity:.6}}
+.rf .rwing{animation:rwing 2.4s ease-in-out infinite;transform-origin:32px 50px}@keyframes rwing{50%{transform:scaleX(1.05)}}
+.rf .rflame{animation:rflame .7s ease-in-out infinite alternate;transform-origin:32px 90px}@keyframes rflame{to{transform:scaleY(1.12);opacity:.7}}
+.rf .rhalo{animation:raura 2.2s ease-in-out infinite}
+.rf .rorb{transform-origin:32px 48px;transform-box:view-box;animation:rspin 9s linear infinite}@keyframes rspin{to{transform:rotate(360deg)}}
+.rf .rspin{transform-origin:32px 22px;transform-box:view-box;animation:rspin 18s linear infinite}
+.rf.prism{animation:rhue 7s linear infinite}@keyframes rhue{to{filter:hue-rotate(360deg)}}
+.mas.rf.cheer .rarmR{transform-origin:44px 52px}
+@media(prefers-reduced-motion:reduce){.rf *,.mas.rf{animation:none!important}}
+.rchip{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1.5px solid}
+.boxc .boxart{flex:none}
+.luck .bar{height:10px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:12px}.luck .bar i{display:block;height:100%;background:var(--pri);border-radius:99px;transition:width .4s}
+table.odds{margin-top:8px}table.odds th[scope=row]{font-weight:400}table.odds td{font-variant-numeric:tabular-nums}
+.coll{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:8px 0 18px}
+.cc{display:grid;justify-items:center;gap:6px;text-align:center;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--rc);border-radius:16px;padding:10px 8px}
+.cc.on{outline:3px solid var(--pri);outline-offset:1px}.cc.lock .ghost{filter:grayscale(1) brightness(.35);opacity:.55}.cc b{font-size:14px}
+.bns{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:8px 0 18px}
+.bc{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}.bc.on{outline:3px solid var(--pri)}.bc .bn{display:block;width:100%;height:auto;aspect-ratio:15/4}
+.tis{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:8px 0 18px}.tc{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}.tc.on{outline:3px solid var(--pri)}
+.bnr{margin:-4px 0 12px;border-radius:16px;overflow:hidden}.bnr .bn{display:block;width:100%;height:auto;aspect-ratio:15/4}
+.modal.rvl .card.rv{max-width:420px;border-top:6px solid var(--rc)}
+.rv-box{display:grid;place-items:center;height:210px}.rv-box.shake svg{animation:rshake .22s linear 5,rgrow 1.1s ease-in forwards}@keyframes rshake{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}@keyframes rgrow{to{scale:1.5}}
+.rv-out:not([hidden]){animation:rpop .5s cubic-bezier(.2,1.4,.4,1) both}@keyframes rpop{from{transform:scale(.6);opacity:0}}
+.rv.r5 .rv-av,.rv.r4 .rv-av,.rv.r3 .rv-av{filter:drop-shadow(0 0 14px var(--rc))}
+.rv-av{display:grid;place-items:center;margin:8px 0}.rv-av .mas{margin:0}
+.rv-box[hidden],.rv-out[hidden]{display:none}
+.luck .bar i{background:var(--pri-t,#0b7a45);min-width:4px}
+.stl .bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin:6px 0}.stl .bar i{display:block;height:100%;background:var(--pri-t,#0b7a45);border-radius:99px}.stl{margin:10px 0}
+
+/* ===== character motion (idle life, like a collectible mascot) ===== */
+.rf .rbody{transform-origin:32px 90px;transform-box:view-box;animation:rsq 2.6s ease-in-out infinite}@keyframes rsq{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,.985)}}
+.rf .rhead{transform-origin:32px 46px;transform-box:view-box;animation:rtilt 5.2s ease-in-out infinite}@keyframes rtilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg)}70%{transform:rotate(3deg)}}
+.rf .rblink{transform-box:fill-box;transform-origin:center;animation:rblink 4.6s infinite}@keyframes rblink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+.rf .rarmR{transform-origin:44px 52px;transform-box:view-box;animation:rwv 3.8s ease-in-out infinite}@keyframes rwv{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-14deg)}80%{transform:rotate(6deg)}90%{transform:rotate(-8deg)}}
+.rf .rarmL{transform-origin:20px 52px;transform-box:view-box;animation:rswl 2.6s ease-in-out infinite}@keyframes rswl{50%{transform:rotate(4deg)}}
+.rf .rtail{transform-origin:44px 72px;transform-box:view-box;animation:rwag 1.4s ease-in-out infinite}@keyframes rwag{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(9deg)}}
+.rf .rant{transform-origin:32px 13px;transform-box:view-box;animation:rant 1.8s ease-in-out infinite}@keyframes rant{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.mas.rf.cheer .rbody,.cc:hover .mas.rf .rbody,.cc:focus-within .mas.rf .rbody{animation:rjump .7s ease-in-out infinite}@keyframes rjump{0%,100%{transform:translateY(0) scale(1,1)}40%{transform:translateY(-7px) scale(.97,1.04)}70%{transform:translateY(0) scale(1.04,.95)}}
+.mas.rf.oops .rbody{animation:rno .5s linear 2}@keyframes rno{25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+.rf .rwing{animation:rflap 1.6s ease-in-out infinite}@keyframes rflap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(1.09) rotate(1deg)}}
+@media(prefers-reduced-motion:reduce){.rf *{animation:none!important}}
+
+/* ===== market (pack cards, open screen, reveal) ===== */
+details.fold{margin:14px 0;border-radius:18px}details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 4px;font-weight:800;font-size:1.1rem}details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"";margin-left:auto;width:10px;height:10px;border-right:3px solid currentColor;border-bottom:3px solid currentColor;transform:rotate(45deg);transition:transform .2s;flex:none;margin-right:6px}details.fold[open]>summary::after{transform:rotate(-135deg)}
+details.fold>summary .small{font-weight:600}details.fold.cardf{background:var(--surface);border:1px solid var(--line);padding:6px 16px 14px}details.fold.cardf>summary{padding-left:0}
+.packs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:8px 0}
+.pack{appearance:none;border:0;cursor:pointer;text-align:center;background:linear-gradient(180deg,var(--pk1),var(--pk2));color:#fff;border-radius:22px;padding:18px 14px 14px;display:grid;justify-items:center;gap:8px;box-shadow:0 6px 0 rgba(0,0,0,.28);font:inherit;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
+.pack:hover,.pack:focus-visible{transform:translateY(-4px) rotate(-1deg);box-shadow:0 10px 0 rgba(0,0,0,.28)}.pack:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.28)}.pack[disabled]{filter:grayscale(.7);cursor:not-allowed}
+.pack .pkart{animation:pkb 2.4s ease-in-out infinite}@keyframes pkb{50%{transform:translateY(-6px) rotate(2deg)}}.pack b{font-size:1.25rem;text-shadow:0 2px 0 rgba(0,0,0,.35)}.pack .sub{font-size:.85rem;opacity:.92}
+.price{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);padding:5px 14px;border-radius:99px;font-weight:800}.price i{width:16px;height:16px;border-radius:50%;background:#ffd23c;border:2px solid #b8860b;display:inline-block}
+.pack::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 0deg,transparent 0 40deg,rgba(255,255,255,.14) 50deg,transparent 60deg 120deg,rgba(255,255,255,.12) 130deg,transparent 140deg 240deg,rgba(255,255,255,.12) 250deg,transparent 260deg);animation:rrot 14s linear infinite;pointer-events:none}@keyframes rrot{to{transform:rotate(360deg)}}
+.modal.rvl{background:radial-gradient(circle at 50% 40%,rgba(30,34,70,.97),rgba(8,10,24,.99))}
+.rvs{width:min(460px,94vw);text-align:center;color:#fff;position:relative;display:grid;gap:10px;justify-items:center}.rvs h2{color:#fff;font-size:1.6rem;margin:0;text-shadow:0 3px 0 rgba(0,0,0,.4)}
+.rvs .pkbig{width:210px;height:210px;display:grid;place-items:center}.rvs .pkbig.shake{animation:rshk .16s linear infinite}@keyframes rshk{25%{transform:translate(-4px,2px) rotate(-5deg)}75%{transform:translate(4px,-2px) rotate(5deg)}}
+.rvs .rays{position:absolute;left:50%;top:42%;width:520px;height:520px;margin:-260px 0 0 -260px;background:repeating-conic-gradient(var(--rc) 0 10deg,transparent 10deg 30deg);opacity:.5;-webkit-mask:radial-gradient(circle,#000 10%,transparent 68%);mask:radial-gradient(circle,#000 10%,transparent 68%);animation:rrot 10s linear infinite;pointer-events:none}
+.rvs .stage{position:relative;display:grid;justify-items:center;gap:8px;min-height:260px;align-content:center}
+.rvs .ribbon{display:inline-block;padding:6px 26px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--rc);clip-path:polygon(0 0,100% 0,94% 50%,100% 100%,0 100%,6% 50%);text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.rvs .rv-av{animation:rpop .6s cubic-bezier(.2,1.5,.4,1) both;position:relative}.rvs .newt{background:#ffd23c;color:#3a2a00;font-weight:900;padding:2px 12px;border-radius:99px;font-size:.8rem}
+.rvs .btn{min-width:130px}.rvs .btn.ghost{color:#fff;box-shadow:none;border-color:rgba(255,255,255,.4)}
+.rvflash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;animation:rfl .5s ease-out}@keyframes rfl{0%{opacity:.9}100%{opacity:0}}
+.coll .cc{cursor:pointer;transition:transform .12s}.coll .cc:hover{transform:translateY(-3px)}.cc .cnt{font-size:.72rem;font-weight:800;color:var(--mut,#555)}
+.cgrp{margin:8px 0 2px;font-weight:800;font-size:.9rem;opacity:.8}
+.cc .gh{appearance:none;background:none;border:0;padding:0;cursor:pointer}.cc .gh:focus-visible{outline:3px solid var(--pri);border-radius:12px}

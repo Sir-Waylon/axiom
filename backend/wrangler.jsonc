@@ -1,0 +1,9 @@
+{
+  // Workers + static assets deployment. Pages deployment: see README (uses wrangler.toml-free setup).
+  "name": "skyvolt",
+  "main": "worker.js",
+  "compatibility_date": "2024-11-01",
+  "assets": { "directory": "./public", "binding": "ASSETS", "not_found_handling": "404-page", "run_worker_first": ["/api/*"] },
+  "d1_databases": [{ "binding": "DB", "database_name": "skyvolt-accounts", "database_id": "REPLACE_WITH_D1_ID" }],
+  "vars": { "GOOGLE_CLIENT_ID": "723722347490-8fs5p0e6jq383fcoat2aicr8eomra5jq.apps.googleusercontent.com" }
+}
