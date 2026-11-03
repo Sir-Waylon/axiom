@@ -30,3 +30,32 @@
 .gtw{max-height:150px;overflow:auto;margin-top:8px}.gtw table{width:100%;border-collapse:collapse;font:13px ui-monospace,monospace;text-align:center}.gtw th,.gtw td{padding:3px 6px;border-bottom:1px solid var(--line)}
 .tnone{font:800 10px inherit;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);background:var(--sunk);border-radius:99px;padding:4px 8px;text-align:center;max-width:70px;line-height:1.1}
 @media(min-width:900px){.tpanel.calc{left:auto;right:96px;bottom:24px;border-radius:22px;max-width:420px}.gcv canvas{height:280px}}
+/* calculator: Desmos-inspired */
+.tpanel.calc{--dc:#2f6fe0}
+.tpanel.calc .tdisp{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:6px 14px 10px;margin-bottom:10px}
+.tpanel.calc .thist{display:flex;flex-direction:column;gap:2px;opacity:1;font-size:14px;min-height:20px;text-align:left}
+.tpanel.calc .hrow{display:flex;justify-content:space-between;gap:12px;align-items:baseline;text-align:left;border:0;border-bottom:1px solid var(--line);padding:7px 0;opacity:1;font:500 15px ui-monospace,monospace;color:var(--mute)}
+.tpanel.calc .hrow b{color:inherit;font-weight:800;color:var(--ink,inherit)}
+.tpanel.calc .tdisp input{font:500 22px ui-monospace,monospace;padding:8px 0 2px;text-align:left;border-left:3px solid var(--dc);padding-left:10px;margin-top:6px}
+.tpanel.calc .tres{text-align:right;font:800 24px ui-monospace,monospace;color:var(--dc);min-height:30px}
+.tpanel.calc .tres.bad{color:#d33;font-size:14px}
+.tpanel.calc .tkeys5 button{border:0;background:var(--sunk);height:40px;font:600 15px inherit;border-radius:10px;color:inherit}
+.tpanel.calc .tkeys5 button.on{background:var(--dc);color:#fff}
+.tpanel.calc .tkeys{gap:6px}
+.tpanel.calc .tkeys button{height:52px;border-radius:10px;border:1px solid var(--line);font:600 20px inherit;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.tpanel.calc .tkeys button.o,.tpanel.calc .tkeys button.f{background:var(--sunk)}
+.tpanel.calc .tkeys button.n{background:var(--surface);font-weight:700}
+.tpanel.calc .tkeys .eq{background:var(--dc);border-color:var(--dc);color:#fff;font-size:24px}
+/* graph */
+.tpanel.calc.wide{max-width:780px}
+.gwrap{display:block}
+.gf{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:0 4px;background:transparent;gap:10px;min-height:48px}
+.gfs{gap:0;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:8px;background:var(--surface)}.gf:last-child{border-bottom:0}
+.gsw{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:3px solid var(--c);background:var(--c);cursor:pointer;padding:0;transition:background .15s}
+.gsw[aria-pressed=false]{background:transparent}
+.gcl{border:0;background:transparent;color:var(--mute);font-size:20px;cursor:pointer;width:30px;height:30px;border-radius:50%}
+.gps{display:grid;gap:4px;margin-bottom:8px}.gp{display:flex;align-items:center;gap:10px;background:var(--sunk);border-radius:10px;padding:6px 12px}.gp b{font:800 15px ui-monospace,monospace;width:14px}.gp input{flex:1;min-width:0;accent-color:var(--dc)}.gp output{font:700 13px ui-monospace,monospace;width:34px;text-align:right}
+.gzm{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}.gzm button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:inherit;font:700 18px inherit;box-shadow:0 1px 3px rgba(0,0,0,.15);cursor:pointer}
+.gcv canvas{border:1.5px solid var(--line);border-radius:12px;height:260px}
+@media(min-width:700px){.tpanel.calc.wide .gwrap{display:grid;grid-template-columns:270px 1fr;gap:14px;align-items:start}.tpanel.calc.wide .gcv canvas{height:360px}}
+@media(min-width:900px){.tpanel.calc.wide{max-width:780px;right:24px}}
