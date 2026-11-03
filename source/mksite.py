@@ -97,8 +97,8 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
 <header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
 <main id="main" tabindex="-1">{body}</main>
 <footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/science/">The science</a></li><li><a href="/resources/">Resources</a></li><li><a href="/account/">Account</a></li></ul></nav>
-<p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom).</p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p>{N} is an independent, free study tool. It is not an official product of Science Olympiad, Inc., any school district or any textbook publisher.</p></div></footer>
-{'<script src="/account.js" defer></script>' if path=='account' else ''}{tail}
+<p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom).</p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p></div></footer>
+{'<script src="/account.js" defer></script>' if path=='account' else ''}<script src="/nav.js" defer></script>{tail}
 </body></html>'''
 def chips(l):return '<ul class="chips">'+''.join(f'<li><span class="pill">{html.escape(x)}</span></li>' for x in l)+'</ul>'
 ART='''<svg viewBox="0 0 320 220" role="img" aria-label="Example of an interactive question: drag the ray to make a 50 degree angle"><rect x="0" y="0" width="320" height="220" rx="14" fill="none"/><text x="16" y="28" font-size="15" font-weight="700" fill="var(--tx)">Drag the ray to make a 50° angle</text><path d="M50 170H260" stroke="var(--tx)" stroke-width="3" stroke-linecap="round"/><path d="M50 170 200 83" stroke="var(--pri)" stroke-width="6" stroke-linecap="round"/><circle cx="200" cy="83" r="12" fill="var(--pri)"/><path d="M110 170A60 60 0 0 0 98 134" fill="none" stroke="var(--gold)" stroke-width="4" stroke-linecap="round"/><text x="116" y="158" font-size="15" font-weight="800" fill="var(--tx)">50°</text><rect x="16" y="188" width="288" height="16" rx="8" fill="var(--soft)"/><rect x="16" y="188" width="170" height="16" rx="8" fill="var(--pri)"/></svg>'''
@@ -113,7 +113,7 @@ def landing():
      ('Explains why','A wrong answer shows the steps and points you to the exact notes.'),
      ('No repeated questions','A question appears once until you have seen the whole bank. After that, only for scheduled review.'),
      ('Read-aloud support','A voice reads questions, hints and explanations aloud. You choose the voice and speed.'),
-     ('Friends and leagues','Add friends by username and compare XP in a weekly league. No real names needed.'),('Private and free','No ads, no trackers, no purchases. Coins are only for fun.')]
+     ('Friends and leagues','Add friends by username and compare XP in a weekly league.'),('Private and free','No ads, no trackers, no purchases. Coins are only for fun.')]
     fh=''.join(f'<div class="card"><h3>{a}</h3><p>{b}</p></div>' for a,b in feats)+st
     body=f'''<div class="wrap"><section class="hero"><div><p><span class="pill">Free · No ads · Any device</span></p><h1>{B['h1']}</h1><p class="lead">{B['sub']}</p>
 <div class="cta"><a class="btn" href="/app/">Start learning</a><a class="btn sec" href="/account/">Create an account</a></div><p class="lead" style="font-size:1rem">No account needed to start. Accounts save progress across devices and unlock friends.</p></div>
@@ -136,11 +136,11 @@ def legal(kind):
     if kind=='privacy':
         b=f'''<div class="wrap doc"><h1>Privacy Policy</h1><p><b>Effective {DATE}.</b> This policy explains what {N} collects, why, and the choices you have. It is written in plain language.</p>
 <div class="note"><b>Short version:</b> you can use {N} as a guest and nothing leaves your device. If you make an account we store only what is needed to save your progress and connect you with friends. We show no ads, use no trackers and never sell data.</div>
-<h2>Who runs this</h2><p>{N} is a free educational tool run by an independent volunteer coach. It is not run by a school, a school district or Science Olympiad, Inc. {P}</p>
+<h2>Who runs this</h2><p>{N} is a free educational project. {P}</p>
 <h2>Guest mode</h2><p>If you do not make an account, your progress is saved only in your own browser (local storage) on your device. We do not receive it. Clearing site data erases it. You can export a backup in Settings.</p>
 <h2>What we collect if you make an account</h2><table><tr><th>Data</th><th>Why</th></tr>
 <tr><td>Email address</td><td>To sign you in and recover your account. Never shown to other users.</td></tr>
-<tr><td>Username (not your real name)</td><td>So friends can find you. Shown to your friends and in your league.</td></tr>
+<tr><td>Username</td><td>So friends can find you. Shown to your friends and in your league.</td></tr>
 <tr><td>Password</td><td>We never see or store it. We store a salted, slow hash (PBKDF2-SHA-256 with a server-side secret) so it cannot be read back.</td></tr>
 <tr><td>Google account ID and email (only if you choose “Continue with Google”)</td><td>To recognise you. We do not receive your Google password, contacts or files.</td></tr>
 <tr><td>Learning progress: XP, level, streak, avatar, answers history, settings</td><td>So your progress follows you between devices and powers your lessons.</td></tr>
@@ -161,7 +161,7 @@ def legal(kind):
 <h2>1. Who can use {N}</h2><p>You must be 13 or older to create an account. If you are younger, use guest mode, or have a parent or teacher’s permission. If you are under 18, please make sure a parent or guardian is comfortable with you using the site.</p>
 <h2>2. What {N} is</h2><p>{N} is a free practice tool. It is independent and is <b>not</b> affiliated with or endorsed by Science Olympiad, Inc., any school or district, or any textbook publisher. Names such as “Science Olympiad” belong to their owners. Lessons and questions are original study material written for practice. They are not official event questions.</p>
 <h2>3. No guarantees</h2><p>{N} was created with AI assistance (see the <a href="/ai-disclosure/">AI disclosure</a>). We work hard to make content correct and check it carefully, but errors can happen. Always check important facts against your textbook, your teacher or the official rules. {N} does not promise any grade, score or competition result. The service is provided “as is” and “as available”.</p>
-<h2>4. Your account</h2><ul><li>Give accurate information and keep your password private. You are responsible for activity on your account.</li><li>Pick a username that is not your real name and is appropriate for a school audience. We may change or remove names that are not.</li><li>One person per account. Do not impersonate others.</li></ul>
+<h2>4. Your account</h2><ul><li>Give accurate information and keep your password private. You are responsible for activity on your account.</li><li>Pick an appropriate username. We may change or remove names that are not.</li><li>One person per account. Do not impersonate others.</li></ul>
 <h2>5. Fair play and acceptable use</h2><ul><li>Do not cheat the XP or league system with scripts, edited data or automated tools. We may reset impossible progress.</li><li>Do not attack, overload, scan or try to break the service or other users’ accounts.</li><li>Do not scrape the question bank, or copy it to sell it.</li><li>Be kind to friends. Harassment, hate or sharing personal information is not allowed and can lead to removal.</li></ul>
 <h2>6. Coins, avatars and rewards</h2><p>Coins, XP, streaks and avatars are cosmetic and for fun. They have no cash value, cannot be bought, sold or transferred, and can be reset if we find abuse.</p>
 <h2>7. Content and licence</h2><p>The site’s code and original lessons and questions are provided for personal, non-commercial educational use unless the project’s repository states a different licence. Your progress data belongs to you.</p>
@@ -210,25 +210,27 @@ def account():
     b=f'''<div class="wrap" style="padding:40px 0 56px"><div style="text-align:center;margin-bottom:20px"><h1 style="font-size:2rem">Your {N} account</h1><p class="lead" style="margin:0 auto">Save progress on every device and add friends. No account is needed to learn.</p></div>
 <div id="signed" hidden class="card" style="max-width:460px;margin:0 auto;text-align:center"><p>Signed in as <b id="who"></b>.</p><a class="btn" href="/app/">Continue learning</a></div>
 <form class="acc" id="f" novalidate aria-describedby="msg"><div class="seg" role="group" aria-label="Choose"><button type="button" id="mIn" aria-pressed="true">Sign in</button><button type="button" id="mUp" aria-pressed="false">Create account</button></div>
+<div id="gw" hidden><div id="gbtn" style="display:flex;justify-content:center;min-height:44px"></div><p class="gnote" id="gnote" style="font-size:.85rem;text-align:center;margin:8px 0 0">By continuing with Google you confirm you are 13 or older, or have a parent or teacher’s permission, and agree to the <a href="/terms/">Terms</a> and <a href="/privacy/">Privacy Policy</a>.</p><div class="or">or use email</div></div>
 <label class="fld" id="wId"><span id="lId">Email or username</span><input id="id" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
 <label class="fld" id="wEm" hidden><span>Email</span><input id="em" type="email" autocomplete="email" autocapitalize="none" spellcheck="false"><small>Used only to sign in. Never shown to others.</small></label>
-<label class="fld" id="wUn" hidden><span>Username</span><input id="un" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="16" aria-describedby="uh"><small id="uh">3 to 16 letters, numbers or _ . Not your real name.</small></label>
+<label class="fld" id="wUn" hidden><span>Username</span><input id="un" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="16" aria-describedby="uh"><small id="uh">3 to 16 letters, numbers or _</small></label>
 <label class="fld"><span>Password</span><input id="pw" type="password" autocomplete="current-password" required aria-describedby="ph"><small id="ph" hidden>At least 10 characters.</small></label>
 <div class="chk"><input type="checkbox" id="sh"><label for="sh">Show password</label></div>
 <div class="chk" id="wCo" hidden><input type="checkbox" id="co"><label for="co">I am 13 or older, or I have a parent or teacher’s permission. I agree to the <a href="/terms/">Terms</a> and <a href="/privacy/">Privacy Policy</a>.</label></div>
 <button class="btn" id="go" type="submit" style="width:100%">Sign in</button>
 <p class="msg" id="msg" role="alert" aria-live="assertive"></p>
-<div id="gw" hidden><div class="or">or</div><div id="gbtn" style="display:flex;justify-content:center"></div></div></form>
-<form class="acc" id="uf" hidden novalidate><h2 style="font-size:1.3rem">Pick a username</h2><p>Friends find you by it. Do not use your real name.</p><label class="fld"><span>Username</span><input id="un2" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="16"></label><button class="btn" type="submit" style="width:100%">Save and continue</button><p class="msg" id="msg2" role="alert"></p></form>
+</form>
+<form class="acc" id="uf" hidden novalidate><h2 style="font-size:1.3rem">Pick a username</h2><label class="fld"><span>Username</span><input id="un2" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="16"></label><button class="btn" type="submit" style="width:100%">Save and continue</button><p class="msg" id="msg2" role="alert"></p></form>
 <p style="text-align:center;margin-top:20px"><a href="/app/">Continue as a guest</a></p></div>'''
     return page('account',f'Sign in or create an account · {N}',b,f'Create a free {N} account or sign in.')
+NAVJS=r'''(function(){"use strict";fetch("/api/me",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(j){if(!j||!j.username)return;var a=document.querySelectorAll('a[href="/account/"]');for(var i=0;i<a.length;i++){if(a[i].closest("footer"))continue;a[i].hidden=true;a[i].style.display="none"}}).catch(function(){})})();'''
 ACCJS=r'''(function(){"use strict";
 var $=function(i){return document.getElementById(i)},up=false,csrf="";
 function ck(){var m=document.cookie.split("; ").filter(function(c){return c.indexOf("__Host-csrf=")===0})[0];return m?m.slice(12):""}
 function api(m,p,b){return fetch("/api"+p,{method:m,credentials:"same-origin",headers:{"content-type":"application/json","x-csrf":csrf||ck()},body:m==="POST"?JSON.stringify(b||{}):undefined}).then(function(r){return r.json().catch(function(){return{error:"The server is not reachable. You can still learn as a guest."}}).then(function(j){j.__s=r.status;return j})})}
 function say(t,id){var e=$(id||"msg");e.textContent=t||"";e.className="msg"+(t?" bad":"")}
 function mark(el,bad){el.setAttribute("aria-invalid",bad?"true":"false")}
-function mode(u){up=u;$("mIn").setAttribute("aria-pressed",!u);$("mUp").setAttribute("aria-pressed",u);$("wId").hidden=u;$("wEm").hidden=!u;$("wUn").hidden=!u;$("wCo").hidden=!u;$("ph").hidden=!u;$("pw").autocomplete=u?"new-password":"current-password";$("go").textContent=u?"Create account":"Sign in";say("")}
+function mode(u){up=u;$("mIn").setAttribute("aria-pressed",!u);$("mUp").setAttribute("aria-pressed",u);$("wId").hidden=u;$("wEm").hidden=!u;$("wUn").hidden=!u;$("wCo").hidden=!u;$("ph").hidden=!u;$("pw").autocomplete=u?"new-password":"current-password";$("go").textContent=u?"Create account":"Sign in";say("");drawG()}
 function next(){var q=/[?&]next=([^&]+)/.exec(location.search),n=q?decodeURIComponent(q[1]):"";return/^\/app\/[a-z0-9\/_-]*$/.test(n)?n:"/app/"}
 function done(j){if(j.error){say(j.error);$("go").disabled=false;return}csrf=j.csrf||csrf;if(j.needUsername){$("f").hidden=true;$("uf").hidden=false;$("un2").focus();return}location.href=next()}
 $("mIn").onclick=function(){mode(false)};$("mUp").onclick=function(){mode(true)};
@@ -242,7 +244,8 @@ $("f").onsubmit=function(e){e.preventDefault();say("");var pw=$("pw").value,bad=
   $("go").disabled=true;api("POST","/signup",{email:em,username:un,password:pw}).then(done)}
  else{var id=$("id").value.trim();if(!id||!pw){say("Enter your email or username and password.");return}$("go").disabled=true;api("POST","/login",{id:id,password:pw}).then(done)}};
 $("uf").onsubmit=function(e){e.preventDefault();var u=$("un2").value.trim().toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(u)){say("Username: 3 to 16 letters, numbers or _.","msg2");return}api("POST","/username",{username:u}).then(function(j){if(j.error)say(j.error,"msg2");else location.href=next()})};
-function loadG(cid){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.onload=function(){try{google.accounts.id.initialize({client_id:cid,callback:function(r){say("");api("POST","/google",{credential:r.credential}).then(done)},auto_select:false});google.accounts.id.renderButton($("gbtn"),{theme:"outline",size:"large",text:"continue_with",shape:"pill",width:320});$("gw").hidden=false}catch(x){}};document.head.appendChild(s)}
+var gok=false;function drawG(){if(!gok)return;$("gbtn").textContent="";google.accounts.id.renderButton($("gbtn"),{theme:"outline",size:"large",text:up?"signup_with":"signin_with",shape:"pill",width:320})}
+function loadG(cid){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.onload=function(){try{google.accounts.id.initialize({client_id:cid,callback:function(r){say("");api("POST","/google",{credential:r.credential}).then(done)},auto_select:false});gok=true;drawG();$("gw").hidden=false}catch(x){}};document.head.appendChild(s)}
 fetch("/api/config",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(c){if(c.google)loadG(c.google);return api("GET","/me")}).then(function(j){
  if(j.__s===200){csrf=j.csrf||"";if(j.needUsername){$("f").hidden=true;$("uf").hidden=false}else{$("f").hidden=true;$("signed").hidden=false;$("who").textContent=j.username}}}).catch(function(){say("Accounts are not available on this copy of the site. You can still learn as a guest.");$("go").disabled=true});
 })();'''
@@ -257,7 +260,7 @@ def aidisc():
     rl=f'<li>Source code, issue tracker and documentation: <a href="{REPO}" rel="noopener">{REPO}</a>.</li>' if REPO else '<li>Source code, issue tracker and documentation are published in the project’s public GitHub repository.</li>'
     b=f'''<div class="wrap doc"><h1>AI disclosure</h1><p>{N} was built with generative AI. This page explains what that means, how the material is checked, and how you can help us correct mistakes.</p>
 <h2>What was made with AI</h2><ul><li>The lessons, practice questions, hints and worked explanations.</li><li>The diagrams, avatars and other illustrations, which are original vector graphics produced with code.</li><li>The website, the learning app and the account system code.</li></ul>
-<p>The AI model used was Claude, made by Anthropic. It worked under the direction of a Science Olympiad coach, who set the scope, the topics and the design goals.</p>
+<p>The AI model used was Claude, made by Anthropic. A human directed the scope, topics and design goals.</p>
 <h2>What is not AI</h2><ul><li>No AI model runs while you use {N}. The app is static code in your browser plus a small accounts service.</li><li>Your answers, progress and messages are never sent to an AI service.</li><li>The read-aloud voice is your device’s built-in text-to-speech.</li></ul>
 <h2>How the content is checked</h2><ul><li>Numeric and algebraic questions are generated from formulas, and an independent program re-solves every one to confirm the stored answer.</li><li>Automated tests confirm that every question can be answered correctly in the app and that explanations are present.</li><li>Content follows public curricula, the event rules and open university and Khan Academy material listed on the <a href="/resources/">resources page</a>.</li></ul>
 <div class="note"><b>Limits.</b> Not every item has been reviewed line by line by a subject-matter expert. AI systems can state incorrect facts with confidence. Treat {N} as practice, and confirm anything important with your textbook, teacher or the official event rules.</div>
@@ -272,7 +275,7 @@ W=lambda p,s:(os.makedirs(os.path.dirname(out+'/'+p),exist_ok=True),open(out+'/'
 W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/index.html',legal('terms'));W('accessibility/index.html',access())
 W('ai-disclosure/index.html',aidisc());W('science/index.html',science());W('resources/index.html',resources());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
-W('site.css',CSS);W('account.js',ACCJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg')
+W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg')
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"

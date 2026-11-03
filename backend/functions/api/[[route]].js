@@ -194,12 +194,271 @@ A['POST /friends/request'] = async (req, env, s) => {
 A['POST /friends/accept'] = async (req, env, s) => { const t = await target(env, await body(req)); if (t) await env.DB.prepare("UPDATE friends SET status='ok' WHERE a=? AND b=? AND status='pending'").bind(t.id, s.uid).run(); return J(await friendList(env, s.uid)); };
 A['POST /friends/remove'] = async (req, env, s) => { const t = await target(env, await body(req)); if (t) await env.DB.prepare('DELETE FROM friends WHERE (a=? AND b=?) OR (a=? AND b=?)').bind(s.uid, t.id, t.id, s.uid).run(); return J(await friendList(env, s.uid)); };
 
+/* ================= Online play: class games + versus (polling over D1; guests allowed) =================
+   Honest limits: the question bank lives in the browser, so the server cannot know the right answer. It never trusts a
+   client for more than a bounded amount: per-question points are capped, answer times are clamped to what the server
+   itself measured, one answer per player per question, late/early answers are rejected. A determined cheater can still
+   report "correct" every time. These modes are for fun and class use and only ever award cosmetic coins. */
+const CODE_AL = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const mkCode = () => { const r = rnd(6); let s = ''; for (let i = 0; i < 6; i++) s += CODE_AL[r[i] % CODE_AL.length]; return s; };
+const NICK_BAD = ['fuck', 'shit', 'bitch', 'nigg', 'fag', 'cunt', 'dick', 'porn', 'sex', 'rape', 'nazi', 'whore', 'slut', 'penis', 'vagin', 'retard', 'kkk', 'hitler', 'anal', 'cock', 'pussy'];
+function cleanNick(n) {
+  n = String(n == null ? '' : n).replace(/\s+/g, ' ').trim();
+  if (!/^[A-Za-z0-9][A-Za-z0-9 _.-]{1,15}$/.test(n)) return null;
+  const f = n.toLowerCase().replace(/[^a-z0-9$@!]/g, '').replace(/0/g, 'o').replace(/[1!]/g, 'i').replace(/3/g, 'e').replace(/4|@/g, 'a').replace(/5|\$/g, 's');
+  if (NICK_BAD.some((w) => f.includes(w))) return null;
+  return n;
+}
+const okPack = (p) => typeof p === 'string' && /^[a-z0-9-]{3,40}$/.test(p);
+const okIds = (a, max) => Array.isArray(a) && a.length >= 1 && a.length <= max && a.every((x) => typeof x === 'string' && /^[A-Za-z0-9._-]{2,40}$/.test(x));
+const okAv = (a) => (typeof a === 'string' && /^[a-z0-9]{1,8}$/.test(a) ? a : 'a0');
+const cleanLims = (l, n, def) => { const out = []; for (let i = 0; i < n; i++) { const v = Array.isArray(l) ? +l[i] : NaN; out.push(Number.isFinite(v) ? Math.max(8000, Math.min(90000, Math.round(v))) : def); } return out; };
+const gTok = () => hex(rnd(16));
+const nowMs = () => Date.now();
+const ROOM_TTL = 3 * 3600 * 1000, MAX_PLAYERS = 60, SEEN_OK = 15000, LATE_GRACE = 2500;
+const MEM = new Map();
+function memRate(k, max, win) { const n = nowMs(), e = MEM.get(k); if (!e || n - e.t > win) { MEM.set(k, { t: n, c: 1 }); if (MEM.size > 5000) for (const [kk, v] of MEM) if (n - v.t > win) MEM.delete(kk); return true; } return ++e.c <= max; }
+const changed = (r) => (r && r.meta && typeof r.meta.changes === 'number' ? r.meta.changes : 1);
+const gtokOf = (req) => { const t = req.headers.get('x-gtok') || ''; return /^[a-f0-9]{32}$/.test(t) ? t : null; };
+function h32(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+const pr = (s) => (h32(s) % 10007) / 10007;
+
+async function gcOnline(env) {
+  const n = nowMs();
+  await env.DB.prepare('DELETE FROM room_answers WHERE code IN (SELECT code FROM rooms WHERE exp<?)').bind(n).run();
+  await env.DB.prepare('DELETE FROM room_players WHERE code IN (SELECT code FROM rooms WHERE exp<?)').bind(n).run();
+  await env.DB.prepare('DELETE FROM rooms WHERE exp<?').bind(n).run();
+  await env.DB.prepare('DELETE FROM vs_queue WHERE t<?').bind(n - 90000).run();
+}
+async function loadRoom(env, code) {
+  if (typeof code !== 'string' || !/^[A-Z2-9]{6}$/.test(code)) return null;
+  const r = await env.DB.prepare('SELECT * FROM rooms WHERE code=?').bind(code).first();
+  if (!r || r.exp < nowMs()) return null;
+  try { r.qids = JSON.parse(r.qids); r.lims = JSON.parse(r.lims); } catch { return null; }
+  return r;
+}
+async function who(env, room, tok) {
+  const th = await sha(tok), isHost = th === room.host;
+  const me = await env.DB.prepare('SELECT * FROM room_players WHERE code=? AND tok=?').bind(room.code, th).first();
+  return { th, isHost, me };
+}
+async function makeRoom(env, o) { /* o: mode, pack, host(hash), qids, lims, state, qi, qat, players:[{nick,tok,av,bot,acc,spd}] */
+  for (let a = 0; a < 6; a++) {
+    const code = mkCode(), n = nowMs();
+    try {
+      await env.DB.prepare('INSERT INTO rooms(code,mode,pack,host,qids,lims,state,qi,qat,rat,bots,created,exp) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        .bind(code, o.mode, o.pack, o.host, JSON.stringify(o.qids), JSON.stringify(o.lims), o.state, o.qi, o.qat, 0, o.players.filter((p) => p.bot).length, n, n + ROOM_TTL).run();
+    } catch (e) { continue; }
+    for (const p of o.players) await env.DB.prepare('INSERT INTO room_players(code,nick,tok,av,bot,acc,spd,seen) VALUES(?,?,?,?,?,?,?,?)').bind(code, p.nick, p.tok, p.av, p.bot ? 1 : 0, p.acc || 0, p.spd || 0, n).run();
+    return code;
+  }
+  throw new Error('code');
+}
+async function addPts(env, room, p, ok, ms) {
+  const lim = room.lims[room.qi] || 20000, streak = ok ? p.streak + 1 : 0;
+  const pts = ok ? Math.min(1200, 500 + Math.round(500 * Math.max(0, 1 - ms / lim)) + Math.min(p.streak, 4) * 50) : 0;
+  const ins = await env.DB.prepare('INSERT OR IGNORE INTO room_answers(code,pid,qi,ok,ms,pts) VALUES(?,?,?,?,?,?)').bind(room.code, p.id, room.qi, ok ? 1 : 0, ms, pts).run();
+  if (changed(ins) < 1) return null; /* one answer per player per question */
+  await env.DB.prepare('UPDATE room_players SET score=score+?,right=right+?,streak=?,seen=? WHERE id=?').bind(pts, ok ? 1 : 0, streak, nowMs(), p.id).run();
+  return pts;
+}
+async function botsAnswer(env, room) {
+  if (!room.bots || room.state !== 'q') return;
+  const n = nowMs(), el = n - room.qat; if (el < 800) return;
+  const lim = room.lims[room.qi] || 20000;
+  const bs = (await env.DB.prepare('SELECT p.* FROM room_players p WHERE p.code=? AND p.bot=1 AND NOT EXISTS(SELECT 1 FROM room_answers a WHERE a.code=p.code AND a.pid=p.id AND a.qi=?)').bind(room.code, room.qi).all()).results;
+  for (const b of bs) {
+    const d = Math.max(1500, Math.min(lim - 1500, lim * b.spd * (0.6 + 0.8 * pr(room.code + b.id + 'd' + room.qi))));
+    if (el >= d) await addPts(env, room, b, pr(room.code + b.id + 'a' + room.qi) < b.acc, Math.round(d));
+  }
+}
+async function setReveal(env, room) {
+  const n = nowMs();
+  const r = await env.DB.prepare("UPDATE rooms SET state='reveal',rat=? WHERE code=? AND state='q' AND qi=?").bind(n, room.code, room.qi).run();
+  if (changed(r) > 0) { room.state = 'reveal'; room.rat = n; }
+  else { const f = await loadRoom(env, room.code); if (f) Object.assign(room, f); }
+}
+async function maybeReveal(env, room, full) {
+  if (room.state !== 'q') return;
+  await botsAnswer(env, room);
+  const lim = room.lims[room.qi] || 20000, n = nowMs();
+  let rev = n - room.qat >= lim + LATE_GRACE;
+  if (!rev && (full || room.bots)) {
+    const c = await env.DB.prepare('SELECT (SELECT COUNT(*) FROM room_players WHERE code=? AND (bot=1 OR seen>?)) pl,(SELECT COUNT(*) FROM room_answers a JOIN room_players p ON p.id=a.pid WHERE a.code=? AND a.qi=? AND (p.bot=1 OR p.seen>?)) an').bind(room.code, n - SEEN_OK, room.code, room.qi, n - SEEN_OK).first();
+    if (c && c.pl > 0 && c.an >= c.pl) rev = true;
+  }
+  if (rev) await setReveal(env, room);
+}
+async function nextQ(env, room) { /* from lobby or reveal */
+  const n = nowMs(), last = room.qi + 1 >= room.qids.length;
+  let r;
+  if (room.state === 'lobby') r = await env.DB.prepare("UPDATE rooms SET state='q',qi=0,qat=? WHERE code=? AND state='lobby'").bind(n, room.code).run();
+  else if (last) r = await env.DB.prepare("UPDATE rooms SET state='done',rat=? WHERE code=? AND state='reveal' AND qi=?").bind(n, room.code, room.qi).run();
+  else r = await env.DB.prepare("UPDATE rooms SET state='q',qi=qi+1,qat=? WHERE code=? AND state='reveal' AND qi=?").bind(n, room.code, room.qi).run();
+  const f = await loadRoom(env, room.code); if (f) Object.assign(room, f);
+  return changed(r) > 0;
+}
+async function roomView(env, room, w) {
+  const n = nowMs(), v = { mode: room.mode, code: room.code, state: room.state, qi: room.qi, n: room.qids.length, lim: room.lims[Math.max(0, room.qi)] || 20000, qat: room.qat, rat: room.rat, t: n, host: w.isHost, player: !!w.me };
+  if (room.state === 'q' || room.state === 'reveal') v.qid = room.qids[room.qi];
+  if (room.state === 'q') {
+    if (w.isHost) { const c = await env.DB.prepare('SELECT (SELECT COUNT(*) FROM room_players WHERE code=?) np,(SELECT COUNT(*) FROM room_answers WHERE code=? AND qi=?) an').bind(room.code, room.code, room.qi).first(); v.np = c.np; v.an = c.an; }
+    if (w.me) { const a = await env.DB.prepare('SELECT ok,pts FROM room_answers WHERE code=? AND pid=? AND qi=?').bind(room.code, w.me.id, room.qi).first(); if (a) { v.done = 1; v.mine = { ok: a.ok, pts: a.pts }; } }
+    if (room.mode === 'vs') { const o = await env.DB.prepare('SELECT nick,bot,av,score FROM room_players WHERE code=? AND id<>? LIMIT 1').bind(room.code, w.me ? w.me.id : 0).first(); if (o) v.opp = { n: o.nick, b: o.bot, av: o.av, s: o.score }; }
+  } else {
+    const qi = room.state === 'reveal' ? room.qi : -1;
+    const rows = (await env.DB.prepare('SELECT p.nick n,p.score s,p.right r,p.bot b,p.av av,a.ok k,a.pts p FROM room_players p LEFT JOIN room_answers a ON a.pid=p.id AND a.code=p.code AND a.qi=? WHERE p.code=? ORDER BY p.score DESC,p.right DESC,p.id LIMIT ?').bind(qi, room.code, MAX_PLAYERS).all()).results;
+    v.players = rows.map((r) => ({ n: r.n, s: r.s, r: r.r, b: r.b, av: r.av, k: r.k === null || r.k === undefined ? null : r.k, p: r.p || 0 }));
+  }
+  if (w.me) { v.me = { n: w.me.nick, s: w.me.score, r: w.me.right, av: w.me.av }; if (v.players) { const i = v.players.findIndex((x) => x.n === w.me.nick); v.me.rank = i + 1; } }
+  return v;
+}
+const G = {};
+G['GET /ping'] = async () => J({ ok: 1, t: nowMs() });
+G['POST /room/create'] = async (req, env, ip) => {
+  if (!(await rate(env, 'rc:' + ip, 20, 3600))) return J({ error: 'Too many games started from this network. Try again later.' }, 429);
+  const b = await body(req, 8000);
+  if (!okPack(b.pack) || !okIds(b.qids, 40)) return J({ error: 'Bad game setup.' }, 400);
+  const lims = cleanLims(b.lims, b.qids.length, 25000), tok = gTok(), th = await sha(tok);
+  let nick = null; if (b.nick !== undefined && b.nick !== null && b.nick !== '') { nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2-16 letters or numbers).' }, 400); }
+  await gcOnline(env);
+  const code = await makeRoom(env, { mode: 'class', pack: b.pack, host: th, qids: b.qids, lims, state: 'lobby', qi: -1, qat: 0, players: nick ? [{ nick, tok: th, av: okAv(b.av) }] : [] });
+  return J({ code, tok, host: true, player: !!nick });
+};
+G['POST /room/join'] = async (req, env, ip) => {
+  if (!(await rate(env, 'rj:' + ip, 300, 3600))) return J({ error: 'Too many tries. Wait a bit.' }, 429);
+  const b = await body(req, 600), code = String(b.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2-16 letters or numbers).' }, 400);
+  const room = await loadRoom(env, code);
+  if (!room || room.mode !== 'class') return J({ error: 'No game with that code.' }, 404);
+  if (b.pack && b.pack !== room.pack) return J({ error: 'That game is for a different trainer.' }, 409);
+  if (room.state === 'done') return J({ error: 'That game has ended.' }, 409);
+  const cnt = await env.DB.prepare('SELECT COUNT(*) c FROM room_players WHERE code=?').bind(code).first();
+  if (cnt.c >= MAX_PLAYERS) return J({ error: 'That game is full.' }, 409);
+  const tok = gTok(), th = await sha(tok);
+  try { await env.DB.prepare('INSERT INTO room_players(code,nick,tok,av,seen) VALUES(?,?,?,?,?)').bind(code, nick, th, okAv(b.av), nowMs()).run(); }
+  catch (e) { return J({ error: 'That name is taken in this game.' }, 409); }
+  return J({ code, tok, pack: room.pack });
+};
+G['GET /room/state'] = async (req, env) => {
+  const tok = gtokOf(req); if (!tok) return J({ error: 'Not in a game.' }, 401);
+  const url = new URL(req.url), code = (url.searchParams.get('code') || '').toUpperCase();
+  if (!memRate('st:' + tok, 150, 60000)) return J({ error: 'Slow down.' }, 429);
+  const room = await loadRoom(env, code); if (!room) return J({ gone: 1, error: 'This game has ended.' }, 404);
+  const w = await who(env, room, tok); if (!w.isHost && !w.me) return J({ error: 'Not in this game.' }, 401);
+  if (w.me && nowMs() - w.me.seen > 8000) await env.DB.prepare('UPDATE room_players SET seen=? WHERE id=?').bind(nowMs(), w.me.id).run();
+  await maybeReveal(env, room, false);
+  if (room.mode === 'vs' && room.state === 'reveal' && nowMs() - room.rat >= 3500) await nextQ(env, room);
+  return J(await roomView(env, room, w));
+};
+G['POST /room/answer'] = async (req, env) => {
+  const tok = gtokOf(req); if (!tok) return J({ error: 'Not in a game.' }, 401);
+  if (!memRate('an:' + tok, 90, 60000)) return J({ error: 'Slow down.' }, 429);
+  const b = await body(req, 400), room = await loadRoom(env, String(b.code || '').toUpperCase());
+  if (!room) return J({ gone: 1, error: 'This game has ended.' }, 404);
+  const w = await who(env, room, tok); if (!w.me) return J({ error: 'Not a player here.' }, 403);
+  await maybeReveal(env, room, false);
+  if (room.state !== 'q' || room.qi !== (b.qi | 0)) return J({ late: 1, state: room.state, qi: room.qi });
+  const lim = room.lims[room.qi] || 20000, n = nowMs(), el = n - room.qat;
+  if (el < -300) return J({ late: 1, state: room.state, qi: room.qi });
+  const ms = Math.max(500, Math.min(lim, Math.round(+b.ms) || lim, Math.max(500, el + 400)));
+  const pts = await addPts(env, room, w.me, b.ok === true || b.ok === 1, ms);
+  if (pts === null) return J({ dup: 1 });
+  await maybeReveal(env, room, true);
+  return J({ ok: 1, pts, state: room.state });
+};
+G['POST /room/next'] = async (req, env) => {
+  const tok = gtokOf(req); if (!tok) return J({ error: 'Not in a game.' }, 401);
+  const b = await body(req, 300), room = await loadRoom(env, String(b.code || '').toUpperCase());
+  if (!room || room.mode !== 'class') return J({ gone: 1, error: 'This game has ended.' }, 404);
+  const w = await who(env, room, tok); if (!w.isHost) return J({ error: 'Only the host can do that.' }, 403);
+  if (room.state === 'lobby') { const c = await env.DB.prepare('SELECT COUNT(*) c FROM room_players WHERE code=?').bind(room.code).first(); if (!c.c) return J({ error: 'Wait for at least one player to join.' }, 409); await nextQ(env, room); }
+  else if (room.state === 'q') await setReveal(env, room);
+  else if (room.state === 'reveal') await nextQ(env, room);
+  return J(await roomView(env, room, w));
+};
+G['POST /room/end'] = async (req, env) => {
+  const tok = gtokOf(req); if (!tok) return J({ error: 'Not in a game.' }, 401);
+  const b = await body(req, 300), room = await loadRoom(env, String(b.code || '').toUpperCase());
+  if (!room) return J({ ok: 1 });
+  const w = await who(env, room, tok); if (!w.isHost && !(room.mode === 'vs' && w.me)) return J({ error: 'Only the host can do that.' }, 403);
+  await env.DB.prepare("UPDATE rooms SET state='done',rat=? WHERE code=?").bind(nowMs(), room.code).run();
+  return J({ ok: 1 });
+};
+/* ---- versus ---- */
+const BOT_NAMES = ['Volt', 'Nova', 'Quark', 'Echo', 'Pixel', 'Vector', 'Ion', 'Delta', 'Orbit', 'Sigma', 'Prism', 'Axis'];
+async function vsRoom(env, a, b) { /* a,b: {nick,th,av} or b bot */
+  const qids = JSON.parse(a.qids), lims = JSON.parse(a.lims);
+  let n2 = b.nick; if (n2.toLowerCase() === a.nick.toLowerCase()) n2 = (n2.slice(0, 14) + ' 2').slice(0, 16);
+  return makeRoom(env, { mode: 'vs', pack: a.pack, host: 'vs', qids, lims, state: 'q', qi: 0, qat: nowMs() + 3000, players: [{ nick: a.nick, tok: a.th, av: a.av }, { nick: n2, tok: b.th, av: b.av, bot: b.bot, acc: b.acc, spd: b.spd }] });
+}
+G['POST /vs/queue'] = async (req, env, ip) => {
+  if (!(await rate(env, 'vq:' + ip, 240, 3600))) return J({ error: 'Too many tries. Wait a bit.' }, 429);
+  const b = await body(req, 4000);
+  const nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2-16 letters or numbers).' }, 400);
+  if (!okPack(b.pack) || !okIds(b.qids, 12)) return J({ error: 'Bad match request.' }, 400);
+  const lims = cleanLims(b.lims, b.qids.length, 25000), tok = gTok(), th = await sha(tok), n = nowMs();
+  const me = { nick, th, av: okAv(b.av), pack: b.pack, qids: JSON.stringify(b.qids), lims: JSON.stringify(lims) };
+  await gcOnline(env);
+  if (!b.bot) {
+    const cand = await env.DB.prepare('SELECT * FROM vs_queue WHERE pack=? AND match IS NULL AND t>? AND th<>? ORDER BY t LIMIT 1').bind(b.pack, n - 12000, th).first();
+    if (cand) {
+      const code = await vsRoom(env, cand, me);
+      const c = await env.DB.prepare('UPDATE vs_queue SET match=? WHERE th=? AND match IS NULL').bind(code, cand.th).run();
+      if (changed(c) > 0) return J({ tok, matched: true, code });
+      await env.DB.prepare('DELETE FROM room_answers WHERE code=?').bind(code).run(); await env.DB.prepare('DELETE FROM room_players WHERE code=?').bind(code).run(); await env.DB.prepare('DELETE FROM rooms WHERE code=?').bind(code).run();
+    }
+    await env.DB.prepare('INSERT INTO vs_queue(th,pack,nick,av,qids,lims,lvl,bav,t,match) VALUES(?,?,?,?,?,?,?,?,?,NULL)').bind(th, me.pack, nick, me.av, me.qids, me.lims, Math.max(0.2, Math.min(0.98, +b.lvl || 0.6)), okAv(b.bav), n).run();
+    return J({ tok, matched: false });
+  }
+  const row = { ...me, lvl: Math.max(0.2, Math.min(0.98, +b.lvl || 0.6)), bav: okAv(b.bav) };
+  const code = await botRoom(env, row);
+  return J({ tok, matched: true, code, bot: true });
+};
+async function botRoom(env, row) { /* row: nick, th, av, pack, qids, lims, lvl, bav */
+  const name = BOT_NAMES[h32(row.th) % BOT_NAMES.length] + ' (bot)';
+  const acc = Math.max(0.3, Math.min(0.93, row.lvl * 0.95 + 0.04 + (pr(row.th + 'acc') - 0.5) * 0.12));
+  const spd = 0.28 + 0.3 * pr(row.th + 'spd');
+  return vsRoom(env, row, { nick: name, th: 'bot:' + gTok(), av: row.bav, bot: 1, acc, spd });
+}
+G['GET /vs/status'] = async (req, env) => {
+  const tok = gtokOf(req); if (!tok) return J({ error: 'Not in the queue.' }, 401);
+  if (!memRate('vs:' + tok, 120, 60000)) return J({ error: 'Slow down.' }, 429);
+  const th = await sha(tok), row = await env.DB.prepare('SELECT match,t FROM vs_queue WHERE th=?').bind(th).first();
+  if (!row) return J({ gone: 1 });
+  if (row.match) return J({ code: row.match });
+  return J({ waiting: 1, waited: nowMs() - row.t });
+};
+G['POST /vs/bot'] = async (req, env) => {
+  const tok = gtokOf(req); if (!tok) return J({ error: 'Not in the queue.' }, 401);
+  if (!memRate('vb:' + tok, 20, 60000)) return J({ error: 'Slow down.' }, 429);
+  const th = await sha(tok), row = await env.DB.prepare('SELECT * FROM vs_queue WHERE th=?').bind(th).first();
+  if (!row) return J({ gone: 1 });
+  if (row.match) return J({ code: row.match });
+  if (nowMs() - row.t < 6000) return J({ waiting: 1, waited: nowMs() - row.t });
+  const code = await botRoom(env, row);
+  const c = await env.DB.prepare('UPDATE vs_queue SET match=? WHERE th=? AND match IS NULL').bind(code, th).run();
+  if (changed(c) > 0) return J({ code, bot: true });
+  await env.DB.prepare('DELETE FROM room_answers WHERE code=?').bind(code).run(); await env.DB.prepare('DELETE FROM room_players WHERE code=?').bind(code).run(); await env.DB.prepare('DELETE FROM rooms WHERE code=?').bind(code).run();
+  const r2 = await env.DB.prepare('SELECT match FROM vs_queue WHERE th=?').bind(th).first();
+  return J(r2 && r2.match ? { code: r2.match } : { waiting: 1 });
+};
+G['POST /vs/cancel'] = async (req, env) => {
+  const tok = gtokOf(req); if (tok) await env.DB.prepare('DELETE FROM vs_queue WHERE th=? AND match IS NULL').bind(await sha(tok)).run();
+  return J({ ok: 1 });
+};
+
 export async function onRequest({ request, env }) {
   const url = new URL(request.url), path = url.pathname.replace(/^\/api/, '') || '/', key = request.method + ' ' + path;
   try {
-    if (!env.DB || !env.PEPPER) return J({ error: 'Accounts are not configured.' }, 503);
     const ip = request.headers.get('cf-connecting-ip') || 'x';
     if (request.method === 'POST') { const o = request.headers.get('origin'); if (o && o !== url.origin) return J({ error: 'forbidden' }, 403); }
+    if (G[key]) { /* online play needs only the database: guests may play without accounts */
+      if (!env.DB) return J({ error: 'Online play is not available here.' }, 503);
+      if (request.method === 'POST' && !(request.headers.get('content-type') || '').startsWith('application/json')) return J({ error: 'bad type' }, 415);
+      return await G[key](request, env, ip);
+    }
+    if (!env.DB || !env.PEPPER) return J({ error: 'Accounts are not configured.' }, 503);
     if (R[key]) { if (request.method === 'POST' && !(request.headers.get('content-type') || '').startsWith('application/json')) return J({ error: 'bad type' }, 415); return await R[key](request, env, ip); }
     if (A[key]) {
       const s = await auth(request, env); if (!s) return J({ error: 'Sign in required.' }, 401);

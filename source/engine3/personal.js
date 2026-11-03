@@ -34,7 +34,7 @@ function withMain(fn){var keep=UN;UN=FULL.filter(function(u){return !REF||!REF[u
 if(REF){var _nl=nextLesson;nextLesson=function(){return withMain(_nl)}}
 var _vl=viewLearn;
 viewLearn=function(){var h=withMain(_vl);
- if(!S.dg)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Placement check</b><div class="small mute">One question per topic. Sets your starting path.</div></div><button class="btn sm" id="dgs">Start</button><button class="btn sec sm" id="dgx" aria-label="Skip">Skip</button></div>$1');
+ if(!S.dg)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Placement check</b></div><button class="btn sm" id="dgs">Start</button><button class="btn sec sm" id="dgx" aria-label="Skip">Skip</button></div>$1');
  var tgt=M.target;if(tgt){var left=0;FULL.forEach(function(u){if(REF&&REF[u.id]&&!refWhy(u.id))return;var us=S.un[u.id]||{d:{}};u.lessons.forEach(function(L){if(!us.d[L.id])left++})});var wk=Math.max(1,(new Date(tgt+'T12:00:00')-Date.now())/6048e5),need=Math.ceil(left/wk),did=0;for(var i=0;i<7;i++){var dk=new Date();dk.setDate(dk.getDate()-i);var k=dk.getFullYear()+'-'+('0'+(dk.getMonth()+1)).slice(-2)+'-'+('0'+dk.getDate()).slice(-2);did+=S.ld[k]||0}
   h=h.replace(/(<div class="cont">)/,'<div class="pace"><span>'+left+' lessons left · '+need+'/week to finish by spring</span><b class="'+(did>=need?'ok':'')+'">'+did+' this week</b></div>$1')}
  var rf=refUnits().filter(function(u){return !refWhy(u.id)});
@@ -44,9 +44,15 @@ viewLearn=function(){var h=withMain(_vl);
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('[data-rfu]');if(r){S.rfu[r.dataset.rfu]=1;save();toast&&toast('Added to your path');route();return}
  if(e.target.id==='dgs')startDiag();if(e.target.id==='dgx'){S.dg='skip';save();route()}});
 /* placement check */
-function startDiag(){var steps=[],used=[];ALL.forEach(function(t){var qs=QS.filter(function(q){return q.t===t&&(q.type==='mcq'||q.type==='short')&&q.l<=2}).sort(function(a,b){return (a.b!==undefined?a.b:LB[a.l])-(b.b!==undefined?b.b:LB[b.l])});if(!qs.length)return;var q=qs[Math.floor(qs.length*.5)];steps.push({k:'try',it:mkItem(q.id)})});
+function startDiag(){var steps=[],used=[],FT=['mcq','short','order','match','slider','angle','point','chips','graph','compass','multi','proof'],bf=function(q){return q.b!==undefined?q.b:LB[q.l]},k=0,seen={};
+ ALL.forEach(function(t){var all=QS.filter(function(q){return q.t===t&&q.l<=2}).sort(function(a,b){return bf(a)-bf(b)});if(!all.length)return;var pick=null;
+  for(var j=0;j<FT.length&&!pick;j++){var ty=FT[(k+j)%FT.length],c=all.filter(function(q){return q.type===ty&&used.indexOf(q.id)<0});if(c.length){pick=c[Math.floor(c.length*.5)];}}
+  if(!pick)pick=all[Math.floor(all.length*.5)];used.push(pick.id);seen[pick.type]=(seen[pick.type]||0)+1;k++;steps.push({k:'try',it:mkItem(pick.id)})});
+ /* make sure every available format is sampled at least twice; extra probes do not change topic placement */
+ FT.forEach(function(ty){var need=2-(seen[ty]||0);if(need<=0)return;var c=QS.filter(function(q){return q.type===ty&&q.l<=2&&used.indexOf(q.id)<0});for(var i=0;i<need&&c.length;i++){var q=c.splice(Math.floor(Math.random()*c.length),1)[0];used.push(q.id);steps.push({k:'try',it:mkItem(q.id),probe:1})}});
+ for(var i=steps.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=steps[i];steps[i]=steps[j];steps[j]=x}
  startSess({kind:'diag',title:'Placement check',steps:steps,nofb:true})}
-var _fs=finishSess;finishSess=function(){var z=Z;var was=z&&z.fin;_fs.apply(this,arguments);if(z&&!was&&z.fin){if(z.kind==='diag'){S.dgr={};z.steps.forEach(function(s){if(s.k!=='try')return;var t=s.it.q.t,ok=!!s.it.ok;S.dgr[t]=ok?1:0;S.th[t]=ok?.9:-.9;S.ema[t]=ok?.8:.3;S.rn[t]=0});S.dg=today()}
+var _fs=finishSess;finishSess=function(){var z=Z;var was=z&&z.fin;_fs.apply(this,arguments);if(z&&!was&&z.fin){if(z.kind==='diag'){S.dgr={};z.steps.forEach(function(s){if(s.k!=='try'||s.probe)return;var t=s.it.q.t,ok=!!s.it.ok;S.dgr[t]=ok?1:0;S.th[t]=ok?.9:-.9;S.ema[t]=ok?.8:.3;S.rn[t]=0});S.dg=today()}
   if(z.kind==='lesson'){S.ld[today()]=(S.ld[today()]||0)+1}save()}};
-var _dr=drawResults;drawResults=function(top){_dr(top);var z=Z;if(!z||z.kind!=='diag'||!z.sumDone)return;var s=$('sess'),good=[],need=[];ALL.forEach(function(t){if(S.dgr&&S.dgr[t]===1)good.push(TOP[t].name);else if(S.dgr&&S.dgr[t]===0)need.push(TOP[t].name)});var b=s.querySelector('.s-body');if(b)b.insertAdjacentHTML('afterbegin','<div class="card"><h3>Your starting point</h3>'+(need.length?'<p><b>Start with:</b> '+need.slice(0,6).map(esc).join(' · ')+'</p>':'')+(good.length?'<p><b>Already strong:</b> '+good.slice(0,8).map(esc).join(' · ')+'</p>':'')+'<p class="small mute">Strong topics get shorter, harder lessons. Others get extra steps.</p></div>')};
+var _dr=drawResults;drawResults=function(top){_dr(top);var z=Z;if(!z||z.kind!=='diag'||!z.sumDone)return;var s=$('sess'),good=[],need=[];ALL.forEach(function(t){if(S.dgr&&S.dgr[t]===1)good.push(TOP[t].name);else if(S.dgr&&S.dgr[t]===0)need.push(TOP[t].name)});var b=s.querySelector('.s-body');if(b)b.insertAdjacentHTML('afterbegin','<div class="card"><h3>Your starting point</h3>'+(need.length?'<p><b>Start with:</b> '+need.slice(0,6).map(esc).join(' · ')+'</p>':'')+(good.length?'<p><b>Already strong:</b> '+good.slice(0,8).map(esc).join(' · ')+'</p>':'')+'</div>')};
 })();

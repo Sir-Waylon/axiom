@@ -21,7 +21,7 @@ var _aa=appendAdaptive;appendAdaptive=function(){_aa.apply(this,arguments);if(Z&
 var _vl2=viewLearn;viewLearn=function(){var h=_vl2();
  if(S.rs){var u=UN.filter(function(x){return x.id===S.rs.u})[0],L=u&&u.lessons.filter(function(x){return x.id===S.rs.l})[0];if(L)h=h.replace('<details class="unit"','<div class="cont resume"><div style="flex:1"><div class="small" style="opacity:.9">Pick up where you left off</div><h2>'+esc(L.title)+'</h2></div><button class="btn" id="rsm">Continue</button></div><details class="unit"')}
  return h};
-var _vp=viewPractice;viewPractice=function(){var h=_vp();return h.replace('<button class="card" data-pm="blitz"','<button class="card" data-pm="endless" style="text-align:left"><h3>Endless</h3><p class="small mute">Never runs out. Skill checks and breaks.</p></button><button class="card" data-pm="blitz"')};
+var _vp=viewPractice;viewPractice=function(){var h=_vp();return h.replace('<button class="card" data-pm="blitz"','<button class="card" data-pm="endless" style="text-align:left"><h3>Endless</h3></button><button class="card" data-pm="blitz"')};
 document.addEventListener('click',function(e){var t=e.target;
  if(t.id==='rsm'){resumeNow();return}
  var pm=t.closest&&t.closest('[data-pm="endless"]');if(pm){e.stopPropagation();startEndless()}},true);

@@ -135,7 +135,7 @@ function drawSess(){
   h+='<div class="card lesson-card"><div class="row" style="margin-bottom:6px">'+mascot(S.cos.on.av,'think',52)+'<span class="tag">'+esc(z.unit.title)+'</span></div><h2>'+esc(c.h)+'</h2><p class="lc">'+esc(c.t)+'</p>'+(c.f?'<div class="fml">'+esc(c.f)+'</div>':'')+'</div>';
   var nx=z.steps[z.i+1];sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="go">'+(nx&&nx.k==='try'?'Try it':'Continue')+'</button></div></div></div>'}
  else if(st.k==='explain'){var it=st.it,q=it.q,hc=helpCard(q);
-  if(st.ex){var q2=st.it.q;h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Worked example</h2></div><p class="small mute">Study how this one is solved. Then go back to yours.</p>'+(q2.svg?'<div class="fig">'+q2.svg+'</div>':'')+'<p class="lc" style="font-size:1.1rem"><b>'+esc(q2.q)+'</b></p>';
+  if(st.ex){var q2=st.it.q;h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Worked example</h2></div>'+(q2.svg?'<div class="fig">'+q2.svg+'</div>':'')+'<p class="lc" style="font-size:1.1rem"><b>'+esc(q2.q)+'</b></p>';
    var ss=q2.sol&&q2.sol.length?q2.sol:[q2.w||''];ss.slice(0,st.sh).forEach(function(t,k){h+='<div class="step"><b>Step '+(k+1)+'</b> '+clz(t,k===st.sh-1)+'</div>'});var mr=st.sh<ss.length;if(!mr)h+='<p class="small"><b>Answer:</b> '+esc(ansText(q2))+'</p>';
    sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(mr?'exs':'exb')+'">'+(mr?'Next step':'Back to my question')+'</button></div></div></div>';h+='</div>'}
   else{
@@ -165,7 +165,7 @@ function helpBox(it){var q=it.q,n=it.help,hc=helpCard(q),h='<div class="help"><b
  h+='<p class="small"><b>1.</b> '+esc(STUDY.stuck[0])+' '+esc(STUDY.stuck[1])+'</p>';
  if(n>=2&&hc)h+='<p class="small"><b>2. '+esc(hc.h)+'.</b> '+esc(hc.t)+(hc.f?' <code>'+esc(hc.f)+'</code>':'')+'</p>';
  if(n>=3)h+='<p class="small"><b>3.</b> '+(q.type==='mcq'?'Two wrong choices are gone. ':'')+esc(STUDY.stuck[2])+'</p>';
- return h+'<p class="small mute">A hint halves the XP for this question.</p></div>'}
+ return h+'</div>'}
 function drawResults(top){
  var z=Z,s=$('sess'),tr=z.steps.filter(function(x){return x.k==='try'&&x.it.done&&!x.it.skipped}),all=z.steps.filter(function(x){return x.k==='try'}),by={},h=top+'<div class="s-body">',pass=z.kind==='unit'?z.pct>=70:true;
  tr.forEach(function(x){var t=x.it.q.t;by[t]=by[t]||[0,0];by[t][1]++;if(x.it.ok)by[t][0]++});

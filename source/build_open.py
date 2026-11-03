@@ -4,7 +4,7 @@ import json,sys,os,hashlib,shutil
 d=os.path.dirname(os.path.abspath(__file__))+'/engine3/'
 out=sys.argv[1];packs=[a.split('=',1) for a in sys.argv[2:]]
 shutil.rmtree(out,ignore_errors=True);os.makedirs(out)
-css=open(d+'app.css',encoding='utf8').read()+open(d+'roster.css',encoding='utf8').read()
+css=open(d+'app.css',encoding='utf8').read()+open(d+'roster.css',encoding='utf8').read()+open(d+'widgets.css',encoding='utf8').read()
 rd=lambda f:open(d+f,encoding='utf8').read()
 ver=hashlib.sha1((css+''.join(rd(f) for f in os.listdir(d))).encode()).hexdigest()[:8]
 files=['sw.js','manifest.webmanifest','icon.svg','hub.css','index.html']
@@ -19,7 +19,7 @@ for slug,pp in packs:
     D=out if ROOT else f'{out}/{slug}';P_='' if ROOT else '../';S_='' if ROOT else slug+'/'
     os.makedirs(D,exist_ok=True)
     SIB=[] if os.environ.get('ROOT')=='1' else [dict(slug=s_,brand=json.load(open(p_,encoding='utf8'))['meta'].get('brand',s_),tag=json.load(open(p_,encoding='utf8'))['meta'].get('tagline','').split(' · ')[0],acc=json.load(open(p_,encoding='utf8'))['meta'].get('accent',['#5b4bff'])[0]) for s_,p_ in packs]
-    js='var __SIB='+json.dumps(SIB)+';\n'+rd('sec_open.js').replace('__PACK_ID__',json.dumps(m['id']))+'\n'+''.join(rd(f)+'\n' for f in ['core.js','fig.js','char.js','roster1.js','session.js','brain.js','app.js','roster2.js','labs.js','audio.js','itypes.js','itypes2.js','rewards.js','tools.js','personal.js','style.js','accounts.js','refs.js','stn_core.js','stn_circ1.js','stn_circ2.js','stn_met1.js','stn_met2.js','extras.js','tracks.js','shorts.js','a11y.js'])
+    js='var __SIB='+json.dumps(SIB)+';\n'+rd('sec_open.js').replace('__PACK_ID__',json.dumps(m['id']))+'\n'+''.join(rd(f)+'\n' for f in ['core.js','fig.js','char.js','roster1.js','session.js','brain.js','app.js','roster2.js','labs.js','audio.js','itypes.js','itypes2.js','rewards.js','widgets.js','tools.js','personal.js','style.js','accounts.js','refs.js','stn_core.js','stn_circ1.js','stn_circ2.js','stn_met1.js','stn_met2.js','extras.js','tracks.js','shorts.js','a11y.js'])
     js=js.replace('__PACK__',json.dumps(pack,ensure_ascii=False,separators=(',',':')).replace('</','<\\/'))
     js='(function(){"use strict";\n'+js+'\n})();' if os.environ.get('WRAP') else js
     hj=hashlib.sha1(js.encode()).hexdigest()[:8];hc=ver

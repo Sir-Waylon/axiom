@@ -31,15 +31,11 @@ var _cpF=coachPick;coachPick=function(o){
 function famStats(){return FAM.map(function(f){var n=0,w=0,ok=0;f[1].forEach(function(t){var x=S.fm[t];if(x){n+=x.n;w+=x.res*x.n;ok+=x.ok}});return{name:f[0],desc:f[2],n:n,res:n?w/n:0,acc:n?ok/n:0}})}
 function styleHTML(){var fs=famStats(),tot=fs.reduce(function(a,f){return a+f.n},0);
  var h='<div class="card"><h3>How you learn</h3>';
- if(tot<12)return h+'<p class="small mute">Answer a few more questions in different formats and this card will show where you do best. It updates as you improve.</p><button class="btn sm sec" id="sty-go">Try a quick format check (8 questions)</button></div>';
- h+='<p class="small mute">Compared with what the model expects at your level. Based on your recent answers, stored only on this device.</p>';
+ if(tot<12)return h+'</div>';
+ h+='';
  fs.forEach(function(f){var v=Math.max(-.3,Math.min(.3,f.res)),pct=Math.round((v+.3)/.6*100),lab=f.n<5?'Still testing':v>.07?'Strength':v<-.07?'Growing area':'On track';
   h+='<div class="stl"><div class="row" style="justify-content:space-between"><b>'+f.name+'</b><span class="small">'+lab+' · '+f.n+' answered</span></div><div class="bar" role="img" aria-label="'+f.name+': '+lab+'"><i style="width:'+(f.n<5?10:Math.max(6,pct))+'%"></i></div><div class="small mute">'+f.desc+'</div></div>'});
- return h+'<button class="btn sm sec" id="sty-go">Re-check my formats</button> <button class="btn sm ghost" id="sty-rs">Reset this profile</button></div>'}
+ return h+'<button class="btn sm ghost" id="sty-rs">Reset</button></div>'}
 var _vmY=viewMe;viewMe=function(){var h=_vmY();if(sub.me==='profile')h+=styleHTML();return h};
-function startStyle(){var d=[],used=[],types=Object.keys(TYB).filter(function(t){return QS.some(function(q){return q.type===t})}),order=types.sort(function(a,b){return (S.fm[a]?S.fm[a].n:0)-(S.fm[b]?S.fm[b].n:0)}).slice(0,8),steps=[];
- order.forEach(function(t){var pool=QS.filter(function(q){return q.type===t&&used.indexOf(q.id)<0&&!(S.mem[q.id])}),best=null,bs=9;pool.forEach(function(q){var s=Math.abs(pBase(q)-.8)+Math.random()*.15;if(s<bs){bs=s;best=q}});if(best){used.push(best.id);steps.push({k:'try',it:mkItem(best.id)})}});
- if(!steps.length){toast('You have tried every format');return}
- startSess({kind:'style',title:'Format check',steps:steps})}
-document.addEventListener('click',function(e){if(e.target.id==='sty-go')startStyle();if(e.target.id==='sty-rs'){S.fm={};save();route();toast('Format profile reset')}});
-var _vlY=viewLearn;viewLearn=function(){var h=_vlY();if(!S.fm||!Object.keys(S.fm).length)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Find your best formats</b><div class="small mute">Eight quick questions in different formats. Your practice adapts to what works for you.</div></div><button class="btn sm" id="sty-go">Start</button></div>$1');return h};
+document.addEventListener('click',function(e){if(e.target.id==='sty-rs'){S.fm={};save();route();toast('Format profile reset')}});
+
