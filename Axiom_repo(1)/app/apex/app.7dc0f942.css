@@ -360,3 +360,4 @@ details.fold>summary .small{font-weight:600}details.fold.cardf{background:var(--
 .gcv canvas{border:1.5px solid var(--line);border-radius:12px;height:260px}
 @media(min-width:700px){.tpanel.calc.wide .gwrap{display:grid;grid-template-columns:270px 1fr;gap:14px;align-items:start}.tpanel.calc.wide .gcv canvas{height:360px}}
 @media(min-width:900px){.tpanel.calc.wide{max-width:780px;right:24px}}
+.swrow{margin:8px 0}.swchip{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);background:var(--surface);color:inherit;border-radius:99px;padding:6px 14px;font:inherit;cursor:pointer}.swchip b{font-weight:800}.swchip span{font-weight:700;opacity:.8}.swchip i{font-style:normal}.swu{border-color:#f5a623;background:#fff7e6;color:#6b4300}.swd{border-color:#7a86c9;background:#eef0ff;color:#2c3470}@media(prefers-color-scheme:dark){.swu{background:#3a2a08;color:#ffd78a}.swd{background:#1d2142;color:#c6ccff}}
