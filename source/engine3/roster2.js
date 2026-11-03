@@ -57,16 +57,17 @@ function packScreen(id){var pk=pkOf(id),m=rmodal();m.setAttribute('aria-label',p
  var b=m.querySelector('button');if(b)b.focus()}
 function openBox(id){
  var pk=pkOf(id);if(S.coins<pk.cost){toast('You need '+pk.cost+' coins for this pack');return}
- S.coins-=pk.cost;var res=rollBox(pk);save();hud();
+ S.coins-=pk.cost;var res=rollBox(pk);save();hud();window.sfx&&window.sfx('shake');
  var m=rmodal(),rc=RC[res.r],rm=A11&&A11.rm;m.setAttribute('aria-label','Opening '+pk.name);m.style.setProperty('--rc',rc[0]);
  m.innerHTML='<div class="rvs"><div class="stage"><div class="pkbig shake" id="rvpk">'+packSVG(pk,200)+'</div></div></div>';
  var show=function(){
+  window.sfx&&window.sfx('reveal'+res.r);
   if(!rm){var f=document.createElement('div');f.className='rvflash';document.body.appendChild(f);setTimeout(function(){f.remove()},600);if(res.r>=3)burst(true)}
-  m.innerHTML='<div class="rvs" style="--rc:'+rc[0]+'"><div class="rays" aria-hidden="true"></div><div class="stage"><div class="ribbon" id="rvt">'+RN[res.r]+'</div><div class="rv-av">'+mascot(res.ch[0],'cheer',200)+'</div><h2>'+esc(res.ch[1])+'</h2>'+(res.dup?'<span class="small">Duplicate. +'+res.gain+' coins back</span>':'<span class="newt">NEW</span>')+'</div><div class="row" style="justify-content:center;flex-wrap:wrap;gap:10px"><button class="btn" data-ro="eq:'+res.ch[0]+'">Equip</button><button class="btn sec" data-ro="pk:'+pk.id+'">Open another</button><button class="btn ghost" data-ro="close">Done</button></div></div>';
+  m.innerHTML='<div class="rvs" style="--rc:'+rc[0]+'"><div class="rays" aria-hidden="true"></div><div class="stage"><div class="ribbon" id="rvt">'+RN[res.r]+'</div><div class="rv-av">'+mascot(res.ch[0],'cheer',200)+'</div><h2>'+esc(res.ch[1])+'</h2>'+(window.persona?personaHTML(res.ch[0]):'')+(res.dup?'<span class="small">Duplicate. +'+res.gain+' coins back</span>':'<span class="newt">NEW</span>')+'</div><div class="row" style="justify-content:center;flex-wrap:wrap;gap:10px"><button class="btn" data-ro="eq:'+res.ch[0]+'">Equip</button><button class="btn sec" data-ro="pk:'+pk.id+'">Open another</button><button class="btn ghost" data-ro="close">Done</button></div></div>';
   var b=m.querySelector('button');if(b)b.focus();try{window.announce&&window.announce('You got '+res.ch[1]+', '+RN[res.r]+'. '+(res.dup?'Duplicate.':'New.'))}catch(e){}};
  if(rm)show();else setTimeout(show,1300)}
 function detailScreen(id){var a=avOf(id),r=a[6],m=rmodal(),rc=r<0?['#9aa4c4']:RC[r],on=S.cos.on.av===id,n=(S.cos.cnt&&S.cos.cnt[id])||1;m.setAttribute('aria-label',a[1]);m.style.setProperty('--rc',rc[0]);
- m.innerHTML='<div class="rvs" style="--rc:'+rc[0]+'"><div class="rays" aria-hidden="true"></div><div class="stage"><div class="ribbon">'+(r<0?'Starter':RN[r])+'</div><div class="rv-av">'+mascot(id,'happy',200)+'</div><h2>'+esc(a[1])+'</h2>'+(n>1?'<span class="small">Found '+n+' times</span>':'')+'</div><div class="row" style="justify-content:center;gap:10px"><button class="btn" data-ro="eq:'+id+'"'+(on?' disabled':'')+'>'+(on?'Equipped':'Equip')+'</button><button class="btn ghost" data-ro="close">Close</button></div></div>';var b=m.querySelector('button');if(b)b.focus()}
+ m.innerHTML='<div class="rvs" style="--rc:'+rc[0]+'"><div class="rays" aria-hidden="true"></div><div class="stage"><div class="ribbon">'+(r<0?'Starter':RN[r])+'</div><div class="rv-av">'+mascot(id,'happy',200)+'</div><h2>'+esc(a[1])+'</h2>'+(window.persona?personaHTML(id):'')+(n>1?'<span class="small">Found '+n+' times</span>':'')+'</div><div class="row" style="justify-content:center;gap:10px"><button class="btn" data-ro="eq:'+id+'"'+(on?' disabled':'')+'>'+(on?'Equipped':'Equip')+'</button><button class="btn ghost" data-ro="close">Close</button></div></div>';var b=m.querySelector('button');if(b)b.focus()}
 /* ---------- shop screen ---------- */
 function rchip(r){var c=RC[r];return '<span class="rchip" style="background:'+c[2]+';color:'+c[1]+';border-color:'+c[0]+'">'+RN[r]+'</span>'}
 function shopHTML(){

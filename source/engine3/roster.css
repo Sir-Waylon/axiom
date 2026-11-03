@@ -66,3 +66,4 @@ details.fold>summary .small{font-weight:600}details.fold.cardf{background:var(--
 .coll .cc{cursor:pointer;transition:transform .12s}.coll .cc:hover{transform:translateY(-3px)}.cc .cnt{font-size:.72rem;font-weight:800;color:var(--mut,#555)}
 .cgrp{margin:8px 0 2px;font-weight:800;font-size:.9rem;opacity:.8}
 .cc .gh{appearance:none;background:none;border:0;padding:0;cursor:pointer}.cc .gh:focus-visible{outline:3px solid var(--pri);border-radius:12px}
+.pers{display:grid;gap:3px;text-align:center;margin:6px auto 4px;max-width:300px}.pers b{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--rc,var(--pri))}.pers span{font-weight:800;font-size:.9rem}.pers em{font-style:normal;font-size:.85rem;opacity:.85}.pers q{font-size:.85rem;font-weight:700;opacity:.9}
