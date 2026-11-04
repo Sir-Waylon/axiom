@@ -85,7 +85,7 @@ input:focus{border-color:var(--pri)}input[aria-invalid=true]{border-color:#c4302
 @media print{header.top,.cta,.skip{display:none}}
 '''%B
 BOLT='<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="var(--pri)"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>'
-NAV=[('/#how','How it works'),('/#topics','Topics'),('/science/','The science'),('/resources/','Resources')]
+NAV=[('/#how','How it works'),('/#topics','Topics')]
 def page(path,title,body,desc='',cur='',head='',tail=''):
     nav=''.join(f'<li><a href="{h}"{" aria-current=page" if h==cur else ""}>{t}</a></li>' for h,t in NAV)
     d=html.escape(desc or B['sub'],quote=True)
@@ -96,7 +96,7 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
 <a class="skip" href="#main">Skip to main content</a>
 <header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
 <main id="main" tabindex="-1">{body}</main>
-<footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/science/">The science</a></li><li><a href="/resources/">Resources</a></li><li><a href="/account/">Account</a></li></ul></nav>
+<footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li></ul></nav>
 <p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom).</p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p></div></footer>
 {'<script src="/account.js" defer></script>' if path=='account' else ''}<script src="/nav.js" defer></script>{tail}
 </body></html>'''
@@ -123,10 +123,9 @@ def landing():
 <div class="card"><span class="num">2</span><h3>Try it</h3><p>Answer right away. Questions get harder as you get them right.</p></div>
 <div class="card"><span class="num">3</span><h3>Understand it</h3><p>After a miss, study the worked steps, then try a fresh version.</p></div>
 <div class="card"><span class="num">4</span><h3>Retain it</h3><p>Earlier topics return on a spaced schedule, just before they fade.</p></div></div></div></section>
-<section class="s"><div class="wrap"><h2>Built to get you to an A+</h2><p class="lead">Lessons begin easy and end at the level of the hardest questions on {B['exam']}. You master a topic by getting those right.</p>
-<div class="stats"><div><b>{fmt(nq)}</b><span>questions</span></div><div><b>{nt}</b><span>topics</span></div><div><b>{nl}</b><span>lessons</span></div>{f'<div><b>{npf}</b><span>proofs</span></div>' if npf else ''}</div></div></section>
+<section class="s"><div class="wrap"><div class="stats"><div><b>{fmt(nq)}</b><span>questions</span></div><div><b>{nt}</b><span>topics</span></div><div><b>{nl}</b><span>lessons</span></div>{f'<div><b>{npf}</b><span>proofs</span></div>' if npf else ''}</div></div></section>
 <section class="s alt" id="topics"><div class="wrap"><h2>What you will learn</h2><p class="lead">{B['what'][0].upper()+B['what'][1:]}.</p><div class="grid">{tr}</div></div></section>
-<section class="s"><div class="wrap"><h2>Why it works</h2><div class="grid">{fh}</div><p style="margin-top:20px"><a href="/science/">See the research behind each feature →</a></p></div></section>
+<section class="s"><div class="wrap"><h2>Features</h2><div class="grid">{fh}</div></div></section>
 <section class="s"><div class="wrap"><div class="note" role="note"><b>Created with AI assistance.</b> The lessons, questions, explanations and code were produced with an AI model (Claude, by Anthropic) under the direction of a Science Olympiad coach, and checked with automated tests. Errors are still possible, so confirm important facts with your textbook or teacher. <a href="/ai-disclosure/">Read the full disclosure</a>{REPOLINK}.</div></div></section>
 <section class="s alt"><div class="wrap" style="text-align:center"><h2>Start practicing today.</h2><div class="cta" style="justify-content:center"><a class="btn" href="/app/">Start learning</a><a class="btn sec" href="/account/">Create an account</a></div></div></section>'''
     body=body.replace('{REPOLINK}',REPOLINK)
@@ -262,10 +261,10 @@ def aidisc():
 <h2>What was made with AI</h2><ul><li>The lessons, practice questions, hints and worked explanations.</li><li>The diagrams, avatars and other illustrations, which are original vector graphics produced with code.</li><li>The website, the learning app and the account system code.</li></ul>
 <p>The AI model used was Claude, made by Anthropic. A human directed the scope, topics and design goals.</p>
 <h2>What is not AI</h2><ul><li>No AI model runs while you use {N}. The app is static code in your browser plus a small accounts service.</li><li>Your answers, progress and messages are never sent to an AI service.</li><li>The read-aloud voice is your device’s built-in text-to-speech.</li></ul>
-<h2>How the content is checked</h2><ul><li>Numeric and algebraic questions are generated from formulas, and an independent program re-solves every one to confirm the stored answer.</li><li>Automated tests confirm that every question can be answered correctly in the app and that explanations are present.</li><li>Content follows public curricula, the event rules and open university and Khan Academy material listed on the <a href="/resources/">resources page</a>.</li></ul>
+<h2>How the content is checked</h2><ul><li>Numeric and algebraic questions are generated from formulas, and an independent program re-solves every one to confirm the stored answer.</li><li>Automated tests confirm that every question can be answered correctly in the app and that explanations are present.</li><li>Content follows public curricula, the event rules and open university and Khan Academy material.</li></ul>
 <div class="note"><b>Limits.</b> Not every item has been reviewed line by line by a subject-matter expert. AI systems can state incorrect facts with confidence. Treat {N} as practice, and confirm anything important with your textbook, teacher or the official event rules.</div>
 <h2>Report a problem</h2><ul>{rl}<li>Include the question text or a screenshot and the correct answer you expect. Errors are fixed and the question bank is rebuilt.</li></ul>
-<p>See also the <a href="/terms/">Terms of Service</a>, <a href="/privacy/">Privacy Policy</a> and <a href="/science/">research behind the design</a>.</p></div>'''
+<p>See also the <a href="/terms/">Terms of Service</a>, and <a href="/privacy/">Privacy Policy</a>.</p></div>'''
     return page('ai-disclosure',f'AI disclosure · {N}',b,f'How {N} was created with AI and how it is checked.')
 def notfound():
     return page('404',f'Page not found · {N}',f'<div class="wrap doc" style="text-align:center"><h1>Page not found</h1><p>The address may be mistyped or the page may have moved.</p><p><a class="btn" href="/">Go home</a> <a class="btn sec" href="/app/">Open the trainer</a></p></div>')
@@ -273,7 +272,7 @@ if os.path.exists(out):shutil.rmtree(out)
 shutil.copytree(appdir,out+'/app',ignore=shutil.ignore_patterns('_headers'))
 W=lambda p,s:(os.makedirs(os.path.dirname(out+'/'+p),exist_ok=True),open(out+'/'+p,'w',encoding='utf8').write(s))
 W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/index.html',legal('terms'));W('accessibility/index.html',access())
-W('ai-disclosure/index.html',aidisc());W('science/index.html',science());W('resources/index.html',resources());W('account/index.html',account());W('404.html',notfound())
+W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
 W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg')
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
