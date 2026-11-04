@@ -2507,6 +2507,15 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 var _vmC=viewMe;viewMe=function(){var h=_vmC();if(sub.me!=='profile')return h;var c=cal(),n=c[1][1]+c[2][1]+c[3][1];if(n<6)return h;
  return h+'<div class="card"><h3>How well you know what you know</h3><p class="small mute">When you rate your confidence, this shows how often each rating was right. Sure should be right most of the time.</p><table class="calt"><tr><th></th><th>Rated</th><th>Right</th></tr>'+[1,2,3].map(function(k){var x=c[k];return '<tr><td>'+LBL[k]+'</td><td>'+x[1]+'</td><td>'+(x[1]?Math.round(100*x[0]/x[1])+'%':'–')+'</td></tr>'}).join('')+'</table></div>'};
 })();
+/* ---- placement check: "I haven't learned this" skip so nobody gets stuck or overwhelmed ---- */
+(function(){
+var _dsK=drawSess;drawSess=function(){_dsK.apply(this,arguments);try{var z=Z;if(!z||z.fin||z.kind!=='diag')return;var row=document.querySelector('.sheet .sheet-in .row');if(!row||document.getElementById('dkip'))return;
+ var b=document.createElement('button');b.className='btn sec sm';b.id='dkip';b.textContent="I haven't learned this";b.setAttribute('aria-label',"Skip: I haven't learned this yet");row.insertBefore(b,row.firstChild);
+ var sp=document.querySelector('.sheet .sheet-in');if(sp&&!sp.querySelector('.dknote')){var n=document.createElement('p');n.className='small mute dknote';n.textContent='Not sure? Skipping is fine. It just tells us where to start you.';sp.appendChild(n)}}catch(e){}};
+document.addEventListener('click',function(e){if(e.target.id!=='dkip')return;var z=Z;if(!z||z.kind!=='diag')return;var st=z.steps[z.i],it=st&&st.it;if(!it)return;
+ it.dk=1;it.skipped=true;it.done=true;it.ok=false;it.res=null;S.dk=S.dk||{};S.dk[it.q.t]=1;if(!st.probe)S.miss[it.id]=1;window.sfx&&sfx('swish');
+ if(z.i===z.steps.length-1)finishSess();else advance()});
+})();
 
 /* ===== accessibility (WCAG 2.2 AA) + voiced assistant ===== */
 (function(){
