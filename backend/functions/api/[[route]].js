@@ -136,7 +136,7 @@ A['POST /username'] = async (req, env, s) => {
   await env.DB.prepare('UPDATE users SET username=? WHERE id=?').bind(user, s.uid).run(); return J({ username: user });
 };
 A['POST /delete'] = async (req, env, s) => {
-  const b = [['DELETE FROM sessions WHERE uid=?'], ['DELETE FROM saves WHERE uid=?'], ['DELETE FROM weekly WHERE uid=?'], ['DELETE FROM friends WHERE a=? OR b=?', 2], ['DELETE FROM users WHERE id=?']];
+  const b = [['DELETE FROM sessions WHERE uid=?'], ['DELETE FROM saves WHERE uid=?'], ['DELETE FROM weekly WHERE uid=?'], ['DELETE FROM notify WHERE uid=?'], ['DELETE FROM friends WHERE a=? OR b=?', 2], ['DELETE FROM users WHERE id=?']];
   for (const [q, n] of b) await env.DB.prepare(q).bind(...Array(n || 1).fill(s.uid)).run();
   return out({ ok: 1 }, 200, { 'set-cookie': [cookie('__Host-sid', '', 0, true), cookie('__Host-csrf', '', 0, false)] });
 };
@@ -448,11 +448,64 @@ G['POST /vs/cancel'] = async (req, env) => {
   return J({ ok: 1 });
 };
 
+
+/* ================= Optional streak reminders by email (opt-in, one-click unsubscribe) =================
+   Needs: a Cloudflare Email Sending binding named EMAIL, MAIL_FROM (an address on an onboarded domain) and SITE_URL.
+   Without them the feature reports itself as unavailable and nothing is ever sent. Both sites share one database,
+   so each reminder is claimed atomically and can only be sent once per day. */
+const mailReady = (env) => !!(env.EMAIL && env.MAIL_FROM && env.SITE_URL);
+const okTz = (z) => { try { new Intl.DateTimeFormat('en-US', { timeZone: z }); return typeof z === 'string' && z.length < 60; } catch { return false; } };
+function localParts(ms, tz) {
+  const f = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(ms));
+  const g = (t) => f.find((x) => x.type === t).value; return { date: g('year') + '-' + g('month') + '-' + g('day'), hour: +g('hour') };
+}
+A['GET /notify'] = async (req, env, s) => {
+  const r = await env.DB.prepare('SELECT on_,hr,tz FROM notify WHERE uid=?').bind(s.uid).first();
+  return J({ available: mailReady(env), on: !!(r && r.on_), hr: r ? r.hr : 17, tz: r ? r.tz : null, email: s.email });
+};
+A['POST /notify'] = async (req, env, s) => {
+  if (!mailReady(env)) return J({ error: 'Email reminders are not set up on this site yet.' }, 503);
+  if (!(await rate(env, 'nt:' + s.uid, 30, 3600))) return J({ error: 'Slow down.' }, 429);
+  const b = await body(req, 400), on = b.on ? 1 : 0, hr = Math.max(0, Math.min(23, Math.round(+b.hr))), tz = okTz(b.tz) ? b.tz : 'America/Los_Angeles';
+  if (!Number.isFinite(hr)) return J({ error: 'Pick an hour.' }, 400);
+  await env.DB.prepare('INSERT INTO notify(uid,on_,hr,tz,sent,tok) VALUES(?,?,?,?,NULL,?) ON CONFLICT(uid) DO UPDATE SET on_=excluded.on_,hr=excluded.hr,tz=excluded.tz').bind(s.uid, on, hr, tz, hex(rnd(16))).run();
+  return J({ ok: 1, on: !!on, hr, tz });
+};
+async function unsubPage(req, env) {
+  const t = new URL(req.url).searchParams.get('t') || '', ok = /^[a-f0-9]{32}$/.test(t);
+  if (ok) await env.DB.prepare('UPDATE notify SET on_=0 WHERE tok=?').bind(t).run();
+  const body = ok ? 'You are unsubscribed. No more reminder emails will be sent.' : 'This unsubscribe link is not valid.';
+  return new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribe</title><body style="font:18px system-ui;max-width:30rem;margin:15vh auto;padding:0 1rem"><h1>' + (ok ? 'Done' : 'Hmm') + '</h1><p>' + body + '</p>', { status: ok ? 200 : 400, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
+}
+export async function runReminders(env) {
+  if (!env.DB || !mailReady(env)) return { sent: 0 };
+  const now = Date.now(); let sent = 0;
+  const rows = (await env.DB.prepare('SELECT n.uid,n.hr,n.tz,n.sent,n.tok,u.email,u.pub FROM notify n JOIN users u ON u.id=n.uid WHERE n.on_=1 LIMIT 2000').all()).results || [];
+  for (const r of rows) {
+    try {
+      const lp = localParts(now, r.tz); if (lp.hour !== r.hr || r.sent === lp.date) continue;
+      let pub = {}; try { pub = JSON.parse(r.pub || '{}'); } catch { /* ignore */ }
+      const streak = Math.max(0, pub.st | 0); if (streak < 1) continue;
+      const last = await env.DB.prepare('SELECT MAX(upd) m FROM saves WHERE uid=?').bind(r.uid).first();
+      if (last && last.m && localParts(last.m, r.tz).date === lp.date) continue; /* already studied today */
+      const claim = await env.DB.prepare('UPDATE notify SET sent=? WHERE uid=? AND (sent IS NULL OR sent<>?)').bind(lp.date, r.uid, lp.date).run();
+      if (changed(claim) < 1) continue;
+      const brand = env.BRAND || 'your study app', link = env.SITE_URL.replace(/\/$/, ''), un = link + '/api/unsub?t=' + r.tok;
+      const text = 'Your ' + streak + '-day streak is waiting on ' + brand + '. A short session keeps it going.\n\nOpen: ' + link + '/app/\n\nYou asked for these reminders. Unsubscribe in one click: ' + un + '\n';
+      const html = '<p>Your <b>' + streak + '-day streak</b> is waiting on ' + brand + '. A short session keeps it going.</p><p><a href="' + link + '/app/">Open ' + brand + '</a></p><p style="color:#666;font-size:12px">You asked for these reminders. <a href="' + un + '">Unsubscribe in one click</a>.</p>';
+      await env.EMAIL.send({ to: r.email, from: env.MAIL_FROM, subject: 'Your ' + streak + '-day streak is waiting', html, text, headers: { 'List-Unsubscribe': '<' + un + '>', 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } });
+      sent++;
+    } catch (e) { console.error('reminder failed', e && e.code, e && e.message); }
+  }
+  return { sent };
+}
+
 export async function onRequest({ request, env }) {
   const url = new URL(request.url), path = url.pathname.replace(/^\/api/, '') || '/', key = request.method + ' ' + path;
   try {
     const ip = request.headers.get('cf-connecting-ip') || 'x';
     if (request.method === 'POST') { const o = request.headers.get('origin'); if (o && o !== url.origin) return J({ error: 'forbidden' }, 403); }
+    if (request.method === 'GET' && path === '/unsub') { if (!env.DB) return J({ error: 'Not available.' }, 503); return await unsubPage(request, env); }
     if (G[key]) { /* online play needs only the database: guests may play without accounts */
       if (!env.DB) return J({ error: 'Online play is not available here.' }, 503);
       if (request.method === 'POST' && !(request.headers.get('content-type') || '').startsWith('application/json')) return J({ error: 'bad type' }, 415);
