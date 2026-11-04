@@ -25,7 +25,7 @@ window.__calc=function(s){return calc(s)};
 var TP={'apex-math':{fn:2,qd2:1,pl:1,ra:2,ex:2,lg:1,sq:1,tc:1,tg:2,ti:1,iv:1,id:1,tl:1,cn:2,pp:2,lm:2,dv:1,da:2,'in':1},
  'geometry-readiness':{eq:0,lin:2,sys:2,exp:1,fac:0,rad:1,qdr:2,bas:0,log:0,par:0,tri:0,quad:0,sim:1,rt:1,cir:1,con:0,area:1,sol:1,crd:1,trn:0},
  'quanta-physics':{dig:0},'circuit-lab-b':{hist:0,ctrl:0,logic:0,sym:0,hands:1,diode:1},'meteorology-b':{obs:0,maps:0,clouds:0,light:0,safety:0,cases:0,winter:0,hurr:0,torn:0}};
-function pol(q){if(!q)return 1;var pid=(typeof P!=='undefined'&&P.meta&&P.meta.id||'').replace(/-20\d\d$/,''),tab=TP[pid]||{},base=tab[q.t]===undefined?1:tab[q.t];
+function pol(q){if(!q)return 1;if(q.type==='sim')return 1;var pid=(typeof P!=='undefined'&&P.meta&&P.meta.id||'').replace(/-20\d\d$/,''),tab=TP[pid]||{},base=tab[q.t]===undefined?1:tab[q.t];
  if(q.cp!==undefined)return q.cp;
  var numeric=q.num&&q.num.v!==undefined;if(!numeric&&q.type!=='graph')return 0;
  if(!numeric)return 0;

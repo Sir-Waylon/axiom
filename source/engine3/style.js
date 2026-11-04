@@ -4,7 +4,7 @@
       counting most so it follows the student as they change. That adjusts how hard each format is FOR THAT STUDENT.
    3. The picker samples every format early, re-checks formats now and then, and leans slightly toward formats that work for the student.
    Everything is stored on this device. Nothing is sent anywhere. */
-var TYB={tune:.5,swipe:.1,yn:0,mcq:0,multi:.25,chips:.2,match:.1,order:.25,slider:.3,angle:.35,point:.4,compass:.35,graph:.45,short:.6,proof:.8};
+var TYB={sim:.4,tune:.5,swipe:.1,yn:0,mcq:0,multi:.25,chips:.2,match:.1,order:.25,slider:.3,angle:.35,point:.4,compass:.35,graph:.45,short:.6,proof:.8};
 var FAM=[['Choosing',['mcq','multi'],'Picking the right answer from a list'],['Typing',['short','proof'],'Writing an answer or a proof step'],['Hands-on',['slider','angle','point','compass','graph'],'Dragging, tapping and measuring'],['Building',['order','match','chips'],'Putting things in order, matching, filling gaps']];
 if(!S.fm)S.fm={};
 function fmOf(t){return S.fm[t]||(S.fm[t]={n:0,res:0,last:0,ok:0})}
