@@ -38,7 +38,6 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 function finishRes(g,tp){/* worked solution text from the generated ops */var R=g.rn.R,o=g.rn.sol,t=R[0],s=['Combine from the left.'],nm={s:'series',p:'parallel'};
  for(var i=0;i<3;i++){var r=R[i+1],n=o[i]==='p'?t*r/(t+r):t+r;s.push('Step '+(i+1)+': '+rd(t,2)+' Ω with '+r+' Ω in '+nm[o[i]]+' = '+rd(n,2)+' Ω.');t=n}g.steps=s;return g}
 add('circuit-lab-b',{id:'rn',t:'circ',l:3,ic:'🔌',type:'resnet',cp:1,gen:function(r){var g=genRes(r);return g&&finishRes(g)}});
-add('quanta-physics',{id:'rn',t:'ohm',l:3,ic:'🔌',type:'resnet',cp:1,gen:function(r){var g=genRes(r);return g&&finishRes(g)}});
 
 /* ---------- 2. wind barb: draw the wind you are told ---------- */
 var DIRS=['N','NE','E','SE','S','SW','W','NW'],DN={N:'north',NE:'northeast',E:'east',SE:'southeast',S:'south',SW:'southwest',W:'west',NW:'northwest'};

@@ -89,7 +89,6 @@ function genLg(r){for(var k=0;k<60;k++){var g=[pk(r,GN),pk(r,GN)],tt=ltable(g),o
   return{q:'Build a circuit whose output matches the target column of the truth table. Pick the first gate (inputs A and B) and the second gate (the first gate’s output and C).',lg:{tt:tt,sol:gx},steps:['Work row by row: first find what the first gate must do to A and B.','Then see what the second gate must do with that result and C.','One answer: '+gx[0]+' then '+gx[1]+'.']}}
  return null}
 add('circuit-lab-b',{id:'lg',t:'logic',l:3,ic:'🧠',type:'lgate',cp:0,gen:genLg});
-add('quanta-physics',{id:'lg',t:'dig',l:3,ic:'🧠',type:'lgate',cp:0,gen:genLg});
 
 var PK=(window.P&&P.meta&&P.meta.id||'').replace(/-20\d\d$/,'');
 var TL=B[PK]||[],NPER=10;

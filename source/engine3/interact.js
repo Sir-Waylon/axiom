@@ -1,7 +1,5 @@
 /* ===== interactive answer formats =====
-   Typed numbers become a dial you tune (with fine nudges and a "type it instead" escape hatch). Multiple choice becomes
-   swipe-to-judge cards: each choice is judged "fits" or "does not fit", so every distractor gets thought about.
-   Yes/no becomes a two-way swipe. Only free-text answers stay typed. Data files are unchanged: the remap happens when a question is shown. */
+   Typed numbers become a dial you tune (with fine nudges and a "type it instead" escape hatch). Everything else keeps its own format. Data files are unchanged: the remap happens when a question is shown. */
 (function(){
 function hsh(s){var h=2166136261;s=String(s);for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h^(h>>>15))>>>0}
 function niceFloor(x){var p=Math.pow(10,Math.floor(Math.log10(x))),m=x/p;return (m>=5?5:m>=2?2:1)*p}
@@ -15,8 +13,6 @@ function spec(q){var n=q.num,v=n.v;if(!isFinite(v))return null;var av=Math.abs(v
 var YN=/^(yes|no|true|false)$/i;
 function virt(q){
  if(q.type==='short'&&q.num&&!q.keep){var s=spec(q);if(s)return Object.assign({},q,{type:'tune',src:q,tn:s})}
- if((q.type==='mcq'||q.type==='short')&&q.o&&q.o.length>=2&&!q.keep)return Object.assign({},q,{type:'swipe',src:q});
- if(q.type==='short'&&q.text&&q.text.length&&q.text.every(function(t){return YN.test(String(t).trim())}))return Object.assign({},q,{type:'yn',src:q});
  return null}
 /* ---------- tune ---------- */
 IT.tune={init:function(it){it.val=null;it.k=null;it.typed=false},
