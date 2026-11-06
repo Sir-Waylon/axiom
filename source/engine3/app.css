@@ -9,7 +9,7 @@ h1,h2,h3{line-height:1.2;margin:0}h2{font-size:1.35rem}h3{font-size:1.05rem}p{ma
 .mute{color:var(--mute)}.small{font-size:.86rem}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sp{flex:1}
 body:not(.ok) #shell{display:none}
 /* top bar + nav */
-.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:8px max(14px,env(safe-area-inset-left)) 8px max(14px,env(safe-area-inset-right))}
+.bar{background:var(--bg);position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:8px max(14px,env(safe-area-inset-left)) 8px max(14px,env(safe-area-inset-right))}
 .bar-in{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:8px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}.brand b{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand small{display:block;color:var(--mute);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
 .logo{width:34px;height:34px;border-radius:10px;background:var(--pri);display:grid;place-items:center;flex:none}
