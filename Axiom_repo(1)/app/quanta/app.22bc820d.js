@@ -2508,7 +2508,7 @@ function withMain(fn){var keep=UN;UN=FULL.filter(function(u){return !REF||!REF[u
 if(REF){var _nl=nextLesson;nextLesson=function(){return withMain(_nl)}}
 var _vl=viewLearn;
 viewLearn=function(){var h=withMain(_vl);
- if(!S.dg)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Placement check</b></div><button class="btn sm" id="dgs">Start</button><button class="btn sec sm" id="dgx" aria-label="Skip">Skip</button></div>$1');
+ if(!S.dg)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Placement check</b></div><button class="btn sm" id="dgs">Start</button></div>$1');
  var tgt=M.target;if(tgt){var left=0;FULL.forEach(function(u){if(REF&&REF[u.id]&&!refWhy(u.id))return;var us=S.un[u.id]||{d:{}};u.lessons.forEach(function(L){if(!us.d[L.id])left++})});var wk=Math.max(1,(new Date(tgt+'T12:00:00')-Date.now())/6048e5),need=Math.ceil(left/wk),did=0;for(var i=0;i<7;i++){var dk=new Date();dk.setDate(dk.getDate()-i);var k=dk.getFullYear()+'-'+('0'+(dk.getMonth()+1)).slice(-2)+'-'+('0'+dk.getDate()).slice(-2);did+=S.ld[k]||0}
   h=h.replace(/(<div class="cont">)/,'<div class="pace"><span>'+left+' lessons left · '+need+'/week to finish by spring</span><b class="'+(did>=need?'ok':'')+'">'+did+' this week</b></div>$1')}
  var rf=refUnits().filter(function(u){return !refWhy(u.id)});
@@ -2516,7 +2516,7 @@ viewLearn=function(){var h=withMain(_vl);
  refUnits().forEach(function(u){var w=refWhy(u.id);if(w)h=h.replace('<h3>'+esc(u.title)+'</h3>','<h3>'+esc(u.title)+' <span class="tag">Refresher</span></h3><div class="small" style="color:var(--pri-t)">'+esc(w)+'</div>')});
  return h};
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('[data-rfu]');if(r){S.rfu[r.dataset.rfu]=1;save();toast&&toast('Added to your path');route();return}
- if(e.target.id==='dgs')startDiag();if(e.target.id==='dgx'){S.dg='skip';save();route()}});
+ if(e.target.id==='dgs')startDiag();});
 /* placement check */
 function startDiag(){var steps=[],used=[],FT=['mcq','short','order','match','slider','angle','point','chips','graph','compass','multi','proof'],bf=function(q){return q.b!==undefined?q.b:LB[q.l]},k=0,seen={};
  ALL.forEach(function(t){var all=QS.filter(function(q){return q.t===t&&q.l<=2}).sort(function(a,b){return bf(a)-bf(b)});if(!all.length)return;var pick=null;
@@ -3116,9 +3116,10 @@ var _dr=drawResults;drawResults=function(top){_dr(top);var z=Z;if(!z||!z.sumDone
  else if(z.plan){var c=chg(z),a=items(),f=a?focus(a)[0]:null;b.insertAdjacentHTML('afterbegin','<div class="card plc"><h3>Plan update</h3>'+(c.length?'<ul class="plu"><li>'+c.join('</li><li>')+'</li></ul>':'<p class="small">Nothing moved yet. Your answers are still shaping what comes next.</p>')+(f?'<p class="small">Next: <b>'+esc(TOP[f.t].name)+'</b> ('+LBL[f.back?'back':f.s].toLowerCase()+')</p>':'<p class="small">Every topic is done. Keep reviewing to hold on to it.</p>')+'<div class="row"><button class="btn sm" data-plan="go">Continue plan</button><button class="btn sec sm" data-plan="view">See plan</button></div></div>')}};
 /* 5. surfaces: Learn and Practice cards, plan sheet, strong topics skipped on the Learn path */
 function card(){var a=items();
- if(!a)return '<div class="card plc"><div class="row"><div style="flex:1"><b>My plan</b><div class="small mute">Take the placement check and we build your plan. Skip any topic you have not learned.</div></div><button class="btn sm" id="dgs">Start check</button></div></div>';
+ if(!a)return '<div class="card plc"><div class="row"><div style="flex:1"><b>My plan</b><div class="small mute">Take the placement check and we build your plan.</div></div><button class="btn sm" id="dgs">Start check</button></div></div>';
  var f=focus(a),d=a.filter(function(x){return x.s==='done'||x.s==='keep'}).length,x=f[0],lab=!x?'All topics done':x.s==='learn'&&!x.back?'Lesson: '+TOP[x.t].name:'Practice: '+f.filter(function(y){return y.s!=='learn'||y.back}).slice(0,2).map(function(y){return TOP[y.t].name}).join(', ');
  return '<div class="card plc"><div class="row"><div style="flex:1;min-width:0"><b>My plan</b><div class="small">Now: '+esc(lab)+'</div></div><button class="btn sm" data-plan="go">'+(x?'Start':'Review')+'</button><button class="btn sec sm" data-plan="view">See plan</button></div><div class="plb" role="img" aria-label="'+d+' of '+a.length+' topics done or strong"><i style="width:'+Math.round(100*d/a.length)+'%"></i></div><div class="small mute">'+d+' of '+a.length+' topics done or strong</div></div>'}
+window.__cu={items:items,focus:focus,tgt:tgt,startPlan:startPlan,card:card,sheet:sheet};
 var _vl=viewLearn;viewLearn=function(){var h=_vl.apply(this,arguments),c=card();if(S.dg&&S.dg!=='skip'&&items())h=h.replace(/<div class="card dgc">.*?<\/div><button class="btn sec sm" id="dgx"[^>]*>Skip<\/button><\/div>/,'');
  return h.indexOf('<div class="cont">')>-1?h.replace('<div class="cont">',c+'<div class="cont">'):c+h};
 var _vp=viewPractice;viewPractice=function(){var h=_vp.apply(this,arguments);return h.replace('<div class="grid">',card()+'<div class="grid">')};
@@ -3135,6 +3136,48 @@ document.addEventListener('click',function(e){var t=e.target,b=t.closest&&t.clos
  if(b.dataset.plan==='view'){sheet();return}
  var go=function(){if(b.dataset.plt){var u=unitBy(b.dataset.plt),x=info(u);if(x.s==='learn'){var L=u.lessons.filter(function(l){return !x.us.us.d[l.id]})[0]||u.lessons[0];startLesson(u.id,L.id)}else if(x.s==='prove')startUnitTest(u.id);else startPractice([u.id],x.s==='keep'||x.s==='done'?8:12)}else startPlan()};
  if(Z&&Z.fin){closeSess();setTimeout(go,30)}else go()});
+})();
+
+/* ===== Today: compulsory placement check, learning category, 15-minute mission that mixes new and earlier units, Practice front and center ===== */
+(function(){
+var CU=window.__cu;if(!CU)return;
+function done(){return !!(S.dg&&S.dg!=='skip'&&S.dgr)}
+/* learning category, from the placement check. Shown to the student, and it only changes pacing */
+function cat(){var c=S.cu;if(!c)return null;var n=0,f=0,s=0,tot=0;Object.keys(c.base).forEach(function(t){var v=c.base[t];tot++;if(v==='n')n++;else if(v==='f')f++;else s++});if(!tot)return null;
+ if(s/tot>=.6)return{k:'Accelerator',d:'Most topics were already strong. Missions are mostly new material and harder questions, with short reviews.',nw:.6};
+ if(n/tot>=.4)return{k:'Foundation builder',d:'Many topics start from the basics. Missions use shorter lessons, more worked examples and easier first questions.',nw:.4};
+ return{k:'Gap closer',d:'A mix of strong and shaky topics. Missions repair the gaps first and keep strong topics fresh.',nw:.5}}
+/* 1. the check is compulsory: only Me (settings, accessibility) opens until it is done */
+var _rt=route;route=function(){if(!done()&&cur!=='me'&&!(typeof Z!=='undefined'&&Z&&!Z.fin)){var m=$('main');[].forEach.call(document.querySelectorAll('#nav button'),function(b){b.setAttribute('aria-current',b.dataset.t===cur?'true':'false')});m.className='view-in';
+  m.innerHTML='<div class="card gate"><h2>Start with the placement check</h2><p>About 15 minutes. It decides where you start, so every lesson and practice set after it fits you.</p><ul class="plu"><li>Tap <b>I have not learned this</b> on any question. That is useful information, not a mistake.</li><li>You can pause and come back. Your answers are saved.</li><li>There is no grade.</li></ul><button class="btn" id="dgs">'+(S.dgp?'Continue':'Start the check')+'</button></div>';window.scrollTo(0,0);return}
+ return _rt.apply(this,arguments)};
+/* 2. Today replaces the premade unit list once the plan exists */
+function mins(){return minsToday()}
+function mCard(){var due=dueIds().length,k=cat(),md=missionDone();
+ return '<div class="cont"><div style="flex:1"><div class="small" style="opacity:.9">Today · about 15 min</div><h2>'+(md?'Mission done':'Daily mission')+'</h2><div class="small" style="opacity:.9">New material, then earlier units mixed in</div></div><button class="btn" id="msn">'+(md?'Again':'Start')+'</button></div>'+
+ '<div class="row" style="margin-bottom:10px">'+(due?'<span class="chip">'+due+' due for review</span>':'')+(k?'<span class="chip">'+esc(k.k)+'</span>':'')+'</div>'}
+var _vl=viewLearn;viewLearn=function(){var a=CU.items();if(!a||!done())return _vl.apply(this,arguments);
+ var k=cat(),h=greet()+mCard()+CU.card();
+ h+='<button class="card prc" data-t2="practice" style="text-align:left;width:100%"><h3>Practice</h3><p class="small mute">Adaptive sets, timed blitz, mock test and review of what you missed.</p></button>';
+ if(k)h+='<div class="card"><b>Your learning category: '+esc(k.k)+'</b><p class="small mute" style="margin-top:4px">'+esc(k.d)+' Your plan re-sorts itself as your answers change.</p></div>';
+ return h};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-t2]');if(b)go(b.dataset.t2)});
+/* 3. 15-minute mission: warm-up from earlier units, new step from the plan, spaced review, mixed set across units, stretch */
+startMission=function(){var a=CU.items();if(!a){startPractice(ALL,12);return}
+ var k=cat()||{nw:.5},steps=[],used=[],last=[],f=CU.focus(a);
+ function add(n,tg,topics){for(var i=0;i<n;i++){var id=coachPick({topics:topics&&topics.length?topics:ALL,exclude:used,last:last,target:tg});if(!id)break;used.push(id);last.push(QS[QI[id]].t);steps.push({k:'try',it:mkItem(id)})}}
+ var earlier=a.filter(function(x){return x.s==='keep'||x.s==='done'||x.us.done>0}).map(function(x){return x.t}),started=a.filter(function(x){return (S.stat[x.t]||[0,0])[1]>0}).map(function(x){return x.t});
+ add(3,.92,earlier.length?earlier:null);
+ var x=f[0];
+ if(x&&x.s==='learn'&&!x.back){var L=x.u.lessons.filter(function(l){return !x.us.us.d[l.id]})[0]||x.u.lessons[0];lessonSteps(x.u,L).forEach(function(s){steps.push(s)});add(2,.9,[x.t])}
+ else if(x){var pt=f.filter(function(y){return y.s!=='learn'||y.back}).slice(0,2).map(function(y){return y.t});add(Math.round(4+2*k.nw),CU.tgt(x,true),pt)}
+ else add(4,.8);
+ var due=dueIds().slice(0,12).map(function(y){return y[0]}),rv=0;due.forEach(function(id){if(rv<4&&used.indexOf(id)<0){used.push(id);steps.push({k:'try',it:mkItem(id)});rv++}});if(rv<2)add(2-rv,.85,started.length?started:null);
+ add(3,.78,started.length?started:null);
+ add(2,.65,f.length?f.map(function(y){return y.t}):null);
+ startSess({kind:'mission',title:'Daily mission',steps:steps,remed:true})};
+/* nav label */
+TABS[0][1]='Today';route();var sp=document.querySelector('#nav button[data-t="learn"] span');if(sp)sp.textContent='Today';
 })();
 
 /* ===== accessibility (WCAG 2.2 AA) + voiced assistant ===== */

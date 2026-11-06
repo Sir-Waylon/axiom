@@ -34,7 +34,7 @@ function withMain(fn){var keep=UN;UN=FULL.filter(function(u){return !REF||!REF[u
 if(REF){var _nl=nextLesson;nextLesson=function(){return withMain(_nl)}}
 var _vl=viewLearn;
 viewLearn=function(){var h=withMain(_vl);
- if(!S.dg)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Placement check</b></div><button class="btn sm" id="dgs">Start</button><button class="btn sec sm" id="dgx" aria-label="Skip">Skip</button></div>$1');
+ if(!S.dg)h=h.replace(/(<div class="cont">|<details class="unit")/,'<div class="card dgc"><div style="flex:1"><b>Placement check</b></div><button class="btn sm" id="dgs">Start</button></div>$1');
  var tgt=M.target;if(tgt){var left=0;FULL.forEach(function(u){if(REF&&REF[u.id]&&!refWhy(u.id))return;var us=S.un[u.id]||{d:{}};u.lessons.forEach(function(L){if(!us.d[L.id])left++})});var wk=Math.max(1,(new Date(tgt+'T12:00:00')-Date.now())/6048e5),need=Math.ceil(left/wk),did=0;for(var i=0;i<7;i++){var dk=new Date();dk.setDate(dk.getDate()-i);var k=dk.getFullYear()+'-'+('0'+(dk.getMonth()+1)).slice(-2)+'-'+('0'+dk.getDate()).slice(-2);did+=S.ld[k]||0}
   h=h.replace(/(<div class="cont">)/,'<div class="pace"><span>'+left+' lessons left · '+need+'/week to finish by spring</span><b class="'+(did>=need?'ok':'')+'">'+did+' this week</b></div>$1')}
  var rf=refUnits().filter(function(u){return !refWhy(u.id)});
@@ -42,7 +42,7 @@ viewLearn=function(){var h=withMain(_vl);
  refUnits().forEach(function(u){var w=refWhy(u.id);if(w)h=h.replace('<h3>'+esc(u.title)+'</h3>','<h3>'+esc(u.title)+' <span class="tag">Refresher</span></h3><div class="small" style="color:var(--pri-t)">'+esc(w)+'</div>')});
  return h};
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('[data-rfu]');if(r){S.rfu[r.dataset.rfu]=1;save();toast&&toast('Added to your path');route();return}
- if(e.target.id==='dgs')startDiag();if(e.target.id==='dgx'){S.dg='skip';save();route()}});
+ if(e.target.id==='dgs')startDiag();});
 /* placement check */
 function startDiag(){var steps=[],used=[],FT=['mcq','short','order','match','slider','angle','point','chips','graph','compass','multi','proof'],bf=function(q){return q.b!==undefined?q.b:LB[q.l]},k=0,seen={};
  ALL.forEach(function(t){var all=QS.filter(function(q){return q.t===t&&q.l<=2}).sort(function(a,b){return bf(a)-bf(b)});if(!all.length)return;var pick=null;
