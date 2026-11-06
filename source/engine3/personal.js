@@ -46,8 +46,8 @@ document.addEventListener('click',function(e){var r=e.target.closest&&e.target.c
 /* placement check */
 function startDiag(){var steps=[],used=[],FT=['mcq','short','order','match','slider','angle','point','chips','graph','compass','multi','proof'],bf=function(q){return q.b!==undefined?q.b:LB[q.l]},k=0,seen={};
  ALL.forEach(function(t){var all=QS.filter(function(q){return q.t===t&&q.l<=2}).sort(function(a,b){return bf(a)-bf(b)});if(!all.length)return;var pick=null;
-  for(var j=0;j<FT.length&&!pick;j++){var ty=FT[(k+j)%FT.length],c=all.filter(function(q){return q.type===ty&&used.indexOf(q.id)<0});if(c.length){pick=c[Math.floor(c.length*.5)];}}
-  if(!pick)pick=all[Math.floor(all.length*.5)];used.push(pick.id);seen[pick.type]=(seen[pick.type]||0)+1;k++;steps.push({k:'try',it:mkItem(pick.id)})});
+  for(var j=0;j<FT.length&&!pick;j++){var ty=FT[(k+j)%FT.length],c=all.filter(function(q){return q.type===ty&&used.indexOf(q.id)<0});if(c.length){pick=c[Math.floor(c.length*(.25+Math.random()*.5))];}}
+  if(!pick)pick=all[Math.floor(all.length*(.25+Math.random()*.5))];used.push(pick.id);seen[pick.type]=(seen[pick.type]||0)+1;k++;steps.push({k:'try',it:mkItem(pick.id)})});
  /* make sure every available format is sampled at least twice; extra probes do not change topic placement */
  FT.forEach(function(ty){var need=2-(seen[ty]||0);if(need<=0)return;var c=QS.filter(function(q){return q.type===ty&&q.l<=2&&used.indexOf(q.id)<0});for(var i=0;i<need&&c.length;i++){var q=c.splice(Math.floor(Math.random()*c.length),1)[0];used.push(q.id);steps.push({k:'try',it:mkItem(q.id),probe:1})}});
  for(var i=steps.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=steps[i];steps[i]=steps[j];steps[j]=x}

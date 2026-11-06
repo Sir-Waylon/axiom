@@ -36,6 +36,8 @@ startMission=function(){var a=CU.items();if(!a){startPractice(ALL,12);return}
  add(3,.78,started.length?started:null);
  add(2,.65,f.length?f.map(function(y){return y.t}):null);
  startSess({kind:'mission',title:'Daily mission',steps:steps,remed:true})};
+/* every test-like session gets a fresh random question order each time, for every student; lessons keep their teaching order */
+var _ss=startSess;startSess=function(o){if(o&&o.steps&&o.kind!=='lesson'&&o.kind!=='mission'&&o.steps.every(function(s){return s.k==='try'}))o.steps=shuf(o.steps);return _ss.apply(this,arguments)};
 /* nav label */
 TABS[0][1]='Today';route();var sp=document.querySelector('#nav button[data-t="learn"] span');if(sp)sp.textContent='Today';
 })();
