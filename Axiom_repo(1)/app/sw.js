@@ -1,5 +1,5 @@
-const V='tr-8fd3dd4d-99b4f9';
-const PRE=["./", "icon.svg", "manifest.webmanifest", "hub.css", "reg.js", "apex/", "apex/app.cddd44a7.js", "apex/app.8fd3dd4d.css", "quanta/", "quanta/app.f58d74f7.js", "quanta/app.8fd3dd4d.css"];
+const V='tr-8fd3dd4d-b0d0e0';
+const PRE=["./", "icon.svg", "manifest.webmanifest", "hub.css", "reg.js", "apex/", "apex/app.0f0dcb92.js", "apex/app.8fd3dd4d.css", "quanta/", "quanta/app.7603cc4a.js", "quanta/app.8fd3dd4d.css"];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(PRE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin||new URL(r.url).pathname.startsWith('/api/'))return;
