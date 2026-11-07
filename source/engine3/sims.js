@@ -126,6 +126,7 @@ T['quanta-physics']=[
   params:[{n:'R',l:'Resistor',min:1,max:100,step:1,u:' kΩ',s:10}],env:{C:C},out:{e:'R*C',l:'Time constant',u:' ms',d:0},goal:{t:tau,rel:.03},
   steps:['Time constant τ = R × C (kΩ × µF = ms).','R = '+tau+' ÷ '+C+' = '+Rr+' kΩ.'],ans:Rr+' kΩ'}}}];
 /* ---------- add to the question bank ---------- */
+T['apex-math']=(T['geometry-readiness']||[]).concat(T['apex-math']||[]);
 var TL=T[PK]||[],NPER=10;
 TL.forEach(function(tp){var seen={};for(var i=0;i<NPER;i++){var id='sim-'+tp.id+'-'+(i<9?'0':'')+(i+1);if(QI[id]!==undefined)continue;var g=tp.gen(mul(hs(PK+tp.id+i)));if(seen[g.story]){continue}seen[g.story]=1;
  var q={id:id,t:tp.t,l:tp.l,type:'sim',ic:tp.ic,q:g.story,sim:g,sol:g.steps,w:g.steps[g.steps.length-1],fp:'sim-'+tp.id};QS.push(q);QI[id]=QS.length-1}});

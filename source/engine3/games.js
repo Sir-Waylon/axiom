@@ -10,7 +10,7 @@ function rd(v,d){return +v.toFixed(d===undefined?2:d)}
 var SUP={0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹','-':'⁻'};function sup(n){return String(n).split('').map(function(c){return SUP[c]||c}).join('')}
 function cur(type){var it=Z&&!Z.fin&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;return it&&it.q.type===type&&!it.done?it:null}
 function refresh(){if(window.itEnable)itEnable()}
-var GP={};function add(pack,tp){(GP[pack]=GP[pack]||[]).push(tp)}
+var GP={};function add(pack,tp){if(pack==='geometry-readiness')pack='apex-math';(GP[pack]=GP[pack]||[]).push(tp)}
 
 /* ---------- 1. Balance scale: do the same thing to both sides until one bag stands alone ---------- */
 var BT=[['gems','bag of gems','gem'],['oranges','crate of oranges','orange'],['coins','purse of coins','coin']];
@@ -53,7 +53,7 @@ function mrefresh(it){var q=it.q.mach,f=MK[q.kind],rows=document.querySelectorAl
 document.addEventListener('input',function(e){var n=e.target.dataset&&e.target.dataset.mc;if(!n||!e.target.classList.contains('mcr'))return;var it=cur('machine');if(!it)return;it[n]=+e.target.value;it.t=true;var b=document.getElementById('mc_'+n);if(b)b.textContent=sg(it[n]);mrefresh(it);window.sfx&&sfx('tick');refresh()});
 function genMach(kinds){return function(r){var kind=pk(r,kinds),m=pk(r,[-5,-4,-3,-2,-1,1,2,3,4,5]),c=ri(r,-9,9),th=pk(r,['Zorp-O-Matic','Number Muncher','Gizmo 3000','Beep-Boop Box']);return{q:'The '+th+' machine eats numbers and spits out new ones, always by the same rule. Study its tickets, then program your own machine to behave exactly the same way.',mach:{kind:kind,m:m,c:c},steps:['Use two tickets to find the rule: the change in OUT for each step in IN shows m.','Then c is what is left over: c = OUT − m × (the processed IN).','Mystery machine: m = '+sg(m)+', c = '+sg(c)+'.']}}}
 add('geometry-readiness',{id:'mach',t:'lin',l:2,ic:'⚙️',type:'machine',cp:0,gen:genMach(['lin'])});
-add('apex-math',{id:'mach',t:'fn',l:3,ic:'⚙️',type:'machine',cp:0,gen:genMach(['sq','abs'])});
+add('apex-math',{id:'machf',t:'fn',l:3,ic:'⚙️',type:'machine',cp:0,gen:genMach(['sq','abs'])});
 
 /* ---------- 3. Catch the mistake: a robot solved it and slipped exactly once ---------- */
 function mm(a){return sg(a)}

@@ -7,7 +7,7 @@ function rd(v,d){return +v.toFixed(d===undefined?2:d)}
 function sg(x){return String(x).replace('-','−')}
 function cur(type){var it=Z&&!Z.fin&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;return it&&it.q.type===type&&!it.done?it:null}
 function refresh(){if(window.itEnable)itEnable()}
-var B={};function add(pack,spec){(B[pack]=B[pack]||[]).push(spec)}
+var B={};function add(pack,spec){if(pack==='geometry-readiness')pack='apex-math';(B[pack]=B[pack]||[]).push(spec)}
 
 /* ---------- 5. curve fit: slide a, h, k until the parabola passes through the dots ---------- */
 function fx(p,x){return p.a*(x-p.h)*(x-p.h)+p.k}

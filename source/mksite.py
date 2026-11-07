@@ -14,7 +14,7 @@ def lum(h):
     return .2126*f(r)+.7152*f(g)+.0722*f(b)
 def cr(a,b):
     x,y=sorted([lum(a),lum(b)],reverse=True);return (x+.05)/(y+.05)
-PK={'skyvolt':['circuit-lab-b','meteorology-b'],'axiom':['geometry-readiness','apex-math','quanta-physics']}[site]
+PK={'skyvolt':['circuit-lab-b','meteorology-b'],'axiom':['apex-merged','quanta-physics']}[site]
 packs=[json.load(open(K+f'events/{p}/pack.json')) for p in PK]
 nq=sum(len(p['questions']) for p in packs);nt=sum(len(p['topics']) for p in packs)
 nl=sum(sum(len(u['lessons']) for u in p['units']) for p in packs);npf=sum(len(p.get('proofs',[])) for p in packs)
@@ -29,8 +29,8 @@ if site=='skyvolt':
 else:
     B=dict(name='Axiom',pri='#4b3bd9',pri_d='#a99dff',acc='#8a5a00',acc_d='#ffd23f',gold='#ffd23f',
         h1='Math, engineering and physics, one small win at a time.',
-        sub='Short interactive lessons start with ideas a 5th grader already knows and climb to high-school exam level. Three tracks: Geometry readiness, Algebra 2 through Calculus, and electrical engineering with physics.',
-        tracks=[('Vertex','Algebra 1 → Geometry Honors','#4b3bd9',[t['name'] for t in packs[0]['topics']]),('Apex','Algebra 2 → Calculus','#b4410a',[t['name'] for t in packs[1]['topics']]),('Quanta','Electrical engineering and physics','#0a6e8a',[t['name'] for t in packs[2]['topics']])],
+        sub='Short interactive lessons start with ideas a 5th grader already knows and climb to high-school exam level. Two tracks: Apex, from Algebra 1 through Calculus III, and Quanta, from 8th-grade physics through electrical engineering.',
+        tracks=[('Apex','Algebra 1 → Calculus III','#b4410a',[t['name'] for t in packs[0]['topics']]),('Quanta','Physics and electrical engineering','#0a6e8a',[t['name'] for t in packs[1]['topics']])],
         what='equations, proofs, similarity, polynomials, logarithms, trigonometry, limits, derivatives, circuits, motion, energy and waves',stations=False,
         exam='a high-school math or physics exam written by a mathematician, physicist or electrical engineer')
 for a,b_,m in [(B['pri'],'#ffffff',4.5),('#14213d','#fbfbf8',7),('#46506b','#fbfbf8',4.5),(B['acc'],'#fbfbf8',4.5),('#eef0fb','#10142b',7),(B['pri_d'],'#10142b',4.5),(B['acc_d'],'#10142b',4.5)]:
@@ -249,7 +249,7 @@ fetch("/api/config",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/js
  if(j.__s===200){csrf=j.csrf||"";if(j.needUsername){$("f").hidden=true;$("uf").hidden=false}else{$("f").hidden=true;$("signed").hidden=false;$("who").textContent=j.username}}}).catch(function(){say("Accounts are not available on this copy of the site. You can still learn as a guest.");$("go").disabled=true});
 })();'''
 
-SLUGS=['circuit','meteorology'] if site=='skyvolt' else ['geometry','apex','quanta']
+SLUGS=['circuit','meteorology'] if site=='skyvolt' else ['apex','quanta']
 def hub():
     cards=''.join(f'<a class="card trk" href="/app/{slug}/" style="border-top:6px solid {c}"><h2>{n}</h2><p><b>{html.escape(s)}</b></p>{chips(t[:6])}<p style="margin-top:12px;color:{c};font-weight:700">Open {n} →</p></a>' for (n,s,c,t),slug in zip(B['tracks'],SLUGS))
     b=f'''<div class="wrap" style="padding:40px 0 56px"><h1 style="font-size:2.2rem">Choose a track</h1><p class="lead">Both tracks share one account, so you can switch at any time. Your progress in each track is saved separately.</p><div class="grid" style="margin-top:24px">{cards}</div><p style="margin-top:24px"><a href="/">Back to the {N} home page</a> · <a href="/account/">Account and friends</a></p></div>'''

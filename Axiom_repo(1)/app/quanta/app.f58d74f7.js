@@ -1,4 +1,4 @@
-var __SIB=[{"slug": "geometry", "brand": "Vertex", "tag": "Algebra 1 \u2192 Geometry Honors", "acc": "#5b4bff"}, {"slug": "apex", "brand": "Apex", "tag": "Algebra 2 \u2192 Calculus", "acc": "#b4410a"}, {"slug": "quanta", "brand": "Quanta", "tag": "Electrical engineering and physics", "acc": "#0a6e8a"}];
+var __SIB=[{"slug": "apex", "brand": "Apex", "tag": "Algebra 1 to Calculus III", "acc": "#b4410a"}, {"slug": "quanta", "brand": "Quanta", "tag": "Electrical engineering and physics", "acc": "#0a6e8a"}];
 /* Open-mode storage: no passcode. Tamper-EVIDENT checksum (casual edits are discarded), not tamper-proof. */
 var __SEC=(function(){
 var K='scioly:'+"quanta-physics-2027", SALT='cl|'+"quanta-physics-2027"+'|v1';
@@ -1675,6 +1675,7 @@ window.__calc=function(s){return calc(s)};
 var TP={'apex-math':{fn:2,qd2:1,pl:1,ra:2,ex:2,lg:1,sq:1,tc:1,tg:2,ti:1,iv:1,id:1,tl:1,cn:2,pp:2,lm:2,dv:1,da:2,'in':1},
  'geometry-readiness':{eq:0,lin:2,sys:2,exp:1,fac:0,rad:1,qdr:2,bas:0,log:0,par:0,tri:0,quad:0,sim:1,rt:1,cir:1,con:0,area:1,sol:1,crd:1,trn:0},
  'quanta-physics':{dig:0},'circuit-lab-b':{hist:0,ctrl:0,logic:0,sym:0,hands:1,diode:1},'meteorology-b':{obs:0,maps:0,clouds:0,light:0,safety:0,cases:0,winter:0,hurr:0,torn:0}};
+TP['apex-math']=Object.assign({},TP['geometry-readiness'],TP['apex-math']);
 function pol(q){if(!q)return 1;if(q.type==='sim')return 1;var pid=(typeof P!=='undefined'&&P.meta&&P.meta.id||'').replace(/-20\d\d$/,''),tab=TP[pid]||{},base=tab[q.t]===undefined?1:tab[q.t];
  if(q.cp!==undefined)return q.cp;
  var numeric=q.num&&q.num.v!==undefined;if(!numeric&&q.type!=='graph')return 0;
@@ -1900,6 +1901,7 @@ T['quanta-physics']=[
   params:[{n:'R',l:'Resistor',min:1,max:100,step:1,u:' kΩ',s:10}],env:{C:C},out:{e:'R*C',l:'Time constant',u:' ms',d:0},goal:{t:tau,rel:.03},
   steps:['Time constant τ = R × C (kΩ × µF = ms).','R = '+tau+' ÷ '+C+' = '+Rr+' kΩ.'],ans:Rr+' kΩ'}}}];
 /* ---------- add to the question bank ---------- */
+T['apex-math']=(T['geometry-readiness']||[]).concat(T['apex-math']||[]);
 var TL=T[PK]||[],NPER=10;
 TL.forEach(function(tp){var seen={};for(var i=0;i<NPER;i++){var id='sim-'+tp.id+'-'+(i<9?'0':'')+(i+1);if(QI[id]!==undefined)continue;var g=tp.gen(mul(hs(PK+tp.id+i)));if(seen[g.story]){continue}seen[g.story]=1;
  var q={id:id,t:tp.t,l:tp.l,type:'sim',ic:tp.ic,q:g.story,sim:g,sol:g.steps,w:g.steps[g.steps.length-1],fp:'sim-'+tp.id};QS.push(q);QI[id]=QS.length-1}});
@@ -1938,7 +1940,7 @@ function sg(x){return String(x).replace('-','−')}
 function cur(type){var it=Z&&!Z.fin&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;return it&&it.q.type===type&&!it.done?it:null}
 function refresh(){if(window.itEnable)itEnable()}
 var B={};/* pack id -> [{id,t,l,ic,type,gen(r)->q fields}] */
-function add(pack,spec){(B[pack]=B[pack]||[]).push(spec)}
+function add(pack,spec){if(pack==='geometry-readiness')pack='apex-math';(B[pack]=B[pack]||[]).push(spec)}
 
 /* ---------- 1. resistor network: wire four resistors to hit a target ---------- */
 function rsv(R,ops){ /* ((R1 a R2) b R3) c R4 as svg. null ops draw faded series */
@@ -2061,7 +2063,7 @@ function rd(v,d){return +v.toFixed(d===undefined?2:d)}
 function sg(x){return String(x).replace('-','−')}
 function cur(type){var it=Z&&!Z.fin&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;return it&&it.q.type===type&&!it.done?it:null}
 function refresh(){if(window.itEnable)itEnable()}
-var B={};function add(pack,spec){(B[pack]=B[pack]||[]).push(spec)}
+var B={};function add(pack,spec){if(pack==='geometry-readiness')pack='apex-math';(B[pack]=B[pack]||[]).push(spec)}
 
 /* ---------- 5. curve fit: slide a, h, k until the parabola passes through the dots ---------- */
 function fx(p,x){return p.a*(x-p.h)*(x-p.h)+p.k}
@@ -2449,7 +2451,7 @@ function rd(v,d){return +v.toFixed(d===undefined?2:d)}
 var SUP={0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹','-':'⁻'};function sup(n){return String(n).split('').map(function(c){return SUP[c]||c}).join('')}
 function cur(type){var it=Z&&!Z.fin&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;return it&&it.q.type===type&&!it.done?it:null}
 function refresh(){if(window.itEnable)itEnable()}
-var GP={};function add(pack,tp){(GP[pack]=GP[pack]||[]).push(tp)}
+var GP={};function add(pack,tp){if(pack==='geometry-readiness')pack='apex-math';(GP[pack]=GP[pack]||[]).push(tp)}
 
 /* ---------- 1. Balance scale: do the same thing to both sides until one bag stands alone ---------- */
 var BT=[['gems','bag of gems','gem'],['oranges','crate of oranges','orange'],['coins','purse of coins','coin']];
@@ -2492,7 +2494,7 @@ function mrefresh(it){var q=it.q.mach,f=MK[q.kind],rows=document.querySelectorAl
 document.addEventListener('input',function(e){var n=e.target.dataset&&e.target.dataset.mc;if(!n||!e.target.classList.contains('mcr'))return;var it=cur('machine');if(!it)return;it[n]=+e.target.value;it.t=true;var b=document.getElementById('mc_'+n);if(b)b.textContent=sg(it[n]);mrefresh(it);window.sfx&&sfx('tick');refresh()});
 function genMach(kinds){return function(r){var kind=pk(r,kinds),m=pk(r,[-5,-4,-3,-2,-1,1,2,3,4,5]),c=ri(r,-9,9),th=pk(r,['Zorp-O-Matic','Number Muncher','Gizmo 3000','Beep-Boop Box']);return{q:'The '+th+' machine eats numbers and spits out new ones, always by the same rule. Study its tickets, then program your own machine to behave exactly the same way.',mach:{kind:kind,m:m,c:c},steps:['Use two tickets to find the rule: the change in OUT for each step in IN shows m.','Then c is what is left over: c = OUT − m × (the processed IN).','Mystery machine: m = '+sg(m)+', c = '+sg(c)+'.']}}}
 add('geometry-readiness',{id:'mach',t:'lin',l:2,ic:'⚙️',type:'machine',cp:0,gen:genMach(['lin'])});
-add('apex-math',{id:'mach',t:'fn',l:3,ic:'⚙️',type:'machine',cp:0,gen:genMach(['sq','abs'])});
+add('apex-math',{id:'machf',t:'fn',l:3,ic:'⚙️',type:'machine',cp:0,gen:genMach(['sq','abs'])});
 
 /* ---------- 3. Catch the mistake: a robot solved it and slipped exactly once ---------- */
 function mm(a){return sg(a)}

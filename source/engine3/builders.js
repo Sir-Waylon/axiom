@@ -9,7 +9,7 @@ function sg(x){return String(x).replace('-','−')}
 function cur(type){var it=Z&&!Z.fin&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;return it&&it.q.type===type&&!it.done?it:null}
 function refresh(){if(window.itEnable)itEnable()}
 var B={};/* pack id -> [{id,t,l,ic,type,gen(r)->q fields}] */
-function add(pack,spec){(B[pack]=B[pack]||[]).push(spec)}
+function add(pack,spec){if(pack==='geometry-readiness')pack='apex-math';(B[pack]=B[pack]||[]).push(spec)}
 
 /* ---------- 1. resistor network: wire four resistors to hit a target ---------- */
 function rsv(R,ops){ /* ((R1 a R2) b R3) c R4 as svg. null ops draw faded series */

@@ -24,5 +24,7 @@ for f,b,t,a in [('apex-math','Apex','Algebra 2 → Calculus',['#b4410a','#ffe9dc
 P
 python3 src/addref.py events/circuit-lab-b/pack.json events/meteorology-b/pack.json
 HUBNAME=Skyvolt APPNAME=Skyvolt python3 build_open.py out/_app_skyvolt circuit=events/circuit-lab-b/pack.json meteorology=events/meteorology-b/pack.json
-HUBNAME=Axiom APPNAME=Axiom python3 build_open.py out/_app_axiom geometry=events/geometry-readiness/pack.json apex=events/apex-math/pack.json quanta=events/quanta-physics/pack.json
+mkdir -p events/apex-merged && python3 src/mergeapex.py events/geometry-readiness/pack.json events/apex-math/pack.json events/apex-merged/pack.json
+HUBNAME=Axiom APPNAME=Axiom python3 build_open.py out/_app_axiom apex=events/apex-merged/pack.json quanta=events/quanta-physics/pack.json
+mkdir -p out/_app_axiom/geometry && printf '<!doctype html><meta charset=utf-8><meta http-equiv=refresh content="0;url=../apex/"><title>Moved</title><a href="../apex/">Vertex is now part of Apex</a>' > out/_app_axiom/geometry/index.html
 python3 mksite.py skyvolt out/_app_skyvolt out/skyvolt && python3 mksite.py axiom out/_app_axiom out/axiom
