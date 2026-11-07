@@ -235,3 +235,10 @@ ul.links{list-style:none;margin:0;padding:0}ul.links a{display:block;padding:12p
 .fam-axm .logo{clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
 .fam-axm .btn{border-radius:6px}.fam-axm .card{border-radius:8px}
 .fam-sky .nav button{border-radius:14px}
+.tracks{overflow-x:auto;scrollbar-width:none}.tracks::-webkit-scrollbar{display:none}.tracks a{min-width:0}.tracks a b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:420px){.tracks{gap:6px;padding-left:10px;padding-right:10px}.tracks a{gap:6px;padding:6px 8px}.tracks a.all{padding:6px 10px}}
+@media(max-width:340px){.tracks a i{display:none}}
+.nav button svg,.logo svg{flex:none;max-width:100%;height:auto;aspect-ratio:1}.nav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:340px){.nav button{font-size:.66rem;padding:6px 1px}}
+@media(max-width:380px){.bar-in{gap:6px}.bar-in .chip,.bar-in .pill,.bar-in [id=hst],.bar-in [id=hco]{font-size:.85rem}.brand{min-width:0;flex:1 1 auto;overflow:hidden}.brand b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}.brand small{display:none}}
+@media(max-width:340px){.brand b{display:none}}
