@@ -20,18 +20,6 @@ var LAB={};function add(pack,tp){(LAB[pack]=LAB[pack]||[]).push(tp)}
 window.__labAdd=add;window.__labKit={mul:mul,hs:hs,pk:pk,rd:rd,sg:sg,fm:fm,SV:SV,TX:TX,LN:LN,RC:RC,CI:CI,PA:PA,PU:PU,OR:OR,GR:GR,RD:RD,BL:BL,G:G};
 
 /* ---------- Quanta: its own set of labs (physics and electronics), not shared with the circuit-event trainer ---------- */
-add('quanta-physics',{id:'proj',t:'kin',l:3,ic:'🏹',cp:1,
- gen:function(r){var a0=pk(r,[30,35,40,45,50,55,60]),v0=12+Math.floor(r()*15),th=a0*PI/180,D=Math.round(v0*v0*Math.sin(2*th)/G);if(D<15)return null;var wx=Math.round(D*pk(r,[.4,.5,.6])),y0=wx*Math.tan(th)-G*wx*wx/(2*v0*v0*Math.cos(th)*Math.cos(th));return{D:D,wx:wx,wh:Math.max(1,Math.floor(y0*.7))}},
- story:function(p){return 'Launch the ball so it lands on the flag '+p.D+' m away and clears the '+p.wh+' m wall that stands '+p.wx+' m from the launcher.'},
- params:function(){return[{n:'a',l:'Launch angle',min:15,max:75,step:5,s:45,u:'°'},{n:'v',l:'Launch speed',min:5,max:30,step:1,s:15,u:' m/s'}]},
- model:function(v,p){var th=v.a*PI/180,R=v.v*v.v*Math.sin(2*th)/G,pkh=Math.pow(v.v*Math.sin(th),2)/(2*G),yw=p.wx*Math.tan(th)-G*p.wx*p.wx/(2*v.v*v.v*Math.cos(th)*Math.cos(th));return{R:R,pk:pkh,yw:yw,t:2*v.v*Math.sin(th)/G}},
- goals:function(p){return[{t:'Land within 1.5 m of the flag',ok:function(o){return Math.abs(o.R-p.D)<=1.5}},{t:'Clear the '+p.wh+' m wall',ok:function(o){return o.R>p.wx&&o.yw>p.wh}}]},
- draw:function(v,o,p){var xm=Math.max(p.D*1.2,Math.min(o.R,p.D*2.2)),ym=Math.max(o.pk,p.wh+1,6),sc=Math.min(270/xm,125/ym),X=function(x){return 15+x*sc},Y=function(y){return 150-y*sc},th=v.a*PI/180,d='',i,x,y;
-  for(i=0;i<=80;i++){x=o.R*i/80;if(x>xm)break;y=x*Math.tan(th)-G*x*x/(2*v.v*v.v*Math.cos(th)*Math.cos(th));d+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(Math.max(0,y)).toFixed(1)}
-  return SV(LN(8,150,292,150,null,2)+RC(X(p.wx)-3,Y(p.wh),6,p.wh*sc,'#e08a00','#e08a00',1)+LN(X(p.D),150,X(p.D),128,'currentColor',2)+'<path d="M'+X(p.D)+' 128 l14 6 l-14 6z" fill="#d6336c"/>'+PA(d,PU)+CI(X(0),150,5,PU,PU)+TX(X(p.D),164,p.D+' m',{a:'middle'}),'Ball trajectory with wall and flag')},
- read:function(v,o){return 'Range <b>'+fm(o.R)+' m</b> · peak <b>'+fm(o.pk)+' m</b> · height at the wall <b>'+fm(o.yw)+' m</b>'},
- why:function(p,s){return['Range = v² sin 2θ ÷ g sets where it lands.','Height at the wall: y = x tan θ − g x² ÷ (2 v² cos² θ). Higher angles clear the wall but need more speed for the same range.','One way: '+s.a+'° at '+s.v+' m/s.']}});
-
 add('quanta-physics',{id:'coast',t:'nrg',l:3,ic:'🎢',cp:1,
  gen:function(r){var Rm=pk(r,[3,4,5,6]),Hm=2.5*Rm+pk(r,[3,4,5,6]);return{Rm:Rm,vmax:Math.ceil(Math.sqrt(2*G*Hm))}},
  story:function(p){return 'Design a roller coaster. The loop must be at least '+p.Rm+' m in radius, the car must not fall off at the top, and it may not exceed '+p.vmax+' m/s at the bottom.'},
@@ -42,17 +30,6 @@ add('quanta-physics',{id:'coast',t:'nrg',l:3,ic:'🎢',cp:1,
   return SV(LN(8,150,292,150,null,2)+PA('M20 '+Y(v.H).toFixed(1)+' Q70 150 130 150',PU,3)+CI(cx,cy,v.R*sc,'none',PU)+LN(130,150,cx-4,150,PU,3)+CI(24,Y(v.H)-5,5,OR,OR)+CI(cx,cy-v.R*sc-6,6,o.ok?'#12935f':'#d6336c','#fff')+TX(24,Y(v.H)-14,v.H+' m'),'Roller coaster hill and loop')},
  read:function(v,o){return 'Bottom speed <b>'+fm(o.vb)+' m/s</b> · top-of-loop speed <b>'+fm(o.vt)+' m/s</b> (needs at least '+fm(o.need)+')'},
  why:function(p,s){return['Energy: ½mv² at the bottom = mgH, so v = √(2gH).','At the top of the loop the car needs v² ≥ gR. With energy, that means H ≥ 2.5 R.','One way: start height '+s.H+' m with a '+s.R+' m loop.']}});
-
-add('quanta-physics',{id:'cart',t:'mom',l:3,ic:'🛒',cp:1,
- gen:function(r){var mB=pk(r,[2,3,4,5]),mA=1+Math.floor(r()*6),vA=2+Math.floor(r()*7),e=pk(r,[0,.5,1]),vB=(1+e)*mA*vA/(mA+mB),vAp=(mA-e*mB)*vA/(mA+mB),c=vAp<-.05?'back':vAp>.05?'fwd':null;if(!c||vB>14)return null;return{mB:mB,vBt:rd(vB,1),c:c}},
- story:function(p){return 'Cart A rolls into cart B ('+p.mB+' kg, at rest). Choose A’s mass, A’s speed and how bouncy the bumpers are so that B leaves at '+p.vBt+' m/s and A '+(p.c==='back'?'bounces backward':'keeps rolling forward')+'.'},
- params:function(){return[{n:'mA',l:'Cart A mass',min:1,max:6,step:1,s:2,u:' kg'},{n:'vA',l:'Cart A speed',min:1,max:8,step:1,s:4,u:' m/s'},{n:'e',l:'Bounciness (0 sticks, 1 bounces)',min:0,max:1,step:.25,s:0,u:''}]},
- model:function(v,p){return{vB:(1+v.e)*v.mA*v.vA/(v.mA+p.mB),vA:(v.mA-v.e*p.mB)*v.vA/(v.mA+p.mB)}},
- goals:function(p){return[{t:'Cart B leaves at '+p.vBt+' m/s (±0.15)',ok:function(o){return Math.abs(o.vB-p.vBt)<=.15}},{t:p.c==='back'?'Cart A rebounds backward':'Cart A keeps rolling forward',ok:function(o){return p.c==='back'?o.vA<-.05:o.vA>.05}}]},
- draw:function(v,o,p){function row(y,a,b,lb){var wa=14+v.mA*5,wb=14+p.mB*5;return TX(8,y-14,lb,{s:9})+RC(40,y-12,wa,18,'#dfe8ff',PU)+RC(190,y-12,wb,18,'#ffe8c9',OR)+TX(40+wa/2,y,'A',{a:'middle'})+TX(190+wb/2,y,'B',{a:'middle'})+(a?LN(40+wa/2,y+14,40+wa/2+a*8,y+14,PU,3):'')+(b?LN(190+wb/2,y+14,190+wb/2+b*8,y+14,OR,3):'')}
-  return SV(LN(8,60,292,60,null,2)+row(55,v.vA,0,'Before')+LN(8,140,292,140,null,2)+row(135,o.vA,o.vB,'After'),'Carts before and after the collision')},
- read:function(v,o){return 'After: A moves at <b>'+fm(o.vA)+' m/s</b>, B at <b>'+fm(o.vB)+' m/s</b>'},
- why:function(p,s){return['Momentum is conserved: mA vA = mA vA′ + mB vB′.','With bounciness e: vB′ = (1+e) mA vA ÷ (mA + mB). A heavier cart A sends B faster; e = 1 conserves energy too.','One way: '+s.mA+' kg at '+s.vA+' m/s, bounciness '+s.e+'.']}});
 
 add('quanta-physics',{id:'str',t:'wav',l:3,ic:'🎸',cp:1,
  gen:function(r){var L=pk(r,[.6,.8,1,1.2,1.5]),mu=pk(r,[.004,.006,.01,.016]),nm=pk(r,[2,3]),n0=1+Math.floor(r()*nm),T0=20+5*Math.floor(r()*37),f0=n0/(2*L)*Math.sqrt(T0/mu);if(f0<80||f0>900)return null;return{L:L,mu:mu,nm:nm,fT:Math.round(f0)}},
