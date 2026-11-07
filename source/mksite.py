@@ -84,7 +84,7 @@ input:focus{border-color:var(--pri)}input[aria-invalid=true]{border-color:#c4302
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{header.top,.cta,.skip{display:none}}
 '''%B
-BOLT='<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="var(--pri)"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>'
+BOLT=('<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="var(--pri)"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>' if site=='skyvolt' else '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0 0h64v44L44 64H0z" fill="var(--pri)"/><path d="M32 10 52 52H12z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="miter"/><path d="M22 40h20" stroke="#ffd23f" stroke-width="4"/><circle cx="32" cy="28" r="3.5" fill="#ffd23f"/></svg>')
 NAV=[('/#how','How it works'),('/#topics','Topics')]
 def page(path,title,body,desc='',cur='',head='',tail=''):
     nav=''.join(f'<li><a href="{h}"{" aria-current=page" if h==cur else ""}>{t}</a></li>' for h,t in NAV)

@@ -230,3 +230,8 @@ details.alt{display:block;text-align:center}details.alt summary{cursor:pointer;m
 body.insess .tracks{display:none}
 ul.links{list-style:none;margin:0;padding:0}ul.links a{display:block;padding:12px 2px;min-height:44px;color:var(--pri-t);font-weight:700;text-decoration:none;border-bottom:1px solid var(--line)}
 .so{margin-top:10px}.so .btn{min-height:44px}
+/* family styling */
+.fam-axm .nav button{border-radius:2px}.fam-axm .nav button[aria-current="true"]{box-shadow:inset 0 3px 0 var(--pri)}
+.fam-axm .logo{clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
+.fam-axm .btn{border-radius:6px}.fam-axm .card{border-radius:8px}
+.fam-sky .nav button{border-radius:14px}

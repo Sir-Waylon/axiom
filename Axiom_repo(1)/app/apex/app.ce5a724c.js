@@ -803,8 +803,8 @@ function addMins(z){if(!z||!z.t0)return;var m=Math.min(30,(Date.now()-z.t0)/6000
 var UN=P.units||[],ALL=P.topics.map(function(t){return t.id}),cur='learn',sub={lib:'notes',me:'profile'};
 if(!S.cos)S.cos={own:{},on:{av:'a0',th:'t0',ti:'i0',ac:'c0'}};if(!S.cos.on.ac)S.cos.on.ac='c0';
 if(!S.un)S.un={};if(!S.fr)S.fr={};if(!S.nm)S.nm='';if(!S.theme)S.theme='auto';if(!S.lr)S.lr={};
-var IC={learn:'<path d="M4 6l8-3 8 3v6c0 4-3.5 7-8 9-4.5-2-8-5-8-9z"/><path d="M9 12l2 2 4-4"/>',practice:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',library:'<path d="M4 4h6a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-6a2 2 0 00-2 2v14a2 2 0 012-2h6z"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>'};
-var TABS=[['learn','Learn'],['practice','Practice'],['library','Library'],['me','Me']];
+var IC={learn:'<path d="M4 6l8-3 8 3v6c0 4-3.5 7-8 9-4.5-2-8-5-8-9z"/><path d="M9 12l2 2 4-4"/>',practice:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',library:'<path d="M4 4h6a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-6a2 2 0 00-2 2v14a2 2 0 012-2h6z"/>',course:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>'};
+var TABS=[['learn','Learn'],['course','Course'],['practice','Practice'],['library','Library'],['me','Me']];
 var A11={};try{A11=JSON.parse(localStorage.getItem('scioly:ui')||'{}')}catch(e){}
 function svgi(p,s){return '<svg width="'+(s||24)+'" height="'+(s||24)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
 /* ---------- shell ---------- */
@@ -822,7 +822,7 @@ function applyUI(){var c=document.documentElement.classList;c.toggle('xl',A11.xl
 function saveUI(){try{localStorage.setItem('scioly:ui',JSON.stringify(A11))}catch(e){}applyUI()}
 function route(){
  [].forEach.call(document.querySelectorAll('#nav button'),function(b){b.setAttribute('aria-current',b.dataset.t===cur?'true':'false')});
- var m=$('main');m.className='view-in';m.innerHTML=({learn:viewLearn,practice:viewPractice,library:viewLibrary,me:viewMe})[cur]();
+ var m=$('main');m.className='view-in';m.innerHTML=({learn:viewLearn,course:(window.viewCourse||viewLearn),practice:viewPractice,library:viewLibrary,me:viewMe})[cur]();
  var f=({library:afterLibrary,me:afterMe})[cur];if(f)f();window.scrollTo(0,0)}
 function go(t){cur=t;route()}
 /* ---------- FX ---------- */
@@ -918,7 +918,7 @@ function viewMe(){
   var wk='';for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var k=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);wk+='<i class="'+(S.days[k]?'on':'')+'">'+'SMTWTFS'[d.getDay()]+'</i>'}
   h+='<div class="card"><h3>'+dayStreak()+' day streak</h3><div class="wk" style="margin-top:8px">'+wk+'</div></div>';
   h+='<div class="card"><h3>Today</h3>'+QU.map(function(u){var v=Math.min(u[2],u[1]());return '<div class="bar2"><span>'+u[0]+(v>=u[2]?' ✓':'')+'</span><span class="tr"><i style="width:'+100*v/u[2]+'%"></i></span><span>'+v+'/'+u[2]+'</span></div>'}).join('')+'</div>';
-  h+='<div class="card"><h3>Mastery</h3>'+P.topics.map(function(t){var st=S.stat[t.id]||[0,0],p=st[1]?100*st[0]/st[1]:0;return '<div class="bar2"><span>'+esc(t.name)+'</span><span class="tr"><i style="width:'+p+'%"></i></span><span>'+(st[1]?Math.round(p)+'%':'–')+'</span></div>'}).join('')+'</div>';
+  h+='<div class="card"><h3>Mastery</h3>'+P.topics.map(function(t){var ml=mastery(t.id),p=25*ml.lv;return '<div class="bar2"><span>'+esc(t.name)+'</span><span class="tr" role="img" aria-label="'+['Not started','Attempted','Familiar','Proficient','Mastered'][ml.lv]+'"><i style="width:'+p+'%"></i></span><span>'+['–','Tried','Familiar','Proficient','Mastered'][ml.lv]+'</span></div>'}).join('')+'</div>';
   h+='<div class="card"><h3>Badges</h3><div class="bdgs" style="margin-top:8px">'+BADGES.map(function(b){return '<div class="bdg'+(S.badges[b[0]]?' on':'')+'"><b>'+b[1]+'</b><small>'+b[2]+'</small></div>'}).join('')+'</div></div>'}
  else if(s==='shop'){h+=shopHTML()}
  else if(s==='friends'){
@@ -955,7 +955,7 @@ applyTheme();applyCos();applyUI();hud();route();
 window.addEventListener('pagehide',function(){save()});
 /* ---------- greeting + daily mission card ---------- */
 function greet(){var dx=S.dxp[today()]||0,st=dayStreak(),hr=new Date().getHours(),m;
- if(!S.total)m='Hi, I am '+avOf(S.cos.on.av)[1]+'. Start with today\'s mission. It takes about 10 minutes.';
+ if(!S.total)m='Hi, I am '+avOf(S.cos.on.av)[1]+'. Start with today\'s mission. It takes about 15 minutes.';
  else if(minsToday()>=45)m='You studied '+minsToday()+' minutes today. That is plenty. Stopping here is a win.';
  else if(hr>=22||hr<5)m='It is late. Sleep helps your memory. A short mission now, then rest.';
  else if(missionDone())m='Mission done today. Extra practice is bonus.';
@@ -3201,7 +3201,7 @@ var _dr=drawResults;drawResults=function(top){_dr(top);var z=Z;if(!z||!z.sumDone
 function card(){var a=items();
  if(!a)return '<div class="card plc"><div class="row"><div style="flex:1"><b>My plan</b><div class="small mute">Take the placement check and we build your plan.</div></div><button class="btn sm" id="dgs">Start check</button></div></div>';
  var f=focus(a),d=a.filter(function(x){return x.s==='done'||x.s==='keep'}).length,x=f[0],lab=!x?'All topics done':x.s==='learn'&&!x.back?'Lesson: '+TOP[x.t].name:'Practice: '+f.filter(function(y){return y.s!=='learn'||y.back}).slice(0,2).map(function(y){return TOP[y.t].name}).join(', ');
- return '<div class="card plc"><div class="row"><div style="flex:1;min-width:0"><b>My plan</b><div class="small">Now: '+esc(lab)+'</div></div><button class="btn sm" data-plan="go">'+(x?'Start':'Review')+'</button><button class="btn sec sm" data-plan="view">See plan</button></div><div class="plb" role="img" aria-label="'+d+' of '+a.length+' topics done or strong"><i style="width:'+Math.round(100*d/a.length)+'%"></i></div><div class="small mute">'+d+' of '+a.length+' topics done or strong</div></div>'}
+ return '<div class="card plc"><div class="row"><div style="flex:1;min-width:0"><b>My plan</b><div class="small">Now: '+esc(lab)+'</div></div><button class="btn sm" data-plan="go">'+(x?'Start':'Review')+'</button><button class="btn sec sm" data-plan="view">See plan</button></div><div class="plb" role="img" aria-label="'+d+' of '+a.length+' topics strong or proven"><i style="width:'+Math.round(100*d/a.length)+'%"></i></div><div class="small mute">'+d+' of '+a.length+' topics strong or proven</div></div>'}
 window.__cu={items:items,focus:focus,tgt:tgt,startPlan:startPlan,card:card,sheet:sheet};
 var _vl=viewLearn;viewLearn=function(){var h=_vl.apply(this,arguments),c=card();if(S.dg&&S.dg!=='skip'&&items())h=h.replace(/<div class="card dgc">.*?<\/div><button class="btn sec sm" id="dgx"[^>]*>Skip<\/button><\/div>/,'');
  return h.indexOf('<div class="cont">')>-1?h.replace('<div class="cont">',c+'<div class="cont">'):c+h};
@@ -3263,6 +3263,57 @@ startMission=function(){var a=CU.items();if(!a){startPractice(ALL,12);return}
 var _ss=startSess;startSess=function(o){if(o&&o.steps&&o.kind!=='lesson'&&o.kind!=='mission'&&o.steps.every(function(s){return s.k==='try'}))o.steps=shuf(o.steps);return _ss.apply(this,arguments)};
 /* nav label */
 TABS[0][1]='Today';route();var sp=document.querySelector('#nav button[data-t="learn"] span');if(sp)sp.textContent='Today';
+})();
+
+/* ===== icon families. Skyvolt: round, open line icons. Axiom: angular icons with a flat tint. Each trainer has its own mark. ===== */
+(function(){
+var id=(P.meta&&P.meta.id||'').replace(/-20\d\d$/,''),SKY=id==='circuit-lab-b'||id==='meteorology-b',fam=SKY?'sky':'axm';
+var T='<path fill="currentColor" fill-opacity=".16" stroke="none" d="';
+var SET={
+ sky:{learn:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+  course:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+  practice:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  library:'<path d="M4 4h6a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-6a2 2 0 00-2 2v14a2 2 0 012-2h6z"/>',
+  me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>'},
+ axm:{learn:T+'M4 5h16v15H4z"/><path d="M4 5h16v15H4zM4 10h16M8 3v4M16 3v4M9 15l2 2 4-4"/>',
+  course:T+'M4 20v-6h5v-5h5V4h6v16z"/><path d="M4 20v-6h5v-5h5V4h6v16z"/>',
+  practice:T+'M12 3l9 9-9 9-9-9z"/><path d="M12 3l9 9-9 9-9-9zM12 8l4 4-4 4-4-4z"/>',
+  library:T+'M5 3h14v18H5z"/><path d="M5 3h14v18H5zM9 3v18M12 8h4M12 12h4"/>',
+  me:T+'M4 21l3-6h10l3 6z"/><path d="M12 3l4 4-4 4-4-4zM4 21l3-6h10l3 6z"/>'}};
+/* trainer marks (24 grid) */
+var MARK={circuit:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',meteorology:'<path d="M7 18a4 4 0 010-8 5 5 0 019.5-1A3.5 3.5 0 0117 18z"/><path d="M9 21l1-2M13 21l1-2"/>',
+ geometry:'<path d="M3 20L12 4l9 16z"/><path d="M7.5 20a5 5 0 011.2-3.3"/>',apex:'<path d="M2 20L9 6l4 7 3-4 6 11z"/>',
+ quanta:'<ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/>'};
+var slug=({'circuit-lab-b':'circuit','meteorology-b':'meteorology','geometry-readiness':'geometry','apex-math':'apex','quanta-physics':'quanta'})[id]||'circuit';
+window.__fam=fam;document.documentElement.classList.add('fam-'+fam,'tr-'+slug);
+var set=SET[fam];Object.keys(set).forEach(function(k){IC[k]=set[k]});IC.mark=MARK[slug];
+svgi=function(p,s){return '<svg width="'+(s||24)+'" height="'+(s||24)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(SKY?2:1.9)+'" stroke-linecap="'+(SKY?'round':'square')+'" stroke-linejoin="'+(SKY?'round':'miter')+'" aria-hidden="true" focusable="false">'+p+'</svg>'};
+/* nav, rebuilt with the family icons */
+$('nav').innerHTML=TABS.map(function(t){return '<button data-t="'+t[0]+'">'+svgi(IC[t[0]]||IC.learn)+'<span>'+t[1]+'</span></button>'}).join('');
+/* header mark */
+var lg=document.querySelector('.logo');if(lg){lg.innerHTML=svgi(IC.mark,22).replace('stroke="currentColor"','stroke="#fff"');lg.style.borderRadius=SKY?'10px':'4px';lg.style.transform=SKY?'':'none'}
+})();
+
+/* ===== Course: unit-by-unit mastery, in the style of a course page. Levels come from real answers: Not started, Attempted, Familiar, Proficient, Mastered. ===== */
+(function(){
+var CU=window.__cu,LV=['Not started','Attempted','Familiar','Proficient','Mastered'],open={};
+function lvl(t){return mastery(t).lv}
+function stage(a,t){for(var i=0;i<a.length;i++)if(a[i].t===t)return a[i];return null}
+function seg(counts,total){return '<div class="cseg" role="img" aria-label="'+LV.map(function(n,i){return counts[i]+' '+n.toLowerCase()}).join(', ')+'">'+counts.map(function(c,i){return c?'<i class="lv'+i+'" style="width:'+(100*c/total)+'%"></i>':''}).join('')+'</div>'}
+window.viewCourse=function(){
+ var a=CU&&CU.items(),U=UN.filter(function(u){return TOP[u.id]}),counts=[0,0,0,0,0],pts=0;
+ U.forEach(function(u){var l=lvl(u.id);counts[l]++;pts+=l});var T=U.length||1,prof=counts[3]+counts[4],foc=a?CU.focus(a)[0]:null;
+ var h='<h2 style="margin-bottom:10px">Course</h2><div class="card cmast"><div class="row"><div style="flex:1"><b>Course mastery</b><div class="small mute">'+prof+' of '+U.length+' units Proficient or Mastered</div></div><div class="cpts" title="Mastery points"><b>'+pts+'</b><small>of '+4*U.length+' pts</small></div></div>'+seg(counts,T)+
+  '<div class="clg">'+LV.map(function(n,i){return '<span><i class="lv'+i+'"></i>'+n+' '+counts[i]+'</span>'}).join('')+'</div></div>';
+ if(foc)h+='<button class="card cnext" data-co="go:'+foc.t+'"><span class="small mute">Up next for you</span><b>'+esc(TOP[foc.t].name)+'</b></button>';
+ h+=U.map(function(u,i){var l=lvl(u.id),us=unitState(u),x=a&&stage(a,u.id),isOpen=open[u.id],lp=100*us.done/Math.max(1,u.lessons.length);
+  var chip=x?'<span class="tag">'+({learn:'Learn',practice:'Practice',prove:'Prove it',slip:'Review',keep:'Strong',done:'Done'})[x.back?'practice':x.s]+'</span>':'';
+  var body=isOpen?'<div class="cbody"><ul class="clessons">'+u.lessons.map(function(L){var d=us.us.d&&us.us.d[L.id];return '<li><span class="cck'+(d?' on':'')+'" aria-hidden="true">'+(d?'✓':'')+'</span><span style="flex:1">'+esc(L.title)+'</span><button class="btn sec sm" data-ls="'+u.id+'|'+L.id+'">'+(d?'Redo':'Start')+'</button></li>'}).join('')+'</ul><div class="row"><button class="btn sm" data-co="prac:'+u.id+'">Practice</button><button class="btn sec sm" data-co="test:'+u.id+'"'+(us.all?'':' disabled')+'>Unit test</button></div>'+(us.all?'':'<div class="small mute">Finish the lessons to unlock the unit test.</div>')+'</div>':'';
+  return '<div class="card cunit"><button class="chead" data-co="tog:'+u.id+'" aria-expanded="'+!!isOpen+'"><span class="cnum">'+(i+1)+'</span><span style="flex:1;min-width:0;text-align:left"><b>'+esc(u.title)+'</b><span class="cpips" aria-label="'+LV[l]+'">'+[1,2,3,4].map(function(k){return '<em class="'+(l>=k?'on lv'+l:'')+'"></em>'}).join('')+'<small>'+LV[l]+'</small></span></span>'+chip+'</button><div class="cprog" role="img" aria-label="'+us.done+' of '+u.lessons.length+' lessons done"><i style="width:'+lp+'%"></i></div><div class="small mute">'+us.done+'/'+u.lessons.length+' lessons'+(us.pass?' · unit test passed':'')+'</div>'+body+'</div>'}).join('');
+ return h};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-co]');if(!b)return;var k=b.dataset.co.split(':'),id=k[1];
+ if(k[0]==='tog'){open[id]=!open[id];route()}else if(k[0]==='prac')startPractice([id],12);else if(k[0]==='test'){if(!b.disabled)startUnitTest(id)}
+ else if(k[0]==='go'){var u=UN.filter(function(x){return x.id===id})[0];if(u){var us=unitState(u),L=u.lessons.filter(function(l){return !(us.us.d&&us.us.d[l.id])})[0];if(L&&!(CU.items().filter(function(x){return x.t===id})[0]||{}).back)startLesson(id,L.id);else startPractice([id],12)}}});
 })();
 
 /* ===== accessibility (WCAG 2.2 AA) + voiced assistant ===== */

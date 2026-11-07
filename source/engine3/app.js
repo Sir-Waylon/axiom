@@ -2,8 +2,8 @@
 var UN=P.units||[],ALL=P.topics.map(function(t){return t.id}),cur='learn',sub={lib:'notes',me:'profile'};
 if(!S.cos)S.cos={own:{},on:{av:'a0',th:'t0',ti:'i0',ac:'c0'}};if(!S.cos.on.ac)S.cos.on.ac='c0';
 if(!S.un)S.un={};if(!S.fr)S.fr={};if(!S.nm)S.nm='';if(!S.theme)S.theme='auto';if(!S.lr)S.lr={};
-var IC={learn:'<path d="M4 6l8-3 8 3v6c0 4-3.5 7-8 9-4.5-2-8-5-8-9z"/><path d="M9 12l2 2 4-4"/>',practice:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',library:'<path d="M4 4h6a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-6a2 2 0 00-2 2v14a2 2 0 012-2h6z"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>'};
-var TABS=[['learn','Learn'],['practice','Practice'],['library','Library'],['me','Me']];
+var IC={learn:'<path d="M4 6l8-3 8 3v6c0 4-3.5 7-8 9-4.5-2-8-5-8-9z"/><path d="M9 12l2 2 4-4"/>',practice:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',library:'<path d="M4 4h6a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-6a2 2 0 00-2 2v14a2 2 0 012-2h6z"/>',course:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>'};
+var TABS=[['learn','Learn'],['course','Course'],['practice','Practice'],['library','Library'],['me','Me']];
 var A11={};try{A11=JSON.parse(localStorage.getItem('scioly:ui')||'{}')}catch(e){}
 function svgi(p,s){return '<svg width="'+(s||24)+'" height="'+(s||24)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
 /* ---------- shell ---------- */
@@ -21,7 +21,7 @@ function applyUI(){var c=document.documentElement.classList;c.toggle('xl',A11.xl
 function saveUI(){try{localStorage.setItem('scioly:ui',JSON.stringify(A11))}catch(e){}applyUI()}
 function route(){
  [].forEach.call(document.querySelectorAll('#nav button'),function(b){b.setAttribute('aria-current',b.dataset.t===cur?'true':'false')});
- var m=$('main');m.className='view-in';m.innerHTML=({learn:viewLearn,practice:viewPractice,library:viewLibrary,me:viewMe})[cur]();
+ var m=$('main');m.className='view-in';m.innerHTML=({learn:viewLearn,course:(window.viewCourse||viewLearn),practice:viewPractice,library:viewLibrary,me:viewMe})[cur]();
  var f=({library:afterLibrary,me:afterMe})[cur];if(f)f();window.scrollTo(0,0)}
 function go(t){cur=t;route()}
 /* ---------- FX ---------- */
@@ -117,7 +117,7 @@ function viewMe(){
   var wk='';for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var k=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);wk+='<i class="'+(S.days[k]?'on':'')+'">'+'SMTWTFS'[d.getDay()]+'</i>'}
   h+='<div class="card"><h3>'+dayStreak()+' day streak</h3><div class="wk" style="margin-top:8px">'+wk+'</div></div>';
   h+='<div class="card"><h3>Today</h3>'+QU.map(function(u){var v=Math.min(u[2],u[1]());return '<div class="bar2"><span>'+u[0]+(v>=u[2]?' ✓':'')+'</span><span class="tr"><i style="width:'+100*v/u[2]+'%"></i></span><span>'+v+'/'+u[2]+'</span></div>'}).join('')+'</div>';
-  h+='<div class="card"><h3>Mastery</h3>'+P.topics.map(function(t){var st=S.stat[t.id]||[0,0],p=st[1]?100*st[0]/st[1]:0;return '<div class="bar2"><span>'+esc(t.name)+'</span><span class="tr"><i style="width:'+p+'%"></i></span><span>'+(st[1]?Math.round(p)+'%':'–')+'</span></div>'}).join('')+'</div>';
+  h+='<div class="card"><h3>Mastery</h3>'+P.topics.map(function(t){var ml=mastery(t.id),p=25*ml.lv;return '<div class="bar2"><span>'+esc(t.name)+'</span><span class="tr" role="img" aria-label="'+['Not started','Attempted','Familiar','Proficient','Mastered'][ml.lv]+'"><i style="width:'+p+'%"></i></span><span>'+['–','Tried','Familiar','Proficient','Mastered'][ml.lv]+'</span></div>'}).join('')+'</div>';
   h+='<div class="card"><h3>Badges</h3><div class="bdgs" style="margin-top:8px">'+BADGES.map(function(b){return '<div class="bdg'+(S.badges[b[0]]?' on':'')+'"><b>'+b[1]+'</b><small>'+b[2]+'</small></div>'}).join('')+'</div></div>'}
  else if(s==='shop'){h+=shopHTML()}
  else if(s==='friends'){
@@ -154,7 +154,7 @@ applyTheme();applyCos();applyUI();hud();route();
 window.addEventListener('pagehide',function(){save()});
 /* ---------- greeting + daily mission card ---------- */
 function greet(){var dx=S.dxp[today()]||0,st=dayStreak(),hr=new Date().getHours(),m;
- if(!S.total)m='Hi, I am '+avOf(S.cos.on.av)[1]+'. Start with today\'s mission. It takes about 10 minutes.';
+ if(!S.total)m='Hi, I am '+avOf(S.cos.on.av)[1]+'. Start with today\'s mission. It takes about 15 minutes.';
  else if(minsToday()>=45)m='You studied '+minsToday()+' minutes today. That is plenty. Stopping here is a win.';
  else if(hr>=22||hr<5)m='It is late. Sleep helps your memory. A short mission now, then rest.';
  else if(missionDone())m='Mission done today. Extra practice is bonus.';

@@ -8,7 +8,7 @@ css=open(d+'app.css',encoding='utf8').read()+open(d+'roster.css',encoding='utf8'
 rd=lambda f:open(d+f,encoding='utf8').read()
 ver=hashlib.sha1((css+''.join(rd(f) for f in os.listdir(d))).encode()).hexdigest()[:8]
 files=['sw.js','manifest.webmanifest','icon.svg','hub.css','index.html']
-ICON='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#5b4bff"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>'
+ICON=('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#5b4bff"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>' if os.environ.get('HUBNAME')!='Axiom' else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M0 0h64v44L44 64H0z" fill="#5b4bff"/><path d="M32 10 52 52H12z" fill="none" stroke="#fff" stroke-width="4"/><path d="M22 40h20" stroke="#ffd23f" stroke-width="4"/><circle cx="32" cy="28" r="3.5" fill="#ffd23f"/></svg>')
 open(out+'/icon.svg','w').write(ICON)
 open(out+'/manifest.webmanifest','w').write(json.dumps({"name":os.environ.get("APPNAME","Trainers"),"short_name":os.environ.get("APPNAME","Trainers"),"start_url":"./","display":"standalone","background_color":"#ffffff","theme_color":"#5b4bff","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}))
 allf=[]
@@ -19,7 +19,7 @@ for slug,pp in packs:
     D=out if ROOT else f'{out}/{slug}';P_='' if ROOT else '../';S_='' if ROOT else slug+'/'
     os.makedirs(D,exist_ok=True)
     SIB=[] if os.environ.get('ROOT')=='1' else [dict(slug=s_,brand=json.load(open(p_,encoding='utf8'))['meta'].get('brand',s_),tag=json.load(open(p_,encoding='utf8'))['meta'].get('tagline','').split(' · ')[0],acc=json.load(open(p_,encoding='utf8'))['meta'].get('accent',['#5b4bff'])[0]) for s_,p_ in packs]
-    js='var __SIB='+json.dumps(SIB)+';\n'+rd('sec_open.js').replace('__PACK_ID__',json.dumps(m['id']))+'\n'+''.join(rd(f)+'\n' for f in ['core.js','fig.js','char.js','roster1.js','people.js','session.js','brain.js','app.js','roster2.js','labs.js','audio.js','itypes.js','itypes2.js','interact.js','rewards.js','window.js','online.js','widgets.js','tools.js','sims.js','builders.js','builders2.js','goals.js','physdemo.js','games.js','rw.js','personal.js','style.js','accounts.js','refs.js','stn_core.js','stn_circ1.js','stn_circ2.js','stn_met1.js','stn_met2.js','extras.js','tracks.js','shorts.js','metacog.js','curric.js','today.js','a11y.js'])
+    js='var __SIB='+json.dumps(SIB)+';\n'+rd('sec_open.js').replace('__PACK_ID__',json.dumps(m['id']))+'\n'+''.join(rd(f)+'\n' for f in ['core.js','fig.js','char.js','roster1.js','people.js','session.js','brain.js','app.js','roster2.js','labs.js','audio.js','itypes.js','itypes2.js','interact.js','rewards.js','window.js','online.js','widgets.js','tools.js','sims.js','builders.js','builders2.js','goals.js','physdemo.js','games.js','rw.js','personal.js','style.js','accounts.js','refs.js','stn_core.js','stn_circ1.js','stn_circ2.js','stn_met1.js','stn_met2.js','extras.js','tracks.js','shorts.js','metacog.js','curric.js','today.js','icons.js','course.js','a11y.js'])
     js=js.replace('__PACK__',json.dumps(pack,ensure_ascii=False,separators=(',',':')).replace('</','<\\/'))
     js='(function(){"use strict";\n'+js+'\n})();' if os.environ.get('WRAP') else js
     hj=hashlib.sha1(js.encode()).hexdigest()[:8];hc=ver
