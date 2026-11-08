@@ -1,0 +1,13 @@
+/* ===== Today: Play panel with three choices: Host, Solo, Versus ===== */
+(function(){
+var P3={host:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',solo:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',vs:'<path d="M4 20L15 9M15 5h4v4M20 20L9 9M9 5H5v4"/>'};
+function tile(k,t,d){return '<button class="tile t-'+k+'" data-og="'+k+'" aria-label="'+t+'. '+d+'"><span class="ti">'+svgi(P3[k],26)+'</span><b>'+t+'</b><small>'+d+'</small></button>'}
+function panel(){return '<section class="card play2" aria-label="Play"><div class="ph"><b>Play</b><button class="lnk" data-og="join">Join with a code</button></div><div class="tiles3">'+tile('host','Host','Run a live game for your class')+tile('solo','Solo','Beat the clock on your own')+tile('vs','Versus','1 on 1 with a classmate')+'</div></section>'}
+var _vl=viewLearn;viewLearn=function(){var h=_vl.apply(this,arguments);var m='<button class="card prc"';return h.indexOf(m)>=0?h.replace(m,panel()+m):h+panel()};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-og="solo"]');if(!b)return;e.stopPropagation();
+ var m=document.createElement('div');m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Play solo');
+ m.innerHTML='<div class="mbox" style="max-width:420px"><h3>Play solo</h3><div class="list2"><button class="rw2" data-solo="blitz"><span class="rt"><b>Blitz</b><small>60 seconds. Answer as many as you can</small></span></button><button class="rw2" data-solo="match"><span class="rt"><b>Match</b><small>Pair terms and meanings against the clock</small></span></button><button class="rw2" data-solo="flash"><span class="rt"><b>Flashcard match</b><small>Race your own best time on your plan\'s cards</small></span></button><button class="rw2" data-solo="mock"><span class="rt"><b>Mock test</b><small>30 timed questions</small></span></button></div><button class="btn sec block" id="slx">Cancel</button></div>';
+ document.body.appendChild(m);var x=m.querySelector('.rw2');if(x)x.focus();
+ m.addEventListener('click',function(ev){var s=ev.target.closest('[data-solo]');if(s){var k=s.dataset.solo;m.remove();if(k==='blitz')startBlitz();else if(k==='match')startMatch();else if(k==='mock')startMock();else if(k==='flash'){go('library');window.__V.lib='flash';flashDeck('plan');route();document.querySelector('[data-fl="mode:match"]')&&document.querySelector('[data-fl="mode:match"]').click()}return}if(ev.target===m||ev.target.id==='slx')m.remove()});
+ var escK=function(ev){if(ev.key==='Escape'){m.remove();document.removeEventListener('keydown',escK)}};document.addEventListener('keydown',escK);var f=m.querySelector('[data-solo]');f&&f.focus()},true);
+})();

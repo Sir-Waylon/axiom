@@ -29,7 +29,7 @@ var _cpF=coachPick;coachPick=function(o){
  return _cpF(o)};
 /* "How you learn" summary */
 function famStats(){return FAM.map(function(f){var n=0,w=0,ok=0;f[1].forEach(function(t){var x=S.fm[t];if(x){n+=x.n;w+=x.res*x.n;ok+=x.ok}});return{name:f[0],desc:f[2],n:n,res:n?w/n:0,acc:n?ok/n:0}})}
-function styleHTML(){var fs=famStats(),tot=fs.reduce(function(a,f){return a+f.n},0);
+function styleHTML(){return '';var fs=famStats(),tot=fs.reduce(function(a,f){return a+f.n},0);
  var h='<div class="card"><h3>How you learn</h3>';
  if(tot<12)return h+'</div>';
  h+='';

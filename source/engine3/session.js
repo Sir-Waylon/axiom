@@ -102,13 +102,12 @@ function resolveIt(it){
  if(it.done)return;it.ok=isOk(it);it.done=true;
  if(!Z.nofb){it.gain=(it.scaf||it.retry)?0:award(it.q,it.ok,0,it.help>0);Z.earned+=it.gain;if(it.ok)Z.right++;else Z.wrong++}
  if(Z.kind==='quick'){if(it.ok){Z.streak++;if(Z.streak>=2){Z.lvl=Math.min(3,Z.lvl+1);Z.streak=0}}else{Z.streak=0;Z.lvl=Math.max(1,Z.lvl-1)}}
- if(!it.follow)Z.doneM++;
+ if(!it.follow&&!it.cnt){it.cnt=1;Z.doneM++}
  if(it.ok){burst();xpFloat(it.gain)}}
 function advance(){
- if(!Z)return;Z.i++;
+ if(!Z)return;var s0=Z.steps[Z.i];if(s0){if(s0.k==='card'&&!s0.cnt){s0.cnt=1;Z.doneM++}else if(s0.k==='try'&&!s0.follow&&s0.it&&!s0.it.cnt&&(Z.nofb||s0.it.done)){s0.it.cnt=1;Z.doneM++}}Z.i++;
  if(Z.adaptive&&Z.i>=Z.steps.length&&Z.seenQ.length<Z.N)appendAdaptive();
  if(Z.i>=Z.steps.length)return finishSess();
- if(Z.steps[Z.i].k==='card')Z.doneM++;
  drawSess();window.scrollTo(0,0)}
 function explainNow(){
  var st=Z.steps[Z.i],it=st.it;Z.steps.splice(Z.i+1,0,{k:'explain',it:it,st:0,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}
@@ -129,10 +128,10 @@ function finishSess(){
 /* ---------- render ---------- */
 function drawSess(){
  var z=Z;if(!z)return;var s=$('sess');if(!s){s=document.createElement('div');s.id='sess';document.body.appendChild(s)}
- var st=z.steps[z.i],top='<div class="s-top"><button class="iconbtn" id="sx" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="prog"><i style="width:'+(z.fin?100:Math.min(100,100*z.doneM/Math.max(1,z.mains)))+'%"></i></div>'+(z.secs&&!z.fin?'<span class="timer" id="tm">–</span>':'')+'</div>',h=top+'<div class="s-body">',sheet='';
+ var st=z.steps[z.i],top='<div class="s-top"><button class="iconbtn" id="sx" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="prog"><i style="width:'+(z.fin?100:Math.min(100,100*z.doneM/Math.max(1,z.adaptive?Math.max(z.mains,z.N||0):z.mains)))+'%"></i></div>'+(z.secs&&!z.fin?'<span class="timer" id="tm">–</span>':'')+'</div>',h=top+'<div class="s-body">',sheet='';
  if(z.fin)return drawResults(top);
  if(st.k==='card'){var c=st.c;
-  h+='<div class="card lesson-card"><div class="row" style="margin-bottom:6px">'+mascot(S.cos.on.av,'think',52)+'<span class="tag">'+esc(z.unit.title)+'</span></div><h2>'+esc(c.h)+'</h2><p class="lc">'+esc(c.t)+'</p>'+(c.f?'<div class="fml">'+esc(c.f)+'</div>':'')+'</div>';
+  h+='<div class="card lesson-card"><div class="row" style="margin-bottom:6px">'+mascot(S.cos.on.av,'think',52)+'<span class="tag">'+esc(st.ut||(z.unit&&z.unit.title)||z.title||'')+'</span></div><h2>'+esc(c.h)+'</h2><p class="lc">'+esc(c.t)+'</p>'+(c.f?'<div class="fml">'+esc(c.f)+'</div>':'')+'</div>';
   var nx=z.steps[z.i+1];sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="go">'+(nx&&nx.k==='try'?'Try it':'Continue')+'</button></div></div></div>'}
  else if(st.k==='explain'){var it=st.it,q=it.q,hc=helpCard(q);
   if(st.ex){var q2=st.it.q;h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Worked example</h2></div>'+(q2.svg?'<div class="fig">'+q2.svg+'</div>':'')+'<p class="lc" style="font-size:1.1rem"><b>'+esc(q2.q)+'</b></p>';
@@ -181,7 +180,7 @@ document.addEventListener('input',function(e){if(e.target.id==='sv'&&Z){var it=Z
 document.addEventListener('keydown',function(e){if(!Z||Z.fin)return;if(e.key==='Enter'&&e.target.id==='sv'){var st=Z.steps[Z.i],it=st.it;if(Z.nofb){if(it.val.trim())advance();return}if(it.val.trim()&&!it.done){resolveIt(it);drawSess()}}});
 document.addEventListener('click',function(e){
  var s=$('sess');if(!s||!s.contains(e.target)||!Z)return;var t=e.target,id=t.id||(t.closest('button')||{}).id,z=Z;
- if(id==='sx'){if(z.fin||confirm('Leave? Progress in this session is kept.'))closeSess();return}
+ if(id==='sx'){if(z.fin){closeSess();return}window.askOk('Leave this session?','Your progress so far is kept.','Leave',closeSess);return}
  if(id==='done'){closeSess();return}
  if(id==='rtry'){var ids=s.dataset.miss.split(',').filter(Boolean);closeSess();startFromIds(ids,'Practice misses');return}
  if(z.fin)return;var st=z.steps[z.i];

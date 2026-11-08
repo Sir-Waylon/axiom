@@ -222,7 +222,19 @@ def account():
 <form class="acc" id="uf" hidden novalidate><h2 style="font-size:1.3rem">Pick a username</h2><label class="fld"><span>Username</span><input id="un2" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="16"></label><button class="btn" type="submit" style="width:100%">Save and continue</button><p class="msg" id="msg2" role="alert"></p></form>
 <p style="text-align:center;margin-top:20px"><a href="/app/">Continue as a guest</a></p></div>'''
     return page('account',f'Sign in or create an account · {N}',b,f'Create a free {N} account or sign in.')
-NAVJS=r'''(function(){"use strict";fetch("/api/me",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(j){if(!j||!j.username)return;var a=document.querySelectorAll('a[href="/account/"]');for(var i=0;i<a.length;i++){if(a[i].closest("footer"))continue;a[i].hidden=true;a[i].style.display="none"}}).catch(function(){})})();'''
+NAVJS=r'''(function(){"use strict";
+function ck(){var m=document.cookie.split("; ").filter(function(c){return c.indexOf("__Host-csrf=")===0})[0];return m?m.slice(12):""}
+fetch("/api/me",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(j){if(!j||!j.username)return;
+var a=document.querySelectorAll('a[href="/account/"]');for(var i=0;i<a.length;i++){if(a[i].closest("footer"))continue;
+ var w=document.createElement("span");w.className="um";var b=document.createElement("button");b.type="button";b.className="btn sec";b.setAttribute("aria-haspopup","menu");b.setAttribute("aria-expanded","false");b.textContent="Signed in ▾";
+ var m=document.createElement("div");m.className="umm";m.setAttribute("role","menu");m.hidden=true;m.innerHTML='<div class="umh">'+String(j.username).replace(/[<>&"]/g,"")+'</div><a role="menuitem" href="/app/#me">Profile</a><a role="menuitem" href="/app/#practice">Practice</a><a role="menuitem" href="/app/">All trainers</a><button role="menuitem" type="button" id="umo">Sign out</button>';
+ w.appendChild(b);w.appendChild(m);a[i].parentNode.replaceChild(w,a[i]);
+ function close(){m.hidden=true;b.setAttribute("aria-expanded","false")}
+ b.addEventListener("click",function(e){e.stopPropagation();var o=m.hidden;m.hidden=!o;b.setAttribute("aria-expanded",String(o));if(o){var f=m.querySelector("a");f&&f.focus()}});
+ document.addEventListener("click",function(e){if(!w.contains(e.target))close()});
+ w.addEventListener("keydown",function(e){if(e.key==="Escape"){close();b.focus()}if(e.key==="ArrowDown"||e.key==="ArrowUp"){var it=[].slice.call(m.querySelectorAll("[role=menuitem]")),k=it.indexOf(document.activeElement);if(!m.hidden){e.preventDefault();it[(k+(e.key==="ArrowDown"?1:it.length-1))%it.length].focus()}}});
+ m.querySelector("#umo").addEventListener("click",function(){fetch("/api/logout",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json","x-csrf":ck()},body:"{}"}).then(function(){location.reload()})});
+ break}}).catch(function(){})})();'''
 ACCJS=r'''(function(){"use strict";
 var $=function(i){return document.getElementById(i)},up=false,csrf="";
 function ck(){var m=document.cookie.split("; ").filter(function(c){return c.indexOf("__Host-csrf=")===0})[0];return m?m.slice(12):""}
@@ -274,6 +286,7 @@ W=lambda p,s:(os.makedirs(os.path.dirname(out+'/'+p),exist_ok=True),open(out+'/'
 W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/index.html',legal('terms'));W('accessibility/index.html',access())
 W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
+CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
 W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg')
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")

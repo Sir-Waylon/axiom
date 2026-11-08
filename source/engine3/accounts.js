@@ -40,10 +40,10 @@ document.addEventListener('click',function(e){var t=e.target,b=t.closest&&t.clos
  if(b.id==='acg'&&!ACC.busy){ACC.busy=true;var up=ACC.f.mode==='up';api('POST',up?'/signup':'/login',up?{email:ACC.f.email,username:ACC.f.username,password:ACC.f.password}:{id:ACC.f.email,password:ACC.f.password}).then(function(j){ACC.f.password='';auth(j)});return}
  if(b.id==='acu'){api('POST','/username',{username:ACC.f.username}).then(function(j){if(j.error)return toast(j.error);ACC.me.username=j.username;ACC.me.needUsername=false;push(true);friends();route()});return}
  if(b.id==='aco'){api('POST','/logout').then(function(){ACC.me=null;ACC.fr=null;NT=null;ACC.mode='out';loadG();route()});return}
- if(b.id==='acd'){e.preventDefault();if(confirm('Delete your account and cloud save? Progress on this device stays.'))api('POST','/delete').then(function(){ACC.me=null;ACC.fr=null;ACC.mode='out';route();toast('Account deleted')});return}
+ if(b.id==='acd'){e.preventDefault();window.askOk('Delete your account?','Your cloud save is deleted. Progress on this device stays.','Delete',function(){api('POST','/delete').then(function(){ACC.me=null;ACC.fr=null;ACC.mode='out';route();toast('Account deleted')})});return}
  if(b.id==='fra'){var u=($('fru').value||'').trim().toLowerCase();if(u)api('POST','/friends/request',{username:u}).then(function(j){toast(j.error||'Request sent');friends()});return}
  if(b.dataset.fa){api('POST','/friends/accept',{username:b.dataset.fa}).then(function(j){if(!j.error){ACC.fr=j;route()}});return}
- if(b.dataset.fr){if(confirm('Remove '+b.dataset.fr+'?'))api('POST','/friends/remove',{username:b.dataset.fr}).then(function(j){if(!j.error){ACC.fr=j;route()}});return}});
+ if(b.dataset.fr){var fu=b.dataset.fr;window.askOk('Remove '+fu+'?','You can add them again later.','Remove',function(){api('POST','/friends/remove',{username:fu}).then(function(j){if(!j.error){ACC.fr=j;route()}})});return}});
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')push(true)});
 boot();
 })();

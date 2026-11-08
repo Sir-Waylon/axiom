@@ -9,12 +9,18 @@ function stats(){var o=hrs(),t=0,r=0,rows=[];for(var h=0;h<24;h++){var x=o[h];if
 function best(st){var ok=st.rows.filter(function(x){return x.n>=MIN}).sort(function(a,b){return b.a-a.a||b.n-a.n});return ok.length>=2&&st.t>=40?ok.slice(0,3).map(function(x){return x.h}):null}
 function fh(h){return (h%12||12)+(h<12?' AM':' PM')}
 window.fmtHour=fh;
-window.studyWindow=function(d){d=d||new Date();var h=d.getHours(),st=stats(),bs=best(st),mult=1,tag='Normal',why='';
- if(h>=22||h<6){mult=.8;tag='Sleep first';why='Late at night coins are 20% lower. Sleep helps you remember more than one extra session.'}
- else if(bs){if(bs.indexOf(h)>=0){mult=1.3;tag='Peak window';why='This is one of your three most accurate hours (based on your answers on this device).'}
-  else{var near=bs.some(function(b){return Math.abs(b-h)===1});if(near){mult=1.15;tag='Good window';why='Next to one of your best hours.'}else{why='Not one of your best hours, so the normal rate applies.'}}}
- else{if(h>=15&&h<20){mult=1.15;tag='Good window';why='Default after-school window. It will switch to your own best hours once you have answered about 40 questions.'}else{why='Default rate. Answer a few more questions at different times and this will learn your best hours.'}}
- return{mult:mult,tag:tag,why:why,best:bs,hour:h,pct:Math.round((mult-1)*100)}};
+/* default schedule, shown to the student. Right after school is the strongest window; it fades through the evening. */
+function sched(d){var h=d.getHours(),m=h*60+d.getMinutes(),wk=d.getDay()===0||d.getDay()===6;
+ if(h>=22||h<6)return{mult:.8,tag:'Sleep first',why:'Late at night coins are 20% lower. Sleep helps you remember more than one extra session.'};
+ if(m>=1290)return{mult:.9,tag:'Wind down',why:'After 9:30 PM coins ease down. Finish a short mission and rest.'};
+ if(wk){if((h>=9&&h<12)||(h>=14&&h<17))return{mult:1.2,tag:'Good window',why:'Weekend default: mid-morning and mid-afternoon.'};return{mult:1,tag:'Normal',why:'Default rate.'}}
+ if(m>=870&&m<1050)return{mult:1.25,tag:'After school',why:'Right after school is the strongest default window (2:30 to 5:30 PM). Your brain is warm and the day is still fresh.'};
+ if(m>=1050&&m<1170)return{mult:1.1,tag:'Good window',why:'Early evening (5:30 to 7:30 PM). The bonus fades as the evening goes on.'};
+ return{mult:1,tag:'Normal',why:'Default rate. Practice right after school for the biggest bonus.'}}
+window.studyWindow=function(d){d=d||new Date();var h=d.getHours(),st=stats(),bs=best(st),s=sched(d);
+ if(bs&&s.mult>=.9){if(bs.indexOf(h)>=0){return{mult:Math.max(s.mult,1.25),tag:'Peak window',why:'This is one of your three most accurate hours (based on your answers on this device).',best:bs,hour:h,pct:Math.round((Math.max(s.mult,1.25)-1)*100)}}
+  if(bs.some(function(b){return Math.abs(b-h)===1})&&s.mult<1.15){return{mult:1.15,tag:'Good window',why:'Next to one of your best hours.',best:bs,hour:h,pct:15}}}
+ return{mult:s.mult,tag:s.tag,why:s.why,best:bs,hour:h,pct:Math.round((s.mult-1)*100)}};
 window.studyChip=function(){var w=studyWindow(),s=w.pct>0?'+'+w.pct+'% coins':w.pct<0?w.pct+'% coins':'Normal coins';
  return '<button class="swchip sw'+(w.pct>0?'u':w.pct<0?'d':'n')+'" data-sw="1" aria-label="'+w.tag+', '+s+'. Tap to see why."><i aria-hidden="true">'+(w.pct>0?'☀':w.pct<0?'☾':'●')+'</i><b>'+w.tag+'</b><span>'+s+'</span></button>'};
 /* coins use the multiplier: wrap award on the coin gain only */
@@ -26,6 +32,6 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
  document.body.appendChild(m);m.addEventListener('click',function(ev){if(ev.target===m||ev.target.id==='swx')m.remove()});var x=m.querySelector('#swx');if(x)x.focus()});
 /* settings: best-time card + one tap to move the reminder */
 var _vm2=viewMe;viewMe=function(){var h=_vm2();if(sub.me!=='settings')return h;var w=studyWindow(),bs=w.best;
- return h+'<div class="card set"><h3>Best study times</h3><p class="small">'+(bs?'Your most accurate hours: <b>'+bs.slice().sort(function(a,b){return a-b}).map(fh).join(', ')+'</b>.':'Still learning your best hours. Answer questions at different times of day.')+' Coins get a visible bonus in those hours, and a small reduction after 10 PM.</p>'+(bs?'<button class="btn sm sec" id="sw-set">Remind me at '+fh(bs[0])+'</button>':'')+'</div>'};
+ return h+'<div class="card set"><h3>Best study times</h3><p class="small">'+(bs?'Your most accurate hours: <b>'+bs.slice().sort(function(a,b){return a-b}).map(fh).join(', ')+'</b>.':'Still learning your best hours. Answer questions at different times of day.')+' Coins get a visible bonus in those hours. The default schedule peaks right after school and fades into the evening, with a small reduction after 9:30 PM.</p>'+(bs?'<button class="btn sm sec" id="sw-set">Remind me at '+fh(bs[0])+'</button>':'')+'</div>'};
 document.addEventListener('click',function(e){if(e.target.id==='sw-set'){var w=studyWindow();if(w.best){var o=RM.get();o.on=true;o.t=('0'+Math.min.apply(null,w.best)).slice(-2)+':00';RM.set(o);toast('Reminder set for '+o.t);route()}}});
 })();

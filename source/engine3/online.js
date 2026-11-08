@@ -5,8 +5,11 @@
 var OG=null,poll=null,raf=0,off=0,NK='ognick';
 function api(m,p,b,tok){var h={'content-type':'application/json'};if(tok)h['x-gtok']=tok;
  return fetch('/api'+p,{method:m,credentials:'same-origin',headers:h,body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){j._s=r.status;return j})}).catch(function(){return{error:'No connection. Check your internet and try again.',_s:0}})}
-function nick(){try{return localStorage.getItem(NK)||''}catch(e){return''}}
-function setNick(n){try{localStorage.setItem(NK,n)}catch(e){}}
+var TN='';try{localStorage.removeItem(NK)}catch(e){}
+function nick(){return TN}
+function setNick(n){TN=n}
+var ADJ=['Swift','Quiet','Bright','Brave','Lucky','Calm','Sharp','Bold'],ANI=['Otter','Fox','Owl','Lynx','Heron','Panda','Gecko','Wolf'];
+function sugg(){return ADJ[Math.floor(Math.random()*ADJ.length)]+' '+ANI[Math.floor(Math.random()*ANI.length)]}
 function myAv(){return (S.cos&&S.cos.on&&S.cos.on.av)||'a0'}
 function pickQ(n,typed){var pool=QS.filter(function(q){return q.id&&(q.type==='mcq'||(typed&&q.type==='short'&&q.l<=3&&(!q.num||(window.calcPolicy&&calcPolicy(q)===0))))});
  var mc=shuf(pool.filter(function(q){return q.type==='mcq'})),sh=shuf(pool.filter(function(q){return q.type==='short'})),out=[];
@@ -16,14 +19,14 @@ function el(){return document.getElementById('ogb')}
 function stop(){if(poll){clearInterval(poll);poll=null}if(raf){cancelAnimationFrame(raf);raf=0}}
 function shell(title){var o=document.getElementById('og');if(!o){o=document.createElement('div');o.id='og';o.className='ogov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Play online');document.body.appendChild(o)}
  o.innerHTML='<div class="ogh"><button class="iconbtn" id="ogx" aria-label="Leave game">×</button><b id="ogt">'+esc(title||'Play online')+'</b><span class="sp"></span><span id="ogc"></span></div><div class="ogbody" id="ogb"></div>';return o}
-function leave(){stop();var o=document.getElementById('og');if(o)o.remove();if(OG&&OG.tok&&OG.mode==='vs'&&OG.code)api('POST','/room/end',{code:OG.code},OG.tok);if(OG&&OG.q)api('POST','/vs/cancel',{},OG.q);OG=null;try{route()}catch(e){}}
+function leave(){TN='';stop();var o=document.getElementById('og');if(o)o.remove();if(OG&&OG.tok&&OG.mode==='vs'&&OG.code)api('POST','/room/end',{code:OG.code},OG.tok);if(OG&&OG.q)api('POST','/vs/cancel',{},OG.q);OG=null;try{route()}catch(e){}}
 function err(m){var b=document.getElementById('ogerr');if(b){b.textContent=m||'';b.hidden=!m}}
 /* ---------- menu ---------- */
-function menu(){stop();OG=null;shell('Play online');var n=nick();
- el().innerHTML='<div class="ogmenu"><div class="ogcard"><h2>Join a class game</h2><p class="small mute">Your teacher shows a 6-letter code.</p><label>Code<input id="ogcode" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABC234"></label><label>Nickname<input id="ognick" maxlength="16" autocomplete="off" placeholder="2 to 16 letters or numbers" value="'+esc(n)+'"></label><button class="btn block" id="ogjoin">Join</button></div>'
- +'<div class="ogcard"><h2>Versus</h2><p class="small mute">10 questions against another student. If nobody is waiting, you can choose to play a practice bot. Bots are always labelled.</p><label>Nickname<input id="ognick2" maxlength="16" autocomplete="off" placeholder="2 to 16 letters or numbers" value="'+esc(n)+'"></label><button class="btn block" id="ogvs">Find an opponent</button></div>'
- +'<div class="ogcard"><h2>Host a class game</h2><p class="small mute">You control the pace. Students join with the code on their own devices.</p><div class="ogrow"><label>Questions<select id="ogn"><option>10</option><option selected>15</option><option>20</option><option>30</option></select></label><label class="chk"><input type="checkbox" id="ogtyped"> Include typed answers</label></div><label class="chk"><input type="checkbox" id="ogplay" checked> I play too</label><label>My nickname<input id="ognick3" maxlength="16" autocomplete="off" value="'+esc(n)+'"></label><button class="btn block" id="oghost">Create game</button></div>'
- +'<p id="ogerr" class="ogerr" role="alert" hidden></p><p class="small mute" style="text-align:center">No account needed. Only your nickname and whether you were right, and how fast, are sent. Games disappear after 3 hours. Coins from games only unlock looks.</p></div>'}
+function menu(mode){stop();OG=null;mode=(mode==='host'||mode==='vs'||mode==='join')?mode:'';shell(mode==='host'?'Host a game':mode==='vs'?'Versus':mode==='join'?'Join a game':'Play online');var n=nick()||sugg();
+ el().innerHTML='<div class="ogmenu"><div class="ogcard" data-m="join"><h2>Join a class game</h2><p class="small mute">Your teacher shows a 6-letter code.</p><label>Code<input id="ogcode" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABC234"></label><label>Nickname<input id="ognick" maxlength="16" autocomplete="off" placeholder="Any name, 2 to 16 characters" value="'+esc(n)+'"></label><button class="btn block" id="ogjoin">Join</button></div>'
+ +'<div class="ogcard" data-m="vs"><h2>Versus</h2><p class="small mute">10 questions against another student. If nobody is waiting, you can choose to play a practice bot. Bots are always labelled.</p><label>Nickname<input id="ognick2" maxlength="16" autocomplete="off" placeholder="Any name, 2 to 16 characters" value="'+esc(n)+'"></label><button class="btn block" id="ogvs">Find an opponent</button></div>'
+ +'<div class="ogcard" data-m="host"><h2>Host a class game</h2><p class="small mute">You control the pace. Students join with the code on their own devices.</p><div class="ogrow"><label>Questions<select id="ogn"><option>10</option><option selected>15</option><option>20</option><option>30</option></select></label><label class="chk"><input type="checkbox" id="ogtyped"> Include typed answers</label></div><label class="chk"><input type="checkbox" id="ogplay" checked> I play too</label><label>My nickname<input id="ognick3" maxlength="16" autocomplete="off" value="'+esc(n)+'"></label><button class="btn block" id="oghost">Create game</button></div>'
+ +'<p id="ogerr" class="ogerr" role="alert" hidden></p><p class="small mute" style="text-align:center">Your nickname is temporary: use any name, even your real one. It is not saved on this device and is deleted from the server about 10 minutes after the game ends. Coins from games only unlock looks.</p></div>';if(mode)[].forEach.call(el().querySelectorAll('.ogcard[data-m]'),function(c){if(c.dataset.m!==mode)c.remove()})}
 /* ---------- joining / hosting / versus ---------- */
 function startPoll(){stop();poll=setInterval(tick,OG&&OG.fast?700:1000);tick()}
 function tick(){if(!OG||!OG.code||OG.busy)return;OG.busy=1;api('GET','/room/state?code='+encodeURIComponent(OG.code),null,OG.tok).then(function(v){OG&&(OG.busy=0);if(!OG)return;if(v.gone||v._s===404){over('This game has ended.');return}if(v.error){if(v._s===0){return}over(v.error);return}onState(v)})}
@@ -97,7 +100,7 @@ function done(b,v){stop();var me=v.me,rank=me?me.rank:0,pl=v.players||[],top=pl.
   +(pl.length>3?'<h3>Everyone</h3>'+ldr(v,12):'')+'<button class="btn block" id="ogagain">Play again</button><button class="btn sec block" id="ogexit">Done</button></div>'}
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){var t=e.target,id=t.id,bt=t.closest&&t.closest('button');
- if(t.closest&&t.closest('[data-og]')){menu();return}
+ if(t.closest&&t.closest('[data-og]')){var og=t.closest('[data-og]').dataset.og;if(og==='solo')return;menu(og);return}
  if(!document.getElementById('og'))return;
  if(id==='ogx'||id==='ogexit'||id==='ogback'){leave();return}
  if(id==='ogjoin')return join();if(id==='oghost')return host();if(id==='ogvs')return versus();

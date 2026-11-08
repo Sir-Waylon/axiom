@@ -204,7 +204,7 @@ const mkCode = () => { const r = rnd(6); let s = ''; for (let i = 0; i < 6; i++)
 const NICK_BAD = ['fuck', 'shit', 'bitch', 'nigg', 'fag', 'cunt', 'dick', 'porn', 'sex', 'rape', 'nazi', 'whore', 'slut', 'penis', 'vagin', 'retard', 'kkk', 'hitler', 'anal', 'cock', 'pussy'];
 function cleanNick(n) {
   n = String(n == null ? '' : n).replace(/\s+/g, ' ').trim();
-  if (!/^[A-Za-z0-9][A-Za-z0-9 _.-]{1,15}$/.test(n)) return null;
+  if (!/^[\p{L}\p{N}][\p{L}\p{N} _.'-]{1,15}$/u.test(n)) return null;
   const f = n.toLowerCase().replace(/[^a-z0-9$@!]/g, '').replace(/0/g, 'o').replace(/[1!]/g, 'i').replace(/3/g, 'e').replace(/4|@/g, 'a').replace(/5|\$/g, 's');
   if (NICK_BAD.some((w) => f.includes(w))) return null;
   return n;
@@ -293,7 +293,7 @@ async function nextQ(env, room) { /* from lobby or reveal */
   const n = nowMs(), last = room.qi + 1 >= room.qids.length;
   let r;
   if (room.state === 'lobby') r = await env.DB.prepare("UPDATE rooms SET state='q',qi=0,qat=? WHERE code=? AND state='lobby'").bind(n, room.code).run();
-  else if (last) r = await env.DB.prepare("UPDATE rooms SET state='done',rat=? WHERE code=? AND state='reveal' AND qi=?").bind(n, room.code, room.qi).run();
+  else if (last) r = await env.DB.prepare("UPDATE rooms SET state='done',rat=?,exp=? WHERE code=? AND state='reveal' AND qi=?").bind(n, n + 600000, room.code, room.qi).run();
   else r = await env.DB.prepare("UPDATE rooms SET state='q',qi=qi+1,qat=? WHERE code=? AND state='reveal' AND qi=?").bind(n, room.code, room.qi).run();
   const f = await loadRoom(env, room.code); if (f) Object.assign(room, f);
   return changed(r) > 0;
@@ -320,7 +320,7 @@ G['POST /room/create'] = async (req, env, ip) => {
   const b = await body(req, 8000);
   if (!okPack(b.pack) || !okIds(b.qids, 40)) return J({ error: 'Bad game setup.' }, 400);
   const lims = cleanLims(b.lims, b.qids.length, 25000), tok = gTok(), th = await sha(tok);
-  let nick = null; if (b.nick !== undefined && b.nick !== null && b.nick !== '') { nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2-16 letters or numbers).' }, 400); }
+  let nick = null; if (b.nick !== undefined && b.nick !== null && b.nick !== '') { nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2 to 16 letters or numbers).' }, 400); }
   await gcOnline(env);
   const code = await makeRoom(env, { mode: 'class', pack: b.pack, host: th, qids: b.qids, lims, state: 'lobby', qi: -1, qat: 0, players: nick ? [{ nick, tok: th, av: okAv(b.av) }] : [] });
   return J({ code, tok, host: true, player: !!nick });
@@ -328,7 +328,7 @@ G['POST /room/create'] = async (req, env, ip) => {
 G['POST /room/join'] = async (req, env, ip) => {
   if (!(await rate(env, 'rj:' + ip, 300, 3600))) return J({ error: 'Too many tries. Wait a bit.' }, 429);
   const b = await body(req, 600), code = String(b.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-  const nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2-16 letters or numbers).' }, 400);
+  const nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2 to 16 letters or numbers).' }, 400);
   const room = await loadRoom(env, code);
   if (!room || room.mode !== 'class') return J({ error: 'No game with that code.' }, 404);
   if (b.pack && b.pack !== room.pack) return J({ error: 'That game is for a different trainer.' }, 409);
@@ -382,7 +382,7 @@ G['POST /room/end'] = async (req, env) => {
   const b = await body(req, 300), room = await loadRoom(env, String(b.code || '').toUpperCase());
   if (!room) return J({ ok: 1 });
   const w = await who(env, room, tok); if (!w.isHost && !(room.mode === 'vs' && w.me)) return J({ error: 'Only the host can do that.' }, 403);
-  await env.DB.prepare("UPDATE rooms SET state='done',rat=? WHERE code=?").bind(nowMs(), room.code).run();
+  await env.DB.prepare("UPDATE rooms SET state='done',rat=?,exp=? WHERE code=?").bind(nowMs(), nowMs() + 600000, room.code).run();
   return J({ ok: 1 });
 };
 /* ---- versus ---- */
@@ -395,7 +395,7 @@ async function vsRoom(env, a, b) { /* a,b: {nick,th,av} or b bot */
 G['POST /vs/queue'] = async (req, env, ip) => {
   if (!(await rate(env, 'vq:' + ip, 240, 3600))) return J({ error: 'Too many tries. Wait a bit.' }, 429);
   const b = await body(req, 4000);
-  const nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2-16 letters or numbers).' }, 400);
+  const nick = cleanNick(b.nick); if (!nick) return J({ error: 'Pick a different name (2 to 16 letters or numbers).' }, 400);
   if (!okPack(b.pack) || !okIds(b.qids, 12)) return J({ error: 'Bad match request.' }, 400);
   const lims = cleanLims(b.lims, b.qids.length, 25000), tok = gTok(), th = await sha(tok), n = nowMs();
   const me = { nick, th, av: okAv(b.av), pack: b.pack, qids: JSON.stringify(b.qids), lims: JSON.stringify(lims) };

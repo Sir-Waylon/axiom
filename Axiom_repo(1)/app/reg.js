@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0)navigator.serviceWorker.register((document.currentScript.src.replace(/reg\.js.*/,''))+'sw.js').catch(function(){});
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0)navigator.serviceWorker.register((document.currentScript.src.replace(/reg\.js.*/,''))+'sw.js').catch(function(){});try{var h=location.hash,l=localStorage.getItem('vx:last');if((h==='#me'||h==='#practice')&&/^\/app\/?(index\.html)?$/.test(location.pathname)&&l&&/^\/app\/[a-z0-9-]+\/$/.test(l))location.replace(l+h)}catch(e){}

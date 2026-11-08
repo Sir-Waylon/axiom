@@ -47,7 +47,7 @@ function viewLearn(){
  return h}
 document.addEventListener('click',function(e){
  var l=e.target.closest('[data-ls]');if(l){var p=l.dataset.ls.split('|');startLesson(p[0],p[1]);return}
- var ut=e.target.closest('[data-ut]');if(ut){var u=UN.filter(function(x){return x.id===ut.dataset.ut})[0];if(unitState(u).all||confirm('Take the test before finishing all lessons?'))startUnitTest(ut.dataset.ut);return}
+ var ut=e.target.closest('[data-ut]');if(ut){var u=UN.filter(function(x){return x.id===ut.dataset.ut})[0];var uid=ut.dataset.ut;if(unitState(u).all)startUnitTest(uid);else window.askOk('Take the test early?','You have not finished every lesson in this unit yet.','Take the test',function(){startUnitTest(uid)});return}
  var tb=e.target.closest('#nav button');if(tb){go(tb.dataset.t);return}
  if(e.target.closest('#thm')){S.theme=isDark()?'light':'dark';applyTheme();save();hud();return}
  if(e.target.closest('#lvr')){sub.me='profile';go('me');return}

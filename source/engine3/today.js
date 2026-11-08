@@ -29,7 +29,7 @@ startMission=function(){var a=CU.items();if(!a){startPractice(ALL,12);return}
  var earlier=a.filter(function(x){return x.s==='keep'||x.s==='done'||x.us.done>0}).map(function(x){return x.t}),started=a.filter(function(x){return (S.stat[x.t]||[0,0])[1]>0}).map(function(x){return x.t});
  add(3,.92,earlier.length?earlier:null);
  var x=f[0];
- if(x&&x.s==='learn'&&!x.back){var L=x.u.lessons.filter(function(l){return !x.us.us.d[l.id]})[0]||x.u.lessons[0];lessonSteps(x.u,L).forEach(function(s){steps.push(s)});add(2,.9,[x.t])}
+ if(x&&x.s==='learn'&&!x.back){var L=x.u.lessons.filter(function(l){return !x.us.us.d[l.id]})[0]||x.u.lessons[0];lessonSteps(x.u,L).forEach(function(s){if(s.k==='card')s.ut=x.u.title;steps.push(s)});add(2,.9,[x.t])}
  else if(x){var pt=f.filter(function(y){return y.s!=='learn'||y.back}).slice(0,2).map(function(y){return y.t});add(Math.round(4+2*k.nw),CU.tgt(x,true),pt)}
  else add(4,.8);
  var due=dueIds().slice(0,12).map(function(y){return y[0]}),rv=0;due.forEach(function(id){if(rv<4&&used.indexOf(id)<0){used.push(id);steps.push({k:'try',it:mkItem(id)});rv++}});if(rv<2)add(2-rv,.85,started.length?started:null);
