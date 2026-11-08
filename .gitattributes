@@ -1,5 +1,5 @@
 * text=auto
 *.pdf binary
-git mv old-folder-name new-folder-name
-git commit -m "Renamed folder"
+git mv "Axiom_repo(1)" "Axiom
+git commit -m "Axiom"
 git push   
