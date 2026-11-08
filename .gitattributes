@@ -1,5 +1,2 @@
 * text=auto
 *.pdf binary
-git mv "Axiom_repo(1)" "Axiom
-git commit -m "Axiom"
-git push   
