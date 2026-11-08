@@ -231,10 +231,9 @@ body.insess .tracks{display:none}
 ul.links{list-style:none;margin:0;padding:0}ul.links a{display:block;padding:12px 2px;min-height:44px;color:var(--pri-t);font-weight:700;text-decoration:none;border-bottom:1px solid var(--line)}
 .so{margin-top:10px}.so .btn{min-height:44px}
 /* family styling */
-.fam-axm .nav button{border-radius:2px}.fam-axm .nav button[aria-current="true"]{box-shadow:inset 0 3px 0 var(--pri)}
+.nav button{border-radius:2px}.nav button[aria-current="true"]{box-shadow:inset 0 3px 0 var(--pri)}
 .fam-axm .logo{clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
-.fam-axm .btn{border-radius:6px}.fam-axm .card{border-radius:8px}
-.fam-sky .nav button{border-radius:14px}
+.btn{border-radius:6px}.card{border-radius:8px}
 .tracks{overflow-x:auto;scrollbar-width:none}.tracks::-webkit-scrollbar{display:none}.tracks a{min-width:0}.tracks a b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:420px){.tracks{gap:6px;padding-left:10px;padding-right:10px}.tracks a{gap:6px;padding:6px 8px}.tracks a.all{padding:6px 10px}}
 @media(max-width:340px){.tracks a i{display:none}}
