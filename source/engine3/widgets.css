@@ -163,3 +163,21 @@ details.gd{background:var(--surface);border:1px solid var(--line);border-radius:
 .t-host{background:linear-gradient(135deg,#7a3df0,#5b4bff)}.t-solo{background:linear-gradient(135deg,#f08a00,#e2552f)}.t-vs{background:linear-gradient(135deg,#0f9d8a,#0a7aa8)}
 @media(max-width:380px){.tiles3{grid-template-columns:1fr}.tile{min-height:0;grid-template-columns:auto 1fr;align-items:center;column-gap:12px}.tile small{grid-column:2}.tile b{grid-column:2}.tile .ti{grid-row:1/3}}
 .lsvg{display:block;width:100%;max-width:520px;margin:0 auto 8px;touch-action:none;background:var(--surface);border:1px solid var(--line);border-radius:14px}.labfree{padding:12px}.labfree .row{flex-wrap:wrap;gap:6px}
+
+.labbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px;padding:8px 10px;border-radius:14px;background:var(--card,#fff);border:1px solid var(--line,#e3e6ee);position:sticky;top:0;z-index:5}
+.labbar .chip{min-width:44px}
+
+.gcalc{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:10px;align-items:start}
+.gplot{position:relative;min-width:0}.gplot canvas{width:100%;height:min(62vh,520px);min-height:260px;border-radius:12px;border:1px solid var(--line,#e3e6ee);background:var(--card,#fff);color:var(--ink,#1c2030);display:block;cursor:grab}
+.gplot canvas:focus-visible{outline:3px solid #5b4bff}.gzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}.gzoom .btn{min-width:40px;min-height:40px;padding:0}
+.grow{display:flex;gap:6px;align-items:center;margin-bottom:6px}.ginp{flex:1;min-width:0;font:16px ui-monospace,Menlo,Consolas,monospace;padding:9px 10px;border-radius:10px;border:1px solid var(--line,#d5d9e6);background:var(--card,#fff);color:inherit}
+.grow.bad .ginp{border-color:#c0392b}.gdot{width:22px;height:22px;border-radius:50%;border:2px solid;flex:none;cursor:pointer;padding:0}.gx{border:0;background:none;font-size:22px;line-height:1;color:inherit;opacity:.6;cursor:pointer;width:32px;height:32px}
+.gerr{font-size:12px;color:#c0392b;margin:-2px 0 6px 28px}.gsl{display:grid;grid-template-columns:22px 1fr 52px;gap:8px;align-items:center;margin:4px 0}.gsl input{width:100%}.gsl output{font:12px ui-monospace,monospace;text-align:right}
+.gex summary{cursor:pointer;font-size:13px;opacity:.8}
+@media(max-width:760px){.gcalc{grid-template-columns:1fr}.gplot canvas{height:min(56vh,420px)}}
+@media(max-width:760px){.gplot{order:-1}.gplot canvas{height:min(42vh,340px);min-height:220px}.gcalc{gap:8px}}
+/* head-and-shoulders avatars stay inside their own square so they never cover neighbouring text */
+svg.mas[viewBox="6 3 52 52"]{overflow:hidden;border-radius:14px;flex:none;display:block;max-width:100%;height:auto;aspect-ratio:1}
+.lesson-card .row,.explain .row{align-items:center;gap:10px;flex-wrap:nowrap}
+.lesson-card .row .tag{min-width:0;flex:1}
+h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus,h3[tabindex="-1"]:focus,[data-focus-heading]:focus{outline:none}

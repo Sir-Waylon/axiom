@@ -53,25 +53,20 @@ function _brow(x,s,y,mood,i,ol){
  var xi=x-s*4.9,xo=x+s*5.4,yi=y+P[0],yo=y+P[1],xm=(xi+xo)/2,ym=(yi+yo)/2+P[2];
  return '<path d="M'+xo+' '+yo+'Q'+xm+' '+(ym-1.3)+' '+xi+' '+(yi-.4)+'L'+(xi-s*.2)+' '+(yi+1.3)+'Q'+xm+' '+(ym+1.7)+' '+xo+' '+(yo+.9)+'z" fill="'+ol+'" stroke="'+ol+'" stroke-width=".8" stroke-linejoin="round"/>'}
 function _eyes(mood,y,pc,ol){
- var xs=[25,39],h='',br='',df='',pcl=_mx(pc,'#ffffff',.45),pcd=_mx(pc,'#000000',.25),id=_rid;
- xs.forEach(function(x,i){br+=_brow(x,i?1:-1,y-9.2,mood,i,ol)});
- if(mood==='cheer')return br+xs.map(function(x,i){var s=i?1:-1;return '<path d="M'+(x-5)+' '+(y+2)+'q5-9 10 0" stroke="'+ol+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M'+(x+s*5)+' '+(y+1.4)+'l'+(s*2)+' -1.6" stroke="'+ol+'" stroke-width="1.5" stroke-linecap="round"/>'}).join('')+'<path d="M31 35.8q1 1.2 2 0" stroke="'+ol+'" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".55"/>';
- xs.forEach(function(x,i){
-  var s=i?1:-1,lx=mood==='think'?1.2:s*-.4,ly=mood==='think'?-1:.3,wide=mood==='oops',pr=wide?2.4:3.9,lid=mood==='think'?1.5:0,
-   sh='M'+(x-5.1)+' '+(y+.6)+'Q'+(x-4.6)+' '+(y-6)+' '+x+' '+(y-6)+'Q'+(x+4.6)+' '+(y-6)+' '+(x+5.1)+' '+(y+.6)+'Q'+(x+4.4)+' '+(y+6)+' '+x+' '+(y+6)+'Q'+(x-4.4)+' '+(y+6)+' '+(x-5.1)+' '+(y+.6)+'z',cid='ec'+id+'_'+i;
-  df+='<clipPath id="'+cid+'"><path d="'+sh+'"/></clipPath><radialGradient id="ei'+id+'_'+i+'" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="'+pcl+'"/><stop offset=".55" stop-color="'+pc+'"/><stop offset="1" stop-color="'+pcd+'"/></radialGradient>';
-  h+='<path d="'+sh+'" fill="#fff"/>'
-   +'<g clip-path="url(#'+cid+')"><path d="M'+(x-6)+' '+(y-6)+'h12v3q-6 2.4-12 0z" fill="#000" opacity=".1"/>'
-   +'<circle cx="'+(x+lx)+'" cy="'+(y+.8+ly)+'" r="'+(pr+.5)+'" fill="url(#ei'+id+'_'+i+')" stroke="'+pcd+'" stroke-width=".9"/>'
-   +'<circle cx="'+(x+lx)+'" cy="'+(y+.9+ly)+'" r="'+(pr*.4)+'" fill="'+ol+'"/>'
-   +'<path d="M'+(x+lx-pr*.8)+' '+(y+1.6+ly)+'a'+(pr*.9)+' '+(pr*.9)+' 0 0 0 '+(pr*1.6)+' 0" stroke="#fff" stroke-width=".8" fill="none" opacity=".4"/>'
-   +'<ellipse cx="'+(x+lx-1.3)+'" cy="'+(y-.9+ly)+'" rx="1.45" ry="1.6" fill="#fff"/><circle cx="'+(x+lx+1.6)+'" cy="'+(y+2+ly)+'" r=".7" fill="#fff" opacity=".9"/>'
-   +(lid?'<path d="M'+(x-6)+' '+(y-6.4)+'h12v'+(6.4+lid-1.2)+'q-6 '+(mood==='think'?0:1.6)+'-12 0z" fill="'+ol+'" opacity=".5"/>':'')+'</g>'
-   +'<path d="'+sh+'" fill="none" stroke="'+ol+'" stroke-width="1.5"/>'
-   +'<path d="M'+(x-5.4)+' '+(y-.6)+'Q'+x+' '+(y-8.4)+' '+(x+5.4)+' '+(y-.6)+'" stroke="'+ol+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
-   +'<path d="M'+(x+s*5.2)+' '+(y-1)+'l'+(s*2.4)+' -2.2M'+(x+s*4.6)+' '+(y-2.6)+'l'+(s*2)+' -2.6" stroke="'+ol+'" stroke-width="1.4" stroke-linecap="round"/>'
-   +'<path d="M'+(x-3.4)+' '+(y+6.6)+'q3.4 1.4 6.8 0" stroke="'+ol+'" stroke-width=".8" fill="none" opacity=".35"/>'});
- return '<defs>'+df+'</defs>'+br+'<g class="rblink" style="animation-delay:-'+((_rid*1.37)%4).toFixed(1)+'s">'+h+'</g><path d="M31 35.8q1 1.2 2 0" stroke="'+ol+'" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".55"/>'}
+ /* game-style eyes: big glossy white ovals, one solid dark pupil, a bright highlight, a simple brow stroke (no lashes, no iris detail) */
+ var xs=[25,39],h='',br='',ink='#171a2c';
+ xs.forEach(function(x,i){var s=i?1:-1,by=y-8.6;
+  if(mood==='cheer')br+='<path d="M'+(x-4)+' '+(by+.8)+'q4-2.6 8 0" stroke="'+ol+'" stroke-width="2" fill="none" stroke-linecap="round"/>';
+  else if(mood==='oops')br+='<path d="M'+(x-s*4.2)+' '+(by-1.4)+'L'+(x+s*3.8)+' '+(by+1.6)+'" stroke="'+ol+'" stroke-width="2.2" stroke-linecap="round"/>';
+  else if(mood==='think')br+='<path d="M'+(x-4)+' '+(by+(i?-1.6:.2))+'q4 '+(i?-3.4:-2.4)+' 8 0" stroke="'+ol+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  else br+='<path d="M'+(x-4)+' '+(by+.6)+'q4-2.8 8 0" stroke="'+ol+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'});
+ if(mood==='cheer')return br+xs.map(function(x){return '<path d="M'+(x-4.6)+' '+(y+2)+'q4.6-8.4 9.2 0" stroke="'+ink+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'}).join('');
+ xs.forEach(function(x,i){var s=i?1:-1,wide=mood==='oops',think=mood==='think',
+   rx=wide?4.6:4.2,ry=wide?6.2:5.4,px=think?(i?-1.1:1.1):s*-.5,py=think?-1.6:.6,pr=wide?[1.9,2.3]:[2.8,3.5];
+  h+='<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="#fff" stroke="'+ol+'" stroke-width="1.5"/>'
+   +'<ellipse cx="'+(x+px)+'" cy="'+(y+py+.4)+'" rx="'+pr[0]+'" ry="'+pr[1]+'" fill="'+ink+'"/>'
+   +'<circle cx="'+(x+px-1)+'" cy="'+(y+py-1.2)+'" r="1.15" fill="#fff"/><circle cx="'+(x+px+1)+'" cy="'+(y+py+1.6)+'" r=".55" fill="#fff" opacity=".85"/>'});
+ return br+'<g class="rblink" style="animation-delay:-'+((_rid*1.37)%4).toFixed(1)+'s">'+h+'</g>'}
 function _mouth(mood,y,ol){
  var dim='<path d="M26.6 '+(y+.4)+'l-1.1 -1M37.4 '+(y+.4)+'l1.1 -1" stroke="'+ol+'" stroke-width="1" stroke-linecap="round" opacity=".6"/>';
  if(mood==='cheer')return '<path d="M26.5 '+y+'q5.5 9 11 0z" fill="#7a1f2e" stroke="'+ol+'" stroke-width="1.6" stroke-linejoin="round"/><path d="M27.6 '+(y+.9)+'h8.8v1.6q-4.4 1.2 -8.8 0z" fill="#fff"/><path d="M29 '+(y+4.4)+'q3 -2.4 6 0q-3 2.6 -6 0z" fill="#ff8a96"/>'+dim;
