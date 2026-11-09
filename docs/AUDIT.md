@@ -10,6 +10,10 @@ Status key: Fixed, Open, Needs a human.
 - Open: confirm the `PEPPER` secret is set the same on both Workers.
 - Needs a human: privacy and children's-data review (COPPA/FERPA/district policy) by the school or district.
 
+## Educator access code
+- Added: Me > Educator access. A code (only its salted SHA-256 hash is in the source) unlocks tools to skip the placement check, preview each learning plan, unlock every cosmetic and add coins. It is client-side, so treat it as a convenience and not a security boundary. It only changes progress saved on that device, shows a red DEV MODE badge while on, and turning it off takes the added looks and coins back.
+- Needs a human: keep the code private; anyone who has it can use it, and a leaked code can only be replaced by changing the hash in `engine3/dev.js`.
+
 ## Web development
 - Fixed: sideways scroll and clipped icons across 17 screen sizes; Escape closes menus.
 - Fixed: mission crash when a lesson card was included; mock-test progress bar did not move.
