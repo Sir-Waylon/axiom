@@ -78,3 +78,9 @@ window.askOk=function(title,msg,yes,cb){var m=document.createElement('div');m.cl
 m.innerHTML='<div class="mbox" style="max-width:380px"><h3>'+esc(title)+'</h3><p>'+esc(msg)+'</p><button class="btn block" data-ok="1">'+esc(yes)+'</button><button class="btn sec block" data-ok="0">Cancel</button></div>';
 var done=function(r){document.removeEventListener('keydown',kd);m.remove();if(r)cb()},kd=function(e){if(e.key==='Escape')done(0)};
 m.addEventListener('click',function(e){var b=e.target.closest('[data-ok]');if(b)done(b.dataset.ok==='1');else if(e.target===m)done(0)});document.addEventListener('keydown',kd);document.body.appendChild(m);var f=m.querySelector('[data-ok="0"]');f&&f.focus()};
+
+/* keep the last line of a question clear of the feedback sheet, whatever its height */
+(function(){var q=0;function fit(){q=0;var se=document.getElementById('sess');if(!se)return;var b=se.querySelector('.s-body'),sh=document.querySelector('.sheet');if(b)b.style.paddingBottom=sh?Math.ceil(sh.getBoundingClientRect().height+28)+'px':''}
+function sched(){if(q||!document.getElementById('sess'))return;q=1;window.requestAnimationFrame(fit)}
+new MutationObserver(sched).observe(document.body,{childList:true,subtree:true});window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);
+if(window.ResizeObserver){var ro=new ResizeObserver(sched),seen=null;new MutationObserver(function(){var sh=document.querySelector('.sheet');if(sh&&sh!==seen){seen=sh;ro.observe(sh)}}).observe(document.body,{childList:true,subtree:true})}})();
