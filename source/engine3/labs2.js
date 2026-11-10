@@ -118,7 +118,7 @@ function mysteryLab(root){
    else if(v==='rev'){fb.innerHTML=s.kind==='res'?'It is a <b>'+s.R+' Ω resistor</b>. Colour bands: '+bandName(s.R)+'. The graph is a straight line through zero.':s.kind==='lamp'?'It is a <b>filament lamp</b>. As it heats up its resistance rises, so the graph bends. It does not obey Ohm’s law.':'It is a <b>diode</b> with a 100 Ω protector. Almost no current flows until about 0.6 V, then it rises very fast.'}}});
  draw();ro()}
 
-window.__labTex.mystery=1;
+window.__labTex.h={dragger:dragger,keep:keep,svgW:svgW,rng:rng,fx:fx,bands:bands,bandName:bandName,COL:COL,stars:stars};
 var SET=[
  {id:'orbit',t:'Gravity and orbits',d:'Textured planets, launch a moon and watch the path',make:orbitLab,p:['quanta-physics']},
  {id:'myst',t:'Mystery component',d:'Measure volts and amps, then work out what is inside',make:mysteryLab,p:['circuit-lab-b','quanta-physics']}
