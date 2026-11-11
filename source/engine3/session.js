@@ -110,7 +110,10 @@ function advance(){
  if(Z.i>=Z.steps.length)return finishSess();
  drawSess();window.scrollTo(0,0)}
 function explainNow(){
- var st=Z.steps[Z.i],it=st.it;Z.steps.splice(Z.i+1,0,{k:'explain',it:it,st:0,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}
+ var st=Z.steps[Z.i],it=st.it,simple=!!(it.ok||st.follow||st.lock);Z.menu=0;Z.steps.splice(Z.i+1,0,{k:'explain',it:it,st:0,sh:1,src:Z.i,simple:simple,skipq:!it.ok&&!st.follow&&!st.lock&&Z.kind!=='mock'});Z.i++;drawSess()}
+/* a wrong or skipped question comes back later in the same session, once */
+function requeue(it,skipped){Z.rq3=Z.rq3||{};if(Z.rq3[it.id])return;Z.rq3[it.id]=1;var at=Math.min(Z.steps.length,Z.i+5);Z.steps.splice(at,0,{k:'try',it:mkItem(it.id),lock:3,skipped:!!skipped});Z.mains++}
+function skipNow(){var st=Z.steps[Z.i];if(!st||st.skipped||st.it.done)return;Z.menu=0;Z.rq3=Z.rq3||{};delete Z.rq3[st.it.id];var it=st.it;Z.steps.splice(Z.i,1);var at=Math.min(Z.steps.length,Z.i+4);Z.steps.splice(at,0,{k:'try',it:mkItem(it.id),lock:st.lock===1?1:3,skipped:1});Z.rq3[it.id]=1;drawSess()}
 function followUp(it){S.xp+=3;S.dxp[today()]=(S.dxp[today()]||0)+3;Z.earned+=3;var avoid=Z.seenQ.concat([it.id]);var id=similar(it.q,avoid);if(!id){advance();return}
  Z.seenQ.push(id);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(id),follow:true});Z.i++;drawSess();window.scrollTo(0,0)}
 function finishSess(){
@@ -128,7 +131,8 @@ function finishSess(){
 /* ---------- render ---------- */
 function drawSess(){
  var z=Z;if(!z)return;var s=$('sess');if(!s){s=document.createElement('div');s.id='sess';document.body.appendChild(s)}
- var st=z.steps[z.i],top='<div class="s-top"><button class="iconbtn" id="sx" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="prog"><i style="width:'+(z.fin?100:Math.min(100,100*z.doneM/Math.max(1,z.adaptive?Math.max(z.mains,z.N||0):z.mains)))+'%"></i></div>'+(z.secs&&!z.fin?'<span class="timer" id="tm">–</span>':'')+'</div>',h=top+'<div class="s-body">',sheet='';
+ var pb=s.querySelector('.s-body'),psc=pb&&z._si===z.i?pb.scrollTop:0,qm=z.steps[z.i]&&z.steps[z.i].k==='try'&&!z.nofb&&!z.steps[z.i].it.done&&!z.fin;
+ var st=z.steps[z.i],top='<div class="s-top"><button class="iconbtn" id="sx" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="prog"><i style="width:'+(z.fin?100:Math.min(100,100*z.doneM/Math.max(1,z.adaptive?Math.max(z.mains,z.N||0):z.mains)))+'%"></i></div>'+(z.secs&&!z.fin?'<span class="timer" id="tm">–</span>':'')+(qm?'<button class="iconbtn" id="smn" aria-label="Question menu" aria-haspopup="true" aria-expanded="'+!!z.menu+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>':'')+'</div>'+(qm&&z.menu?'<div class="smenu" role="menu">'+(STUDY&&!z.auto?'<button class="mi" id="help" role="menuitem">Show an example</button>':'')+(window.confRow?'<div class="mi2">'+confRow(z.steps[z.i].it)+'</div>':'')+'</div>':''),h=top+'<div class="s-body">',sheet='';
  if(z.fin)return drawResults(top);
  if(st.k==='card'){var c=st.c;
   h+='<div class="card lesson-card"><div class="row" style="margin-bottom:6px">'+mascot(S.cos.on.av,'think',52)+'<span class="tag">'+esc(st.ut||(z.unit&&z.unit.title)||z.title||'')+'</span></div><h2>'+esc(c.h)+'</h2><p class="lc">'+esc(c.t)+'</p>'+(c.f?'<div class="fml">'+esc(c.f)+'</div>':'')+'</div>';
@@ -137,6 +141,11 @@ function drawSess(){
   if(st.ex){var q2=st.it.q;h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Worked example</h2></div>'+(q2.svg?'<div class="fig">'+q2.svg+'</div>':'')+'<p class="lc" style="font-size:1.1rem"><b>'+esc(q2.q)+'</b></p>';
    var ss=q2.sol&&q2.sol.length?q2.sol:[q2.w||''];ss.slice(0,st.sh).forEach(function(t,k){h+='<div class="step"><b>Step '+(k+1)+'</b> '+clz(t,k===st.sh-1)+'</div>'});var mr=st.sh<ss.length;if(!mr)h+='<p class="small"><b>Answer:</b> '+esc(ansText(q2))+'</p>';
    sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(mr?'exs':'exb')+'">'+(mr?'Next step':'Back to my question')+'</button></div></div></div>';h+='</div>'}
+  else if(st.simple){var qs=st.it.q,hs=helpCard(qs),mn=qs.type==='mcq'||qs.type==='multi'?st.it.sel.map(function(i){return qs.o[i]}).join('; '):qs.type==='short'?st.it.val:'',sl=qs.sol&&qs.sol.length?qs.sol:(qs.w?[qs.w]:[]);
+   h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,st.it.ok?'cheer':'think',52)+'<h2>'+(st.it.ok?'Why that works':'How to get it')+'</h2></div>'+(qs.svg?'<div class="fig">'+qs.svg+'</div>':'')+'<p class="lc" style="font-size:1.05rem"><b>'+esc(qs.q)+'</b></p><p class="small mute">'+(mn?'You answered <b>'+esc(mn)+'</b>. ':'')+'Correct: <b>'+esc(ansText(qs))+'</b></p>';
+   if(hs)h+='<div class="step"><b>Key idea · '+esc(hs.h)+'</b><p class="lc" style="font-size:1.05rem">'+esc(hs.t)+'</p>'+(hs.f?'<div class="fml">'+esc(hs.f)+'</div>':'')+'</div>';
+   sl.forEach(function(t,k){h+='<div class="step"><b>Step '+(k+1)+'</b> '+esc(t)+'</div>'});if(qs.w&&sl.length>1)h+='<p class="small"><b>In one line:</b> '+esc(qs.w)+'</p>';
+   sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="exd">Continue</button></div></div></div>';h+='</div>'}
   else{
   h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Review the solution</h2></div>';
   var mine=q.type==='mcq'||q.type==='multi'?it.sel.map(function(i){return q.o[i]}).join('; '):q.type==='short'?it.val:'';
@@ -147,17 +156,16 @@ function drawSess(){
    var more=st.sh<steps.length;sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(more?'exs':'exf')+'">'+(more?'Next step':'Try a similar one')+'</button></div></div></div>'}
   h+='</div>'}}
  else{var it=st.it,q=it.q,rev=it.done&&!z.nofb;
-  h+=(st.follow?'<span class="tag" style="margin-bottom:8px">'+(st.scaf?'Warm-up: a simpler version':st.retry?'Your question again':'Similar problem')+'</span>':'')+qBody(it,rev);
+  h+=(st.lock?'<span class="tag" style="margin-bottom:8px">'+(st.lock===3?(st.skipped?'You skipped this one earlier':'Another go at this one'):st.lock===2?'Lock it in: once more':'Lock it in: from earlier')+'</span>':'')+(st.follow?'<span class="tag" style="margin-bottom:8px">'+(st.scaf?'Warm-up: a simpler version':st.retry?'Your question again':'Similar problem')+'</span>':'')+qBody(it,rev);
   
   if(z.nofb){var last=z.i===z.steps.length-1;
    sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(z.i>0&&z.kind==='mock'?'<button class="btn sec" id="pv">Back</button>':'')+'<span class="sp"></span><button class="btn" id="nx"'+(z.kind!=='mock'&&!answered(it)?' disabled':'')+'>'+(last?'Finish':'Next')+'</button></div></div></div>'}
-  else if(!rev){var need=q.type==='short'||q.type==='multi'||q.type==='order'||q.type==='match'||!!(window.IT&&IT[q.type]);
-   sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(STUDY&&!z.auto?'<button class="btn sec sm" id="help">Show an example</button>':'')+'<span class="sp"></span>'+(need?'<button class="btn" id="chk"'+(answered(it)?'':' disabled')+'>Check</button>':'')+'</div></div></div>'}
-  else{var ok=it.ok,hc=(!ok&&STUDY&&!st.follow)?null:null;
-   sheet='<div class="sheet '+(ok?'ok':'bad')+'"><div class="sheet-in">'+mascot(S.cos.on.av,ok?'cheer':'oops',48)+'<div><h3>'+(ok?['Correct','Well done','Correct','Excellent'][z.i%4]:'Not yet')+(ok&&it.gain?' <span class="small">+'+it.gain+' XP</span>':'')+'</h3>'+(ok?'':'<div><b>Answer:</b> '+esc(ansText(q))+'</div>')+(q.w?'<div class="small">'+esc(q.w)+'</div>':'')+'<div class="btns">'+
-    (!ok&&z.remed&&!st.follow?'<button class="btn bad" id="exp">Explain it</button><button class="btn sec" id="nx">Skip</button>':'<button class="btn '+(ok?'ok':'bad')+'" id="nx">Continue</button>')+'</div></div></div></div>'}}
- s.innerHTML=h+'</div>'+sheet;
- if(z.secs)tick();if(!z.brk&&Date.now()-z.t0>20*60000){z.brk=1;toast('20 minutes in. Stand up and stretch for 2 minutes?')}
+  else if(!rev){var need=q.type==='short'||q.type==='multi'||q.type==='order'||q.type==='match'||!!(window.IT&&IT[q.type]),canSkip=!st.skipped&&z.steps.length-z.i>1&&z.kind!=='mock'&&z.kind!=='testout';
+   sheet='<div class="sheet plain"><div class="sheet-in"><div class="row" style="width:100%">'+(canSkip?'<button class="btn sec" id="skp">Skip</button>':'')+'<span class="sp"></span>'+(need?'<button class="btn" id="chk"'+(answered(it)?'':' disabled')+'>Check</button>':'')+'</div></div></div>'}
+  else{var ok=it.ok;
+   sheet='<div class="sheet '+(ok?'ok':'bad')+'" role="status" aria-live="polite"><div class="sheet-in">'+mascot(S.cos.on.av,ok?'cheer':'oops',48)+'<div><h3>'+(ok?['Correct','Well done','Correct','Excellent'][z.i%4]:'Not yet')+(ok&&it.gain?' <span class="small">+'+it.gain+' XP</span>':'')+'</h3>'+(ok?'':'<div><b>Answer:</b> '+esc(ansText(q))+'</div>')+(q.w?'<div class="small">'+esc(q.w)+'</div>':'')+(it.hyper?'<div class="small"><b>You were sure about that one.</b> Corrections to answers you felt sure about tend to stick best, so it comes back soon.</div>':'')+(!ok&&!st.follow&&!st.lock&&z.kind!=='mock'?'<div class="small mute">We will ask this one again a little later.</div>':'')+'<div class="btns"><button class="btn sec" id="exp">Explain step by step</button><button class="btn '+(ok?'ok':'bad')+'" id="nx">Continue</button></div></div></div></div>'}}
+ s.innerHTML=h+'</div>'+sheet;z._si=z.i;var nb=s.querySelector('.s-body');if(nb&&psc)nb.scrollTop=psc;
+ if(z.secs)tick();if(!z.brk&&(window.actNow?actNow():Date.now())-(z.a0||z.t0)>20*60000){z.brk=1;toast('20 minutes in. Stand up and stretch for 2 minutes?')}
  var inp=$('sv');if(inp&&!(st.it&&st.it.done)){inp.focus()}
  if(z.auto&&st.it&&st.it.done)setTimeout(function(){if(Z===z&&!z.fin&&z.steps[z.i]===st)advance()},st.it.ok?600:1300)}
 function helpBox(it){var q=it.q,n=it.help,hc=helpCard(q),h='<div class="help"><b>Hint</b>';
@@ -171,21 +179,23 @@ function drawResults(top){
  var right=tr.filter(function(x){return x.it.ok}).length,miss=all.filter(function(x){return x.it.done&&!x.it.ok}).map(function(x){return x.it});
  h+='<div class="card" style="text-align:center">'+mascot(S.cos.on.av,pass&&z.pct>=60?'cheer':'think',88)+'<div class="score">'+(z.kind==='lesson'?'Lesson done':z.pct+'%')+'</div>'+(z.chest?'<p><b>Mission complete! +25 XP</b></p>':'')+(z.kind==='unit'?'<p><b>'+(z.pct>=70?(z.first?'Unit passed! +40 XP':'Unit passed'):'Pass mark is 70%. Review the lessons and try again.')+'</b></p>':'')+'<p class="mute">'+right+' correct · +'+z.earned+' XP'+(z.kind==='blitz'?'':'')+'</p></div>';
  if(Object.keys(by).length>1){h+='<div class="card"><h3>By topic</h3>';Object.keys(by).forEach(function(t){var p=by[t];h+='<div class="bar2"><span>'+esc(TOP[t].name)+'</span><span class="tr"><i style="width:'+(100*p[0]/p[1])+'%"></i></span><span>'+p[0]+'/'+p[1]+'</span></div>'});h+='</div>'}
- if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
+ if(window.calCard)h+=calCard(all);if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
  var sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(miss.length?'<button class="btn sec" id="rtry">Practice misses</button>':'')+'<span class="sp"></span><button class="btn" id="done">Done</button></div></div></div>';
  s.innerHTML=h+'</div>'+sheet;
  s.dataset.miss=miss.map(function(i){return i.id}).join(',')}
 /* ---------- events ---------- */
 document.addEventListener('input',function(e){if(e.target.id==='sv'&&Z){var it=Z.steps[Z.i].it;if(!it)return;it.val=e.target.value;var b=$('chk');if(b)b.disabled=!it.val.trim();var n=$('nx');if(n&&Z.nofb&&Z.kind!=='mock')n.disabled=!it.val.trim()}});
-document.addEventListener('keydown',function(e){if(!Z||Z.fin)return;if(e.key==='Enter'&&e.target.id==='sv'){var st=Z.steps[Z.i],it=st.it;if(Z.nofb){if(it.val.trim())advance();return}if(it.val.trim()&&!it.done){resolveIt(it);drawSess()}}});
+document.addEventListener('keydown',function(e){if(!Z||Z.fin)return;if(e.key==='Escape'&&Z.menu){Z.menu=0;drawSess();return}if(e.key==='Enter'&&e.target.id==='sv'){var st=Z.steps[Z.i],it=st.it;if(Z.nofb){if(it.val.trim())advance();return}if(it.val.trim()&&!it.done){resolveIt(it);drawSess()}}});
 document.addEventListener('click',function(e){
  var s=$('sess');if(!s||!s.contains(e.target)||!Z)return;var t=e.target,id=t.id||(t.closest('button')||{}).id,z=Z;
  if(id==='sx'){if(z.fin){closeSess();return}window.askOk('Leave this session?','Your progress so far is kept.','Leave',closeSess);return}
  if(id==='done'){closeSess();return}
  if(id==='rtry'){var ids=s.dataset.miss.split(',').filter(Boolean);closeSess();startFromIds(ids,'Practice misses');return}
  if(z.fin)return;var st=z.steps[z.i];
+ if(z.menu&&!t.closest('.smenu')&&id!=='smn'){z.menu=0;var mm=s.querySelector('.smenu');if(mm)mm.remove();var mb=$('smn');if(mb)mb.setAttribute('aria-expanded','false')}
+ if(id==='smn'){z.menu=!z.menu;drawSess();return}
  if(id==='go'){advance();return}
- if(st.k==='explain'){if(id==='exb'){var src=st.src;Z.steps.splice(Z.i,1);Z.i=src;drawSess();return}if(id==='exq'){var ez=easier(st.it.q);Z.seenQ.push(ez);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(ez),follow:true,scaf:true},{k:'explain',it:st.it,st:1,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}else if(id==='exn'){st.st=1;drawSess()}else if(id==='exs'){st.sh++;drawSess()}else if(id==='exf'){retryThen(st.it)}return}
+ if(st.k==='explain'){if(id==='exd'){var srcd=st.src,wasOk=st.it.ok,itd=st.it,sk=st.skipq;Z.steps.splice(Z.i,1);Z.i=srcd;if(!wasOk&&sk)requeue(itd);advance();return}if(id==='exb'){var src=st.src;Z.steps.splice(Z.i,1);Z.i=src;drawSess();return}if(id==='exq'){var ez=easier(st.it.q);Z.seenQ.push(ez);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(ez),follow:true,scaf:true},{k:'explain',it:st.it,st:1,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}else if(id==='exn'){st.st=1;drawSess()}else if(id==='exs'){st.sh++;drawSess()}else if(id==='exf'){retryThen(st.it)}return}
  var it=st.it,q=it.q;
  var o=t.closest('.opt');
  if(o&&!it.done){var oi=+o.dataset.oi,k=it.sel.indexOf(oi);
@@ -198,12 +208,13 @@ document.addEventListener('click',function(e){
  if(id==='chk'){if(answered(it)){resolveIt(it);drawSess()}}
  else if(id==='help'){exampleNow()}
  else if(id==='exp'){explainNow()}
- else if(id==='nx'){if(!it.done&&!z.nofb)return;if(z.nofb&&z.i===z.steps.length-1)finishSess();else advance()}
+ else if(id==='skp'){skipNow()}
+ else if(id==='nx'){if(!it.done&&!z.nofb)return;if(it.done&&!it.ok&&!st.follow&&!st.lock&&!z.nofb&&z.kind!=='mock')requeue(it);if(z.nofb&&z.i===z.steps.length-1)finishSess();else advance()}
  else if(id==='pv'){z.i--;drawSess()}
 });
 
 function clz(t,live){var i=t.lastIndexOf('=');if(!live||i<0||i>=t.length-2)return esc(t);var a=t.slice(0,i+1),b=t.slice(i+1);return esc(a)+'<span class="clz" tabindex="0" role="button" aria-label="Tap to reveal">'+esc(b)+'</span><span class="small mute"> (try it, then tap)</span>'}
-function exampleNow(){var st=Z.steps[Z.i],q=st.it.q,sid=similar(q,[q.id]);if(!sid){toast('No example for this one');return}st.it.help=1;Z.steps.splice(Z.i+1,0,{k:'explain',ex:1,src:Z.i,it:mkItem(sid),sh:1,st:1});Z.i++;drawSess();window.scrollTo(0,0)}
+function exampleNow(){Z.menu=0;var st=Z.steps[Z.i],q=st.it.q,sid=similar(q,[q.id]);if(!sid){toast('No example for this one');return}st.it.help=1;Z.steps.splice(Z.i+1,0,{k:'explain',ex:1,src:Z.i,it:mkItem(sid),sh:1,st:1});Z.i++;drawSess();window.scrollTo(0,0)}
 
 function easier(q){var qw=W3(q.q),best=null,bs=-1e9,qb=(q.b!==undefined?q.b:(q.l-2)*.8);
  QS.forEach(function(c){if(c.id===q.id||c.t!==q.t||c.type==='multi'||c.type==='order'||c.type==='match')return;var cb=(c.b!==undefined?c.b:(c.l-2)*.8);if(c.l>q.l||cb>qb-.2)return;

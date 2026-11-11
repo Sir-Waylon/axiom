@@ -26,9 +26,9 @@ document.addEventListener('click',function(e){var t=e.target;
  if(t.id==='rsm'){resumeNow();return}
  var pm=t.closest&&t.closest('[data-pm="endless"]');if(pm){e.stopPropagation();startEndless()}},true);
 /* breaks */
-function brk(){var m=document.createElement('div');m.className='modal';var left=180;m.innerHTML='<div class="card">'+mascot(S.cos.on.av,'happy',96)+'<h2>Brain break</h2><p class="mute">Stand up, stretch, sip some water. Your brain files what you learned while you rest.</p><div class="bigtime" id="bt">3:00</div><button class="btn" id="bk">I am back</button></div>';document.body.appendChild(m);
- var iv=setInterval(function(){left--;var e=$('bt');if(e)e.textContent=Math.floor(left/60)+':'+('0'+left%60).slice(-2);if(left<=0){clearInterval(iv);var b=$('bk');if(b)b.textContent='Ready to continue'}},1000);
- $('bk').onclick=function(){clearInterval(iv);m.remove();if(Z)Z.nextBrk=Date.now()+20*60000}}
-setInterval(function(){if(!Z||Z.fin||Z.kind==='blitz'||Z.kind==='mock'||Z.kind==='unit'||Z.kind==='testout'||document.querySelector('.modal'))return;if(!Z.nextBrk)Z.nextBrk=Z.t0+20*60000;if(Date.now()>=Z.nextBrk){Z.nextBrk=Date.now()+60*60000;brk()}},15000);
+function brk(){var m=document.createElement('div');m.className='modal';var endAt=actNow()+180000,left=180;m.innerHTML='<div class="card">'+mascot(S.cos.on.av,'happy',96)+'<h2>Brain break</h2><p class="mute">Stand up, stretch, sip some water. Your brain files what you learned while you rest.</p><div class="bigtime" id="bt">3:00</div><button class="btn" id="bk">I am back</button></div>';document.body.appendChild(m);
+ var iv=setInterval(function(){left=Math.max(0,Math.ceil((endAt-actNow())/1000));var e=$('bt');if(e)e.textContent=Math.floor(left/60)+':'+('0'+left%60).slice(-2);if(left<=0){clearInterval(iv);var b=$('bk');if(b)b.textContent='Ready to continue'}},1000);
+ $('bk').onclick=function(){clearInterval(iv);m.remove();if(Z)Z.nextBrk=actNow()+20*60000}}
+setInterval(function(){if(!Z||Z.fin||Z.kind==='blitz'||Z.kind==='mock'||Z.kind==='unit'||Z.kind==='testout'||document.querySelector('.modal'))return;if(!Z.nextBrk)Z.nextBrk=(Z.a0||actNow())+20*60000;if(actNow()>=Z.nextBrk){Z.nextBrk=actNow()+60*60000;brk()}},15000);
 window.__brk=brk;route();window.startEndless=startEndless;
 })();

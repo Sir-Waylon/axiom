@@ -644,7 +644,10 @@ function advance(){
  if(Z.i>=Z.steps.length)return finishSess();
  drawSess();window.scrollTo(0,0)}
 function explainNow(){
- var st=Z.steps[Z.i],it=st.it;Z.steps.splice(Z.i+1,0,{k:'explain',it:it,st:0,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}
+ var st=Z.steps[Z.i],it=st.it,simple=!!(it.ok||st.follow||st.lock);Z.menu=0;Z.steps.splice(Z.i+1,0,{k:'explain',it:it,st:0,sh:1,src:Z.i,simple:simple,skipq:!it.ok&&!st.follow&&!st.lock&&Z.kind!=='mock'});Z.i++;drawSess()}
+/* a wrong or skipped question comes back later in the same session, once */
+function requeue(it,skipped){Z.rq3=Z.rq3||{};if(Z.rq3[it.id])return;Z.rq3[it.id]=1;var at=Math.min(Z.steps.length,Z.i+5);Z.steps.splice(at,0,{k:'try',it:mkItem(it.id),lock:3,skipped:!!skipped});Z.mains++}
+function skipNow(){var st=Z.steps[Z.i];if(!st||st.skipped||st.it.done)return;Z.menu=0;Z.rq3=Z.rq3||{};delete Z.rq3[st.it.id];var it=st.it;Z.steps.splice(Z.i,1);var at=Math.min(Z.steps.length,Z.i+4);Z.steps.splice(at,0,{k:'try',it:mkItem(it.id),lock:st.lock===1?1:3,skipped:1});Z.rq3[it.id]=1;drawSess()}
 function followUp(it){S.xp+=3;S.dxp[today()]=(S.dxp[today()]||0)+3;Z.earned+=3;var avoid=Z.seenQ.concat([it.id]);var id=similar(it.q,avoid);if(!id){advance();return}
  Z.seenQ.push(id);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(id),follow:true});Z.i++;drawSess();window.scrollTo(0,0)}
 function finishSess(){
@@ -662,7 +665,8 @@ function finishSess(){
 /* ---------- render ---------- */
 function drawSess(){
  var z=Z;if(!z)return;var s=$('sess');if(!s){s=document.createElement('div');s.id='sess';document.body.appendChild(s)}
- var st=z.steps[z.i],top='<div class="s-top"><button class="iconbtn" id="sx" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="prog"><i style="width:'+(z.fin?100:Math.min(100,100*z.doneM/Math.max(1,z.adaptive?Math.max(z.mains,z.N||0):z.mains)))+'%"></i></div>'+(z.secs&&!z.fin?'<span class="timer" id="tm">–</span>':'')+'</div>',h=top+'<div class="s-body">',sheet='';
+ var pb=s.querySelector('.s-body'),psc=pb&&z._si===z.i?pb.scrollTop:0,qm=z.steps[z.i]&&z.steps[z.i].k==='try'&&!z.nofb&&!z.steps[z.i].it.done&&!z.fin;
+ var st=z.steps[z.i],top='<div class="s-top"><button class="iconbtn" id="sx" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="prog"><i style="width:'+(z.fin?100:Math.min(100,100*z.doneM/Math.max(1,z.adaptive?Math.max(z.mains,z.N||0):z.mains)))+'%"></i></div>'+(z.secs&&!z.fin?'<span class="timer" id="tm">–</span>':'')+(qm?'<button class="iconbtn" id="smn" aria-label="Question menu" aria-haspopup="true" aria-expanded="'+!!z.menu+'"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>':'')+'</div>'+(qm&&z.menu?'<div class="smenu" role="menu">'+(STUDY&&!z.auto?'<button class="mi" id="help" role="menuitem">Show an example</button>':'')+(window.confRow?'<div class="mi2">'+confRow(z.steps[z.i].it)+'</div>':'')+'</div>':''),h=top+'<div class="s-body">',sheet='';
  if(z.fin)return drawResults(top);
  if(st.k==='card'){var c=st.c;
   h+='<div class="card lesson-card"><div class="row" style="margin-bottom:6px">'+mascot(S.cos.on.av,'think',52)+'<span class="tag">'+esc(st.ut||(z.unit&&z.unit.title)||z.title||'')+'</span></div><h2>'+esc(c.h)+'</h2><p class="lc">'+esc(c.t)+'</p>'+(c.f?'<div class="fml">'+esc(c.f)+'</div>':'')+'</div>';
@@ -671,6 +675,11 @@ function drawSess(){
   if(st.ex){var q2=st.it.q;h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Worked example</h2></div>'+(q2.svg?'<div class="fig">'+q2.svg+'</div>':'')+'<p class="lc" style="font-size:1.1rem"><b>'+esc(q2.q)+'</b></p>';
    var ss=q2.sol&&q2.sol.length?q2.sol:[q2.w||''];ss.slice(0,st.sh).forEach(function(t,k){h+='<div class="step"><b>Step '+(k+1)+'</b> '+clz(t,k===st.sh-1)+'</div>'});var mr=st.sh<ss.length;if(!mr)h+='<p class="small"><b>Answer:</b> '+esc(ansText(q2))+'</p>';
    sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(mr?'exs':'exb')+'">'+(mr?'Next step':'Back to my question')+'</button></div></div></div>';h+='</div>'}
+  else if(st.simple){var qs=st.it.q,hs=helpCard(qs),mn=qs.type==='mcq'||qs.type==='multi'?st.it.sel.map(function(i){return qs.o[i]}).join('; '):qs.type==='short'?st.it.val:'',sl=qs.sol&&qs.sol.length?qs.sol:(qs.w?[qs.w]:[]);
+   h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,st.it.ok?'cheer':'think',52)+'<h2>'+(st.it.ok?'Why that works':'How to get it')+'</h2></div>'+(qs.svg?'<div class="fig">'+qs.svg+'</div>':'')+'<p class="lc" style="font-size:1.05rem"><b>'+esc(qs.q)+'</b></p><p class="small mute">'+(mn?'You answered <b>'+esc(mn)+'</b>. ':'')+'Correct: <b>'+esc(ansText(qs))+'</b></p>';
+   if(hs)h+='<div class="step"><b>Key idea · '+esc(hs.h)+'</b><p class="lc" style="font-size:1.05rem">'+esc(hs.t)+'</p>'+(hs.f?'<div class="fml">'+esc(hs.f)+'</div>':'')+'</div>';
+   sl.forEach(function(t,k){h+='<div class="step"><b>Step '+(k+1)+'</b> '+esc(t)+'</div>'});if(qs.w&&sl.length>1)h+='<p class="small"><b>In one line:</b> '+esc(qs.w)+'</p>';
+   sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="exd">Continue</button></div></div></div>';h+='</div>'}
   else{
   h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Review the solution</h2></div>';
   var mine=q.type==='mcq'||q.type==='multi'?it.sel.map(function(i){return q.o[i]}).join('; '):q.type==='short'?it.val:'';
@@ -681,17 +690,16 @@ function drawSess(){
    var more=st.sh<steps.length;sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(more?'exs':'exf')+'">'+(more?'Next step':'Try a similar one')+'</button></div></div></div>'}
   h+='</div>'}}
  else{var it=st.it,q=it.q,rev=it.done&&!z.nofb;
-  h+=(st.follow?'<span class="tag" style="margin-bottom:8px">'+(st.scaf?'Warm-up: a simpler version':st.retry?'Your question again':'Similar problem')+'</span>':'')+qBody(it,rev);
+  h+=(st.lock?'<span class="tag" style="margin-bottom:8px">'+(st.lock===3?(st.skipped?'You skipped this one earlier':'Another go at this one'):st.lock===2?'Lock it in: once more':'Lock it in: from earlier')+'</span>':'')+(st.follow?'<span class="tag" style="margin-bottom:8px">'+(st.scaf?'Warm-up: a simpler version':st.retry?'Your question again':'Similar problem')+'</span>':'')+qBody(it,rev);
   
   if(z.nofb){var last=z.i===z.steps.length-1;
    sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(z.i>0&&z.kind==='mock'?'<button class="btn sec" id="pv">Back</button>':'')+'<span class="sp"></span><button class="btn" id="nx"'+(z.kind!=='mock'&&!answered(it)?' disabled':'')+'>'+(last?'Finish':'Next')+'</button></div></div></div>'}
-  else if(!rev){var need=q.type==='short'||q.type==='multi'||q.type==='order'||q.type==='match'||!!(window.IT&&IT[q.type]);
-   sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(STUDY&&!z.auto?'<button class="btn sec sm" id="help">Show an example</button>':'')+'<span class="sp"></span>'+(need?'<button class="btn" id="chk"'+(answered(it)?'':' disabled')+'>Check</button>':'')+'</div></div></div>'}
-  else{var ok=it.ok,hc=(!ok&&STUDY&&!st.follow)?null:null;
-   sheet='<div class="sheet '+(ok?'ok':'bad')+'"><div class="sheet-in">'+mascot(S.cos.on.av,ok?'cheer':'oops',48)+'<div><h3>'+(ok?['Correct','Well done','Correct','Excellent'][z.i%4]:'Not yet')+(ok&&it.gain?' <span class="small">+'+it.gain+' XP</span>':'')+'</h3>'+(ok?'':'<div><b>Answer:</b> '+esc(ansText(q))+'</div>')+(q.w?'<div class="small">'+esc(q.w)+'</div>':'')+'<div class="btns">'+
-    (!ok&&z.remed&&!st.follow?'<button class="btn bad" id="exp">Explain it</button><button class="btn sec" id="nx">Skip</button>':'<button class="btn '+(ok?'ok':'bad')+'" id="nx">Continue</button>')+'</div></div></div></div>'}}
- s.innerHTML=h+'</div>'+sheet;
- if(z.secs)tick();if(!z.brk&&Date.now()-z.t0>20*60000){z.brk=1;toast('20 minutes in. Stand up and stretch for 2 minutes?')}
+  else if(!rev){var need=q.type==='short'||q.type==='multi'||q.type==='order'||q.type==='match'||!!(window.IT&&IT[q.type]),canSkip=!st.skipped&&z.steps.length-z.i>1&&z.kind!=='mock'&&z.kind!=='testout';
+   sheet='<div class="sheet plain"><div class="sheet-in"><div class="row" style="width:100%">'+(canSkip?'<button class="btn sec" id="skp">Skip</button>':'')+'<span class="sp"></span>'+(need?'<button class="btn" id="chk"'+(answered(it)?'':' disabled')+'>Check</button>':'')+'</div></div></div>'}
+  else{var ok=it.ok;
+   sheet='<div class="sheet '+(ok?'ok':'bad')+'" role="status" aria-live="polite"><div class="sheet-in">'+mascot(S.cos.on.av,ok?'cheer':'oops',48)+'<div><h3>'+(ok?['Correct','Well done','Correct','Excellent'][z.i%4]:'Not yet')+(ok&&it.gain?' <span class="small">+'+it.gain+' XP</span>':'')+'</h3>'+(ok?'':'<div><b>Answer:</b> '+esc(ansText(q))+'</div>')+(q.w?'<div class="small">'+esc(q.w)+'</div>':'')+(it.hyper?'<div class="small"><b>You were sure about that one.</b> Corrections to answers you felt sure about tend to stick best, so it comes back soon.</div>':'')+(!ok&&!st.follow&&!st.lock&&z.kind!=='mock'?'<div class="small mute">We will ask this one again a little later.</div>':'')+'<div class="btns"><button class="btn sec" id="exp">Explain step by step</button><button class="btn '+(ok?'ok':'bad')+'" id="nx">Continue</button></div></div></div></div>'}}
+ s.innerHTML=h+'</div>'+sheet;z._si=z.i;var nb=s.querySelector('.s-body');if(nb&&psc)nb.scrollTop=psc;
+ if(z.secs)tick();if(!z.brk&&(window.actNow?actNow():Date.now())-(z.a0||z.t0)>20*60000){z.brk=1;toast('20 minutes in. Stand up and stretch for 2 minutes?')}
  var inp=$('sv');if(inp&&!(st.it&&st.it.done)){inp.focus()}
  if(z.auto&&st.it&&st.it.done)setTimeout(function(){if(Z===z&&!z.fin&&z.steps[z.i]===st)advance()},st.it.ok?600:1300)}
 function helpBox(it){var q=it.q,n=it.help,hc=helpCard(q),h='<div class="help"><b>Hint</b>';
@@ -705,21 +713,23 @@ function drawResults(top){
  var right=tr.filter(function(x){return x.it.ok}).length,miss=all.filter(function(x){return x.it.done&&!x.it.ok}).map(function(x){return x.it});
  h+='<div class="card" style="text-align:center">'+mascot(S.cos.on.av,pass&&z.pct>=60?'cheer':'think',88)+'<div class="score">'+(z.kind==='lesson'?'Lesson done':z.pct+'%')+'</div>'+(z.chest?'<p><b>Mission complete! +25 XP</b></p>':'')+(z.kind==='unit'?'<p><b>'+(z.pct>=70?(z.first?'Unit passed! +40 XP':'Unit passed'):'Pass mark is 70%. Review the lessons and try again.')+'</b></p>':'')+'<p class="mute">'+right+' correct · +'+z.earned+' XP'+(z.kind==='blitz'?'':'')+'</p></div>';
  if(Object.keys(by).length>1){h+='<div class="card"><h3>By topic</h3>';Object.keys(by).forEach(function(t){var p=by[t];h+='<div class="bar2"><span>'+esc(TOP[t].name)+'</span><span class="tr"><i style="width:'+(100*p[0]/p[1])+'%"></i></span><span>'+p[0]+'/'+p[1]+'</span></div>'});h+='</div>'}
- if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
+ if(window.calCard)h+=calCard(all);if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
  var sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(miss.length?'<button class="btn sec" id="rtry">Practice misses</button>':'')+'<span class="sp"></span><button class="btn" id="done">Done</button></div></div></div>';
  s.innerHTML=h+'</div>'+sheet;
  s.dataset.miss=miss.map(function(i){return i.id}).join(',')}
 /* ---------- events ---------- */
 document.addEventListener('input',function(e){if(e.target.id==='sv'&&Z){var it=Z.steps[Z.i].it;if(!it)return;it.val=e.target.value;var b=$('chk');if(b)b.disabled=!it.val.trim();var n=$('nx');if(n&&Z.nofb&&Z.kind!=='mock')n.disabled=!it.val.trim()}});
-document.addEventListener('keydown',function(e){if(!Z||Z.fin)return;if(e.key==='Enter'&&e.target.id==='sv'){var st=Z.steps[Z.i],it=st.it;if(Z.nofb){if(it.val.trim())advance();return}if(it.val.trim()&&!it.done){resolveIt(it);drawSess()}}});
+document.addEventListener('keydown',function(e){if(!Z||Z.fin)return;if(e.key==='Escape'&&Z.menu){Z.menu=0;drawSess();return}if(e.key==='Enter'&&e.target.id==='sv'){var st=Z.steps[Z.i],it=st.it;if(Z.nofb){if(it.val.trim())advance();return}if(it.val.trim()&&!it.done){resolveIt(it);drawSess()}}});
 document.addEventListener('click',function(e){
  var s=$('sess');if(!s||!s.contains(e.target)||!Z)return;var t=e.target,id=t.id||(t.closest('button')||{}).id,z=Z;
  if(id==='sx'){if(z.fin){closeSess();return}window.askOk('Leave this session?','Your progress so far is kept.','Leave',closeSess);return}
  if(id==='done'){closeSess();return}
  if(id==='rtry'){var ids=s.dataset.miss.split(',').filter(Boolean);closeSess();startFromIds(ids,'Practice misses');return}
  if(z.fin)return;var st=z.steps[z.i];
+ if(z.menu&&!t.closest('.smenu')&&id!=='smn'){z.menu=0;var mm=s.querySelector('.smenu');if(mm)mm.remove();var mb=$('smn');if(mb)mb.setAttribute('aria-expanded','false')}
+ if(id==='smn'){z.menu=!z.menu;drawSess();return}
  if(id==='go'){advance();return}
- if(st.k==='explain'){if(id==='exb'){var src=st.src;Z.steps.splice(Z.i,1);Z.i=src;drawSess();return}if(id==='exq'){var ez=easier(st.it.q);Z.seenQ.push(ez);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(ez),follow:true,scaf:true},{k:'explain',it:st.it,st:1,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}else if(id==='exn'){st.st=1;drawSess()}else if(id==='exs'){st.sh++;drawSess()}else if(id==='exf'){retryThen(st.it)}return}
+ if(st.k==='explain'){if(id==='exd'){var srcd=st.src,wasOk=st.it.ok,itd=st.it,sk=st.skipq;Z.steps.splice(Z.i,1);Z.i=srcd;if(!wasOk&&sk)requeue(itd);advance();return}if(id==='exb'){var src=st.src;Z.steps.splice(Z.i,1);Z.i=src;drawSess();return}if(id==='exq'){var ez=easier(st.it.q);Z.seenQ.push(ez);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(ez),follow:true,scaf:true},{k:'explain',it:st.it,st:1,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}else if(id==='exn'){st.st=1;drawSess()}else if(id==='exs'){st.sh++;drawSess()}else if(id==='exf'){retryThen(st.it)}return}
  var it=st.it,q=it.q;
  var o=t.closest('.opt');
  if(o&&!it.done){var oi=+o.dataset.oi,k=it.sel.indexOf(oi);
@@ -732,12 +742,13 @@ document.addEventListener('click',function(e){
  if(id==='chk'){if(answered(it)){resolveIt(it);drawSess()}}
  else if(id==='help'){exampleNow()}
  else if(id==='exp'){explainNow()}
- else if(id==='nx'){if(!it.done&&!z.nofb)return;if(z.nofb&&z.i===z.steps.length-1)finishSess();else advance()}
+ else if(id==='skp'){skipNow()}
+ else if(id==='nx'){if(!it.done&&!z.nofb)return;if(it.done&&!it.ok&&!st.follow&&!st.lock&&!z.nofb&&z.kind!=='mock')requeue(it);if(z.nofb&&z.i===z.steps.length-1)finishSess();else advance()}
  else if(id==='pv'){z.i--;drawSess()}
 });
 
 function clz(t,live){var i=t.lastIndexOf('=');if(!live||i<0||i>=t.length-2)return esc(t);var a=t.slice(0,i+1),b=t.slice(i+1);return esc(a)+'<span class="clz" tabindex="0" role="button" aria-label="Tap to reveal">'+esc(b)+'</span><span class="small mute"> (try it, then tap)</span>'}
-function exampleNow(){var st=Z.steps[Z.i],q=st.it.q,sid=similar(q,[q.id]);if(!sid){toast('No example for this one');return}st.it.help=1;Z.steps.splice(Z.i+1,0,{k:'explain',ex:1,src:Z.i,it:mkItem(sid),sh:1,st:1});Z.i++;drawSess();window.scrollTo(0,0)}
+function exampleNow(){Z.menu=0;var st=Z.steps[Z.i],q=st.it.q,sid=similar(q,[q.id]);if(!sid){toast('No example for this one');return}st.it.help=1;Z.steps.splice(Z.i+1,0,{k:'explain',ex:1,src:Z.i,it:mkItem(sid),sh:1,st:1});Z.i++;drawSess();window.scrollTo(0,0)}
 
 function easier(q){var qw=W3(q.q),best=null,bs=-1e9,qb=(q.b!==undefined?q.b:(q.l-2)*.8);
  QS.forEach(function(c){if(c.id===q.id||c.t!==q.t||c.type==='multi'||c.type==='order'||c.type==='match')return;var cb=(c.b!==undefined?c.b:(c.l-2)*.8);if(c.l>q.l||cb>qb-.2)return;
@@ -1767,8 +1778,8 @@ function openPad(){close();var key=(Z&&Z.i)||0,col='#2b2f45',w=3,er=false,hs=[];
   if(c==='cl'){g.clearRect(0,0,r.width,r.height);pads[key]=''}else if(c==='un'){var u=hs.pop();if(u){var m=new Image();m.onload=function(){g.globalCompositeOperation='source-over';g.clearRect(0,0,r.width,r.height);g.drawImage(m,0,0,r.width,r.height);pads[key]=cv.toDataURL()};m.src=u}}else if(c==='er')er=true;else{er=false;col=c}})}
 
 function bar(){var s=document.getElementById('sess');if(!s||!Z||Z.fin){var o=document.getElementById('tbar');if(o)o.remove();close();return}
- var pl=curPol(),d=document.getElementById('tbar');if(!d){d=document.createElement('div');d.id='tbar';d.className='tbar';s.appendChild(d);d.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.id==='tpad')openPad();else if(b.id==='tcalc')openCalc(curPol()>=2,'calc');else if(b.id==='tgraph')openCalc(true,'graph')})}
- var sig=pl+':'+(Z.i||0);if(d.dataset.sig===sig)return;d.dataset.sig=sig;
+ var pl=curPol(),d=document.getElementById('tbar');if(!d){d=document.createElement('div');d.id='tbar';d.className='tbar';var sh=s.querySelector('.sheet');if(sh)s.insertBefore(d,sh);else s.appendChild(d);d.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.id==='tpad')openPad();else if(b.id==='tcalc')openCalc(curPol()>=2,'calc');else if(b.id==='tgraph')openCalc(true,'graph')})}
+ var sh2=s.querySelector('.sheet');if(sh2&&d.nextSibling!==sh2)s.insertBefore(d,sh2);var sig=pl+':'+(Z.i||0);if(d.dataset.sig===sig)return;d.dataset.sig=sig;
  d.innerHTML='<button id="tpad" aria-label="Scratchpad"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/></svg></button>'+(pl>=1?'<button id="tcalc" aria-label="Calculator"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg></button>':'')+(pl>=2?'<button id="tgraph" aria-label="Graphing calculator"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3M3 21h18"/><path d="M6 17c4 0 4-10 8-10s2 6 6 6"/></svg></button>':'')+(pl===0?'<span class="tnone" title="This question is meant to be done by hand or in your head">No calculator</span>':'');
  if(pl===0&&panel&&panel.classList.contains('calc'))close();else if(pl<2&&panel&&tab==='graph')close()}
 var _ds=drawSess;drawSess=function(){_ds.apply(this,arguments);bar()};
@@ -3084,10 +3095,10 @@ document.addEventListener('click',function(e){var t=e.target;
  if(t.id==='rsm'){resumeNow();return}
  var pm=t.closest&&t.closest('[data-pm="endless"]');if(pm){e.stopPropagation();startEndless()}},true);
 /* breaks */
-function brk(){var m=document.createElement('div');m.className='modal';var left=180;m.innerHTML='<div class="card">'+mascot(S.cos.on.av,'happy',96)+'<h2>Brain break</h2><p class="mute">Stand up, stretch, sip some water. Your brain files what you learned while you rest.</p><div class="bigtime" id="bt">3:00</div><button class="btn" id="bk">I am back</button></div>';document.body.appendChild(m);
- var iv=setInterval(function(){left--;var e=$('bt');if(e)e.textContent=Math.floor(left/60)+':'+('0'+left%60).slice(-2);if(left<=0){clearInterval(iv);var b=$('bk');if(b)b.textContent='Ready to continue'}},1000);
- $('bk').onclick=function(){clearInterval(iv);m.remove();if(Z)Z.nextBrk=Date.now()+20*60000}}
-setInterval(function(){if(!Z||Z.fin||Z.kind==='blitz'||Z.kind==='mock'||Z.kind==='unit'||Z.kind==='testout'||document.querySelector('.modal'))return;if(!Z.nextBrk)Z.nextBrk=Z.t0+20*60000;if(Date.now()>=Z.nextBrk){Z.nextBrk=Date.now()+60*60000;brk()}},15000);
+function brk(){var m=document.createElement('div');m.className='modal';var endAt=actNow()+180000,left=180;m.innerHTML='<div class="card">'+mascot(S.cos.on.av,'happy',96)+'<h2>Brain break</h2><p class="mute">Stand up, stretch, sip some water. Your brain files what you learned while you rest.</p><div class="bigtime" id="bt">3:00</div><button class="btn" id="bk">I am back</button></div>';document.body.appendChild(m);
+ var iv=setInterval(function(){left=Math.max(0,Math.ceil((endAt-actNow())/1000));var e=$('bt');if(e)e.textContent=Math.floor(left/60)+':'+('0'+left%60).slice(-2);if(left<=0){clearInterval(iv);var b=$('bk');if(b)b.textContent='Ready to continue'}},1000);
+ $('bk').onclick=function(){clearInterval(iv);m.remove();if(Z)Z.nextBrk=actNow()+20*60000}}
+setInterval(function(){if(!Z||Z.fin||Z.kind==='blitz'||Z.kind==='mock'||Z.kind==='unit'||Z.kind==='testout'||document.querySelector('.modal'))return;if(!Z.nextBrk)Z.nextBrk=(Z.a0||actNow())+20*60000;if(actNow()>=Z.nextBrk){Z.nextBrk=actNow()+60*60000;brk()}},15000);
 window.__brk=brk;route();window.startEndless=startEndless;
 })();
 
@@ -3116,14 +3127,14 @@ function reasonOpts(q){var w=String(q.w||'');if(!w)return null;var pool=QS.filte
 function hsh(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 var _ds5=drawSess;drawSess=function(){_ds5.apply(this,arguments);try{
  var z=Z;if(!z||z.fin||z.nofb)return;var st=z.steps[z.i];if(!st||st.k!=='try'||!st.it)return;var it=st.it,sh=document.querySelector('.sheet .sheet-in');if(!sh)return;
- if(!it.done){if(sh.querySelector('.conf'))return;var d=document.createElement('div');d.className='conf';d.setAttribute('role','group');d.setAttribute('aria-label','How sure are you? Optional');d.innerHTML='<span>How sure? <i>(optional)</i></span>'+[1,2,3].map(function(n){return '<button data-cf="'+n+'" aria-pressed="'+(it.conf===n)+'" class="'+(it.conf===n?'on':'')+'">'+LBL[n]+'</button>'}).join('');sh.insertBefore(d,sh.firstChild);return}
+ if(!it.done){return;var d=document.createElement('div');d.className='conf';d.setAttribute('role','group');d.setAttribute('aria-label','How sure are you? Optional');d.innerHTML='<span>How sure? <i>(optional)</i></span>'+[1,2,3].map(function(n){return '<button data-cf="'+n+'" aria-pressed="'+(it.conf===n)+'" class="'+(it.conf===n?'on':'')+'">'+LBL[n]+'</button>'}).join('');sh.insertBefore(d,sh.firstChild);return}
  /* after checking */
  if(sh.querySelector('.cfb,.xpl'))return;var add='',q=it.q;
- if(it.conf&&!it.cald){it.cald=1;var c=cal()[it.conf];c[1]++;if(it.ok)c[0]++;save()}
- if(it.conf){var m=it.ok?(it.conf===1?'You said guess and got it. Check the steps so it sticks.':it.conf===3?'You were sure and right. That is real knowledge.':'Nice, your hunch was right.'):(it.conf===3?'You were sure, but it was a miss. That is the most useful kind of mistake to study.':it.conf===1?'You said guess. Good call: this one needs more practice.':'Close. Review the steps below.');add+='<div class="cfb">'+m+'</div>'}
+ 
+ if(it.conf){var m=it.ok?(it.conf==='g'?'You said guess and got it. Check the steps so it sticks.':it.conf==='s'?'You were sure and right. That is real knowledge.':'Nice, your hunch was right.'):(it.conf==='s'?'You were sure, but it was a miss. That is the most useful kind of mistake to study.':it.conf==='g'?'You said guess. Good call: this one needs more practice.':'Close. Review the steps below.');add+='<div class="cfb">'+m+'</div>'}
  if(it.ok&&q.type!=='sim'&&q.l>=2&&!it.xpd&&(z.right%3===1)&&!z.nofb){var o=reasonOpts(q);if(o){it.xo=o;add+='<div class="xpl" id="xpl"><b>Why does it work? +3 XP</b>'+o.map(function(x,i){return '<button data-xp="'+i+'">'+esc(x.t)+'</button>'}).join('')+'</div>'}}
  if(add){var dv=document.createElement('div');dv.innerHTML=add;while(dv.firstChild)sh.appendChild(dv.firstChild)}}catch(e){}};
-document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-cf],[data-xp]');if(!b)return;var it=Z&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;if(!it)return;
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-xp]');if(!b)return;var it=Z&&Z.steps&&Z.steps[Z.i]&&Z.steps[Z.i].it;if(!it)return;
  if(b.dataset.cf){it.conf=+b.dataset.cf;b.parentNode.querySelectorAll('button').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});window.sfx&&sfx('tick');return}
  if(b.dataset.xp!==undefined&&it.xo&&!it.xpd){it.xpd=1;var o=it.xo[+b.dataset.xp];var box=document.getElementById('xpl');box.querySelectorAll('button').forEach(function(x,i){x.disabled=true;x.classList.add(it.xo[i].ok?'good':(x===b?'wrong':''))});
   if(o.ok){S.xp+=3;S.dxp[today()]=(S.dxp[today()]||0)+3;save();hud&&hud();window.sfx&&sfx('ok')}else window.sfx&&sfx('almost')}});
@@ -3269,6 +3280,42 @@ var _ss=startSess;startSess=function(o){if(o&&o.steps&&o.kind!=='lesson'&&o.kind
 /* nav label */
 TABS[0][1]='Today';route();var sp=document.querySelector('#nav button[data-t="learn"] span');if(sp)sp.textContent='Today';
 })();
+
+/* ===== lock it in: delayed retrieval, confidence ratings, end-of-mission retest ===== */
+/* Why: retrieving something after a gap beats re-reading it (Roediger & Karpicke 2006; Cepeda et al. 2006).
+   Rating how sure you are before checking trains accurate self-judgement, and corrections to confident errors stick well
+   (Butler, Fazio & Marsh 2011). A retest after other items adds spaced practice inside the session. */
+(function(){
+if(!S.cal)S.cal={g:[0,0],t:[0,0],s:[0,0]};if(!S.hyper)S.hyper={};
+var CF=[['g','Guess'],['t','Think so'],['s','Sure']];
+window.confRow=function(it){return '<div class="conf" role="group" aria-label="How sure are you?"><span class="small mute">How sure?</span>'+CF.map(function(c){return '<button type="button" class="cfdd'+(it.conf===c[0]?' on':'')+'" aria-pressed="'+(it.conf===c[0])+'" data-cf="'+c[0]+'">'+c[1]+'</button>'}).join('')+'</div>'};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-cf]');if(!b||!Z)return;var st=Z.steps[Z.i],it=st&&st.it;if(!it||it.done)return;it.conf=it.conf===b.dataset.cf?null:b.dataset.cf;[].forEach.call(document.querySelectorAll('[data-cf]'),function(x){var on=x.dataset.cf===it.conf;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)})});
+var _ri=resolveIt;resolveIt=function(it){var was=it.done;_ri(it);if(!was&&it.done&&it.conf&&!it.follow){var c=S.cal[it.conf]=S.cal[it.conf]||[0,0];c[1]++;if(it.ok)c[0]++;
+ if(!it.ok&&it.conf==='s'){it.hyper=1;S.hyper[it.id]=dayN()}else if(it.ok&&S.hyper[it.id])delete S.hyper[it.id]}};
+window.calCard=function(all){var r={g:[0,0],t:[0,0],s:[0,0]},n=0;all.forEach(function(x){var it=x.it;if(it.done&&!it.skipped&&it.conf){r[it.conf][1]++;n++;if(it.ok)r[it.conf][0]++}});if(n<3)return '';
+ var h='<div class="card"><h3>How sure you were</h3>';CF.forEach(function(c){var v=r[c[0]];if(v[1])h+='<div class="bar2"><span>'+c[1]+'</span><span class="tr"><i style="width:'+(100*v[0]/v[1])+'%"></i></span><span>'+v[0]+'/'+v[1]+'</span></div>'});
+ var s=r.s;h+='<p class="small mute">'+(s[1]&&s[0]<s[1]?'Some answers you felt sure about were wrong. Those are the best ones to learn from.':'Your confidence matched your results. Keep trusting your checks.')+'</p></div>';return h};
+/* delayed retrieval first: items last practised 1 to 5 days ago, weakest first */
+function lockIds(n){var d=dayN(),c=[];for(var id in S.mem){if(QI[id]===undefined)continue;var m=S.mem[id],last=m[1]-BOX[m[0]],age=d-last;if(age<1||age>6)continue;c.push([id,(S.hyper[id]?-5:0)+m[0]*2-Math.min(age,6)*.2+Math.random()*.5])}
+ c.sort(function(a,b){return a[1]-b[1]});return c.slice(0,n).map(function(x){return x[0]})}
+var _s3=startSess;startSess=function(o){
+ if(o)o.a0=window.actNow();
+ if(o&&o.kind==='mission'&&!o.lkd&&o.steps){o.lkd=1;var ids=lockIds(3);if(ids.length){var rest=o.steps.filter(function(s){return !(s.k==='try'&&ids.indexOf(s.it.id)>-1)});o.steps=ids.map(function(id){return {k:'try',it:mkItem(id),lock:1}}).concat(rest)}}
+ return _s3.apply(this,arguments)};
+/* end of mission: ask the missed ones again after the other items in between */
+var _ad=advance;advance=function(){
+ if(Z&&Z.kind==='mission'&&!Z.rq&&Z.i+1>=Z.steps.length){Z.rq=1;var ms=Z.steps.filter(function(s){return s.k==='try'&&s.it&&s.it.done&&!s.it.ok&&!s.it.skipped&&!s.follow&&!s.lock&&!(Z.rq3&&Z.rq3[s.it.id])}).sort(function(a,b){return (b.it.hyper?1:0)-(a.it.hyper?1:0)}).slice(0,3);
+  ms.forEach(function(s){Z.steps.push({k:'try',it:mkItem(s.it.id),lock:2})});Z.mains+=ms.length}
+ return _ad.apply(this,arguments)};
+})();
+
+/* time on the site only: the break timer ignores time the tab is hidden or the window is not focused */
+(function(){var AC=0,last=Date.now();function on(){return document.visibilityState==='visible'&&(!document.hasFocus||document.hasFocus())}
+setInterval(function(){var n=Date.now(),d=n-last;last=n;if(on()&&d<5000)AC+=d},500);
+window.actNow=function(){var n=Date.now(),d=n-last;return AC+(on()&&d<5000?d:0)};
+/* keep the footer above the on-screen keyboard */
+function fit(){var se=document.getElementById('sess'),vv=window.visualViewport;if(!se||!vv)return;se.style.height=vv.height+'px';se.style.top=vv.offsetTop+'px';se.style.bottom='auto'}
+if(window.visualViewport){visualViewport.addEventListener('resize',fit);visualViewport.addEventListener('scroll',fit)}})();
 
 /* ===== icon families. Skyvolt: round, open line icons. Axiom: angular icons with a flat tint. Each trainer has its own mark. ===== */
 (function(){
@@ -3500,11 +3547,6 @@ m.innerHTML='<div class="mbox" style="max-width:380px"><h3>'+esc(title)+'</h3><p
 var done=function(r){document.removeEventListener('keydown',kd);m.remove();if(r)cb()},kd=function(e){if(e.key==='Escape')done(0)};
 m.addEventListener('click',function(e){var b=e.target.closest('[data-ok]');if(b)done(b.dataset.ok==='1');else if(e.target===m)done(0)});document.addEventListener('keydown',kd);document.body.appendChild(m);var f=m.querySelector('[data-ok="0"]');f&&f.focus()};
 
-/* keep the last line of a question clear of the feedback sheet, whatever its height */
-(function(){var q=0;function fit(){q=0;var se=document.getElementById('sess');if(!se)return;var b=se.querySelector('.s-body'),sh=document.querySelector('.sheet');if(b)b.style.paddingBottom=sh?Math.ceil(sh.getBoundingClientRect().height+28)+'px':''}
-function sched(){if(q||!document.getElementById('sess'))return;q=1;window.requestAnimationFrame(fit)}
-new MutationObserver(sched).observe(document.body,{childList:true,subtree:true});window.addEventListener('resize',sched);window.addEventListener('orientationchange',sched);
-if(window.ResizeObserver){var ro=new ResizeObserver(sched),seen=null;new MutationObserver(function(){var sh=document.querySelector('.sheet');if(sh&&sh!==seen){seen=sh;ro.observe(sh)}}).observe(document.body,{childList:true,subtree:true})}})();
 
 /* ===== flashcards: Flip, Learn, Write and Match, on your plan's topics. Progress is saved on this device. ===== */
 (function(){
