@@ -97,7 +97,7 @@ function award(q,ok,part,helped){
  }else{S.miss[q.id]=1;combo=0}
  S.stat[q.t]=st;
  if(gain&&helped)gain=Math.max(1,Math.round(gain/2));
- if(gain){var before=lvInfo().l;S.xp+=gain;S.coins+=Math.max(1,Math.round(gain/2));S.dxp[today()]=(S.dxp[today()]||0)+gain;if(lvInfo().l>before)levelUp()}
+ if(gain){var before=lvInfo().l;S.xp+=gain;S.coins+=Math.max(2,Math.round(gain*.9));S.dxp[today()]=(S.dxp[today()]||0)+gain;if(lvInfo().l>before)levelUp()}
  S.days[today()]=1;
  if(typeof coachUpdate==='function')coachUpdate(q,ok,helped);
  checkBadges();save();hud();

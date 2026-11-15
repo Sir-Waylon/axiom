@@ -117,7 +117,7 @@ function award(q,ok,part,helped){
  }else{S.miss[q.id]=1;combo=0}
  S.stat[q.t]=st;
  if(gain&&helped)gain=Math.max(1,Math.round(gain/2));
- if(gain){var before=lvInfo().l;S.xp+=gain;S.coins+=Math.max(1,Math.round(gain/2));S.dxp[today()]=(S.dxp[today()]||0)+gain;if(lvInfo().l>before)levelUp()}
+ if(gain){var before=lvInfo().l;S.xp+=gain;S.coins+=Math.max(2,Math.round(gain*.9));S.dxp[today()]=(S.dxp[today()]||0)+gain;if(lvInfo().l>before)levelUp()}
  S.days[today()]=1;
  if(typeof coachUpdate==='function')coachUpdate(q,ok,helped);
  checkBadges();save();hud();
@@ -233,6 +233,12 @@ function _derive(src,names,cols){return src.map(function(r,i){var c=cols[i%cols.
 var _PC=[['#ef6c00','#fff3e0'],['#6a1b9a','#ffd45a'],['#00897b','#fff59d'],['#c62828','#ffe0b2'],['#1565c0','#ffd54f'],['#ad1457','#f8bbd0'],['#33691e','#ffee58'],['#4527a0','#b2ff59'],['#00838f','#ffab40'],['#e65100','#e1f5fe'],['#2e7d32','#ffcc80'],['#283593','#ffd740']];
 RB.Apex={k:'p',dk:'#3a1500',bg:['#b4410a','#3a1500'],mk:'sig',ro:_derive(RB.Axiom.ro,['Slope','Lim','Parab','Asymp','Radian','Sine','Cosa','Tangy','Secant','Vector','Matrix','Integra','Derive','Logan','Expo','Polar','Conic','Ellipse','Hyper','Calcula','Zeno','Newtonia','Leibniz'],_PC)};
 RB.Quanta={k:'q',dk:'#032a36',bg:['#0a6e8a','#032a36'],mk:'atom',ro:_derive(RB.Voltaic.ro,['Qubit','Joule','Newt','Hertz','Tesla','Gauss','Watt','Ohmi','Coulomb','Farady','Henrik','Kelvin','Pascal','Bohr','Curie','Planck','Maxwell','Lenz','Quark','Photon','Neutrino','Boson','Higgs'],_PC.slice().reverse())};
+/* limited-time season characters (ids 100+): only found in the season pack; vaulted when the season ends */
+var SEAS_INFO={id:'season',name:'Frostbyte Season',start:'2026-11-01',end:'2027-01-06',cost:150};
+var SEAS=[[100,'Flurry',0,'sprite','#b3e5fc','#ffffff',''],[101,'Mittens',1,'cat','#90caf9','#ff5252',''],[102,'Glacia',2,'wiz','#4dd0e1','#e0f7fa','staff'],[103,'Yetibyte',3,'drake','#eceff1','#40c4ff','wings'],[104,'Aurorus',4,'knight','#1a237e','#69f0ae','staff'],[105,'Solstice',5,'nova','#fff8e1','#ffab40','staff']];
+['Voltaic','Stratus','Axiom','Apex','Quanta'].forEach(function(k){SEAS.forEach(function(r){RB[k].ro.push(r.slice())})});
+function isSeason(id){return /\d{3}$/.test(id)}
+function seasonOn(){var d=(typeof today==='function')?today():new Date().toISOString().slice(0,10);return d>=SEAS_INFO.start&&d<SEAS_INFO.end}
 function _hx(c){c=c.replace('#','');return[parseInt(c.substr(0,2),16),parseInt(c.substr(2,2),16),parseInt(c.substr(4,2),16)]}
 function _mx(a,b,t){var x=_hx(a),y=_hx(b);return '#'+[0,1,2].map(function(i){var v=Math.round(x[i]+(y[i]-x[i])*t);return (v<16?'0':'')+v.toString(16)}).join('')}
 RB.Vertex=RB.Axiom;
@@ -654,11 +660,11 @@ function finishSess(){
  var z=Z;if(!z||z.fin)return;if(tmr){clearInterval(tmr);tmr=null}
  if(z.nofb){z.steps.forEach(function(s){if(s.k!=='try')return;var it=s.it;if(!it.done){if(answered(it)){it.ok=isOk(it);it.done=true}else{it.done=true;it.ok=false;it.skipped=true}}
   if(!it.skipped){it.gain=award(it.q,it.ok,0,false);if(it.ok){z.right++;z.earned+=it.gain}else z.wrong++}else S.miss[it.id]=1})}
- z.fin=true;addMins(z);if(z.kind==='mission'&&!missionDone()){S.msn=today();S.xp+=25;S.coins+=15;S.dxp[today()]=(S.dxp[today()]||0)+25;z.earned+=25;z.chest=1}
+ z.fin=true;addMins(z);if(z.kind==='mission'&&!missionDone()){S.msn=today();S.xp+=25;S.coins+=60;S.dxp[today()]=(S.dxp[today()]||0)+25;z.earned+=25;z.chest=1}
  var tries=z.steps.filter(function(s){return s.k==='try'&&s.it.done&&!s.it.skipped});
  z.pct=z.nofb?Math.round(100*z.right/Math.max(1,z.steps.filter(function(s){return s.k==='try'}).length)):(tries.length?Math.round(100*tries.filter(function(s){return s.it.ok}).length/tries.length):0);
- if(z.kind==='lesson'){var us=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};if(!us.d[z.lesson.id]){us.d[z.lesson.id]=1;S.xp+=20;S.coins+=10;S.dxp[today()]=(S.dxp[today()]||0)+20;z.earned+=20;dq().l+=z.lesson.cards.length}}
- if(z.kind==='unit'){var u2=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};u2.best=Math.max(u2.best||0,z.pct);if(z.pct>=70&&!u2.pass){u2.pass=1;S.xp+=40;S.coins+=20;z.earned+=40;z.first=1}}
+ if(z.kind==='lesson'){var us=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};if(!us.d[z.lesson.id]){us.d[z.lesson.id]=1;S.xp+=20;S.coins+=50;S.dxp[today()]=(S.dxp[today()]||0)+20;z.earned+=20;dq().l+=z.lesson.cards.length}}
+ if(z.kind==='unit'){var u2=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};u2.best=Math.max(u2.best||0,z.pct);if(z.pct>=70&&!u2.pass){u2.pass=1;S.xp+=40;S.coins+=80;z.earned+=40;z.first=1}}
  if(z.kind!=='blitz'&&z.right>=10&&z.wrong===0){S.perfect++}
  S.days[today()]=1;checkBadges();save();hud();drawSess();
  if(z.kind==='unit'&&z.pct>=70||z.kind==='lesson'||z.pct===100)burst(true)}
@@ -713,7 +719,7 @@ function drawResults(top){
  var right=tr.filter(function(x){return x.it.ok}).length,miss=all.filter(function(x){return x.it.done&&!x.it.ok}).map(function(x){return x.it});
  h+='<div class="card" style="text-align:center">'+mascot(S.cos.on.av,pass&&z.pct>=60?'cheer':'think',88)+'<div class="score">'+(z.kind==='lesson'?'Lesson done':z.pct+'%')+'</div>'+(z.chest?'<p><b>Mission complete! +25 XP</b></p>':'')+(z.kind==='unit'?'<p><b>'+(z.pct>=70?(z.first?'Unit passed! +40 XP':'Unit passed'):'Pass mark is 70%. Review the lessons and try again.')+'</b></p>':'')+'<p class="mute">'+right+' correct · +'+z.earned+' XP'+(z.kind==='blitz'?'':'')+'</p></div>';
  if(Object.keys(by).length>1){h+='<div class="card"><h3>By topic</h3>';Object.keys(by).forEach(function(t){var p=by[t];h+='<div class="bar2"><span>'+esc(TOP[t].name)+'</span><span class="tr"><i style="width:'+(100*p[0]/p[1])+'%"></i></span><span>'+p[0]+'/'+p[1]+'</span></div>'});h+='</div>'}
- if(window.calCard)h+=calCard(all);if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
+ if(window.calCard)h+=calCard(all);if(window.packCard)h+=packCard();if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
  var sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(miss.length?'<button class="btn sec" id="rtry">Practice misses</button>':'')+'<span class="sp"></span><button class="btn" id="done">Done</button></div></div></div>';
  s.innerHTML=h+'</div>'+sheet;
  s.dataset.miss=miss.map(function(i){return i.id}).join(',')}
@@ -1006,8 +1012,9 @@ function bannerSVG(id,w,h){
  if(p==='stars')for(var q=0;q<16;q++)s+='<path d="M'+((q*47)%350+6)+' '+((q*29)%80+8)+'l1.6 3.6 3.6 1.6-3.6 1.6-1.6 3.6-1.6-3.6-3.6-1.6 3.6-1.6z" fill="#fff" fill-opacity="'+(.3+.1*(q%4))+'"/>';
  var br=RB[rbrand()];
  return '<svg class="bn" viewBox="0 0 360 96" preserveAspectRatio="xMidYMid slice" width="'+(w||360)+'" height="'+(h||96)+'" role="img" aria-label="Banner: '+b[1]+'"><defs><linearGradient id="'+u+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient></defs><rect width="360" height="96" fill="url(#'+u+')"/>'+s+'<rect y="76" width="360" height="20" fill="#000" opacity=".16"/></svg>'}
-/* ---------- packs, luck, rolling (odds are never shown) ---------- */
-var PACKS=[{id:'classic',name:'Classic Pack',sub:'Everyday finds',cost:100,lo:0,hi:3,c:['#34c759','#0b6b2c']},{id:'elite',name:'Elite Pack',sub:'Rare and rarer finds',cost:250,lo:1,hi:5,c:['#a35cff','#341a85']}];
+/* ---------- packs, luck, rolling (odds are published in the shop, see oddsTable) ---------- */
+var PACKS=[{id:'classic',name:'Classic Pack',sub:'Everyday finds',cost:100,lo:0,hi:3,c:['#34c759','#0b6b2c']},{id:'elite',name:'Elite Pack',sub:'Rare and rarer finds',cost:250,lo:1,hi:5,c:['#a35cff','#341a85']},{id:'season',name:'Frostbyte Season Pack',sub:'Limited-time winter set',cost:150,lo:0,hi:5,season:1,c:['#4dd0e1','#1a237e']}];
+function packList(){return PACKS.filter(function(p){return !p.season||seasonOn()})}
 function pkOf(id){return PACKS.filter(function(p){return p.id===id})[0]||PACKS[0]}
 function luckNow(){var m=(S.mins&&S.mins[today()])||0;return Math.min(1,m/LUCK_MIN)}
 function oddsNow(){var L=luckNow();return ODDS_LO.map(function(lo,i){return lo+(ODDS_HI[i]-lo)*L})}
@@ -1020,12 +1027,14 @@ function rollBox(pk){
  var w=od.map(function(v,i){return (i<lo||i>pk.hi)?0:v}),tot=w.reduce(function(a,b){return a+b},0),x=rnd()*tot,r=0;
  while(r<5&&x>=w[r]){x-=w[r];r++}
  p.e++;p.l++;p.n++;if(r>=2)p.e=0;if(r>=3)p.l=0;
- var pool=AV.filter(function(a){return a[6]===r}),ch=pool[Math.floor(rnd()*pool.length)];
+ var pool=AV.filter(function(a){return a[6]===r&&(pk.season?isSeason(a[0]):!isSeason(a[0]))}),ch=pool[Math.floor(rnd()*pool.length)];
  if(!c.cnt)c.cnt={};c.cnt[ch[0]]=(c.cnt[ch[0]]||0)+1;
  var dup=!!c.own[ch[0]],gain=0;
  if(dup){gain=REFUND[r];S.coins+=gain;c.dups++}else c.own[ch[0]]=1;
  return{ch:ch,r:r,dup:dup,gain:gain}}
 function rmodal(){var o=document.querySelector('.modal.rvl');if(o)o.remove();var m=document.createElement('div');m.className='modal rvl';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');document.body.appendChild(m);m.addEventListener('keydown',function(e){if(e.key==='Escape'){m.remove();route()}});return m}
+function packOdds(pk,L){var w=ODDS_LO.map(function(lo,i){return (i<pk.lo||i>pk.hi)?0:lo+(ODDS_HI[i]-lo)*L}),t=w.reduce(function(a,b){return a+b},0);return w.map(function(v){return t?100*v/t:0})}
+function oddsTable(){var L=luckNow();return packList().map(function(pk){var a=packOdds(pk,0),b=packOdds(pk,1),n=packOdds(pk,L);return '<table class="odds" aria-label="Drop rates for '+esc(pk.name)+'"><caption>'+esc(pk.name)+' ('+pk.cost+' coins)'+(pk.season?' · characters from this season only; leaves the shop '+SEAS_INFO.end+'':'')+'</caption><tr><th>Rarity</th><th>No study today</th><th>Studied '+LUCK_MIN+'+ min</th><th>Right now</th></tr>'+RN.map(function(nm,i){return a[i]||b[i]?'<tr><td>'+nm+'</td><td>'+a[i].toFixed(1)+'%</td><td>'+b[i].toFixed(1)+'%</td><td>'+n[i].toFixed(1)+'%</td></tr>':''}).join('')+'</table>'}).join('')}
 function packScreen(id){var pk=pkOf(id),m=rmodal();m.setAttribute('aria-label',pk.name);
  m.innerHTML='<div class="rvs"><h2>'+pk.name+'</h2><div class="stage"><div class="pkbig">'+packSVG(pk,200)+'</div><span class="price"><i></i>'+pk.cost+'</span></div><div class="row" style="justify-content:center;flex-wrap:wrap;gap:10px"><button class="btn" data-ro="go:'+pk.id+'"'+(S.coins<pk.cost?' disabled':'')+'>'+(S.coins<pk.cost?'Not enough coins':'Open')+'</button><button class="btn ghost" data-ro="close">Back</button></div><p class="small" style="opacity:.8">You have '+S.coins+' coins. Study to earn more.</p></div>';
  var b=m.querySelector('button');if(b)b.focus()}
@@ -1047,8 +1056,8 @@ function rchip(r){var c=RC[r];return '<span class="rchip" style="background:'+c[
 function shopHTML(){
  var own=S.cos.own,got=AV.filter(function(a){return own[a[0]]}).length,pt=S.cos.pity,h='';
  h+='<p class="mute small">'+S.coins+' coins. Looks only, no advantages.</p>';
- h+=fold('packs','Packs','',' <div class="packs">'+PACKS.map(function(p){return '<button class="pack" style="--pk1:'+p.c[0]+';--pk2:'+p.c[1]+'" data-ro="pk:'+p.id+'" aria-label="'+p.name+', '+p.cost+' coins">'+packSVG(p,110)+'<b>'+p.name+'</b><span class="sub">'+p.sub+'</span><span class="price"><i></i>'+p.cost+'</span></button>'}).join('')+'</div>');
- h+=fold('how','How packs work','','<ul class="small" style="margin:4px 0 0;padding-left:20px"><li>Each pack holds one random character. The Elite Pack never holds Uncommon characters and is the only place to find the very rarest ones.</li><li>Rarer characters are harder to find. Studying today gently improves your luck.</li><li>An Epic or better character is guaranteed within '+BOX_PITY_E+' packs ('+Math.max(0,BOX_PITY_E-pt.e)+' left). A Legendary or better is guaranteed within '+BOX_PITY_L+' ('+Math.max(0,BOX_PITY_L-pt.l)+' left).</li><li>A duplicate gives coins back: '+RN.map(function(n,i){return n+' '+REFUND[i]}).join(', ')+'.</li></ul>','cardf');
+ h+=fold('packs','Packs','',' <div class="packs">'+packList().map(function(p){return '<button class="pack" style="--pk1:'+p.c[0]+';--pk2:'+p.c[1]+'" data-ro="pk:'+p.id+'" aria-label="'+p.name+', '+p.cost+' coins">'+packSVG(p,110)+'<b>'+p.name+'</b><span class="sub">'+p.sub+'</span><span class="price"><i></i>'+p.cost+'</span></button>'}).join('')+'</div>');
+ h+=fold('how','How packs work','','<ul class="small" style="margin:4px 0 0;padding-left:20px"><li>Each pack holds one random character. The Elite Pack never holds Uncommon characters and is the only place to find the very rarest ones.</li><li>Rarer characters are harder to find. Studying today gently improves your luck.</li><li>An Epic or better character is guaranteed within '+BOX_PITY_E+' packs ('+Math.max(0,BOX_PITY_E-pt.e)+' left). A Legendary or better is guaranteed within '+BOX_PITY_L+' ('+Math.max(0,BOX_PITY_L-pt.l)+' left).</li><li>A duplicate gives coins back: '+RN.map(function(n,i){return n+' '+REFUND[i]}).join(', ')+'.</li><li>These are the real drop rates the game uses, and they never change except for the study bonus shown. Packs only ever hold cosmetics (looks, no advantages).</li></ul><div class="oddsw">'+oddsTable()+'</div>','cardf');
  var order=AV.slice().sort(function(a,b){return a[6]-b[6]});
  h+=fold('coll','Collection','<span class="small mute">'+got+' of '+AV.length+'</span>','<div class="coll">'+order.map(function(a){var o=!!own[a[0]],on=S.cos.on.av===a[0],r=a[6],n=(S.cos.cnt&&S.cos.cnt[a[0]])||0;return '<div class="cc'+(o?'':' lock')+(on?' on':'')+'" style="--rc:'+(r<0?'#9aa4c4':RC[r][0])+'">'+(o?'<button class="gh" data-ro="det:'+a[0]+'" aria-label="View '+esc(a[1])+'">'+mascot(a[0],'happy',104)+'</button>':'<div class="ghost" aria-hidden="true">'+mascot(a[0],'happy',104)+'</div>')+'<b>'+(o?esc(a[1]):'?')+'</b>'+(r<0?'<span class="rchip" style="background:#eef0f8;color:#3b4469;border-color:#9aa4c4">Starter</span>':rchip(r))+(o?(n>1?'<span class="cnt">×'+n+'</span>':'')+'<button class="btn sm" data-ro="eq:'+a[0]+'"'+(on?' disabled':'')+'>'+(on?'Equipped':'Equip')+'</button>':'<span class="small mute">Not found yet</span>')+'</div>'}).join('')+'</div>');
  h+=fold('bn','Banners','','<div class="bns">'+BN.map(function(b){var o=!!own[b[0]]||b[2]===0,on=S.cos.on.bn===b[0];return '<div class="bc'+(on?' on':'')+'">'+bannerSVG(b[0],360,96)+'<div class="row" style="justify-content:space-between;padding:8px 10px"><b>'+esc(b[1])+'</b><button class="btn sm" data-ro="bn:'+b[0]+'"'+(on?' disabled':(!o&&S.coins<b[2]?' disabled':''))+'>'+(on?'Equipped':o?'Equip':'Buy · '+b[2])+'</button></div></div>'}).join('')+'</div>');
@@ -1086,6 +1095,9 @@ document.addEventListener('change',function(e){var t=e.target;if(t.id==='rm-on'|
 document.addEventListener('click',function(e){var id=e.target.id;
  if(id==='rm-perm'){try{Notification.requestPermission().then(function(){route()})}catch(x){}}
  if(id==='rm-ics'){var t=(RM.get().t)||'17:00',b=new Blob([icsDaily(t)],{type:'text/calendar'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(P.meta.id||'practice')+'-reminder.ics';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},500)}});
+
+/* results-screen shortcut: shows what you earned and a one-tap path to the shop */
+window.packCard=function(){var cs=S.coins,cl=PACKS[0].cost;if(cs>=cl)return '<div class="card pkc"><div class="row"><div style="flex:1"><b>You have '+cs+' coins.</b><div class="small mute">Enough for a pack. Looks only, no advantages.</div></div><button class="btn" data-ro="pk:classic">Open a pack</button></div></div>';return '<div class="card pkc"><div class="small"><b>'+cs+' / '+cl+' coins</b> toward your next pack</div><div class="bar2"><span class="tr" style="flex:1"><i style="width:'+Math.min(100,100*cs/cl)+'%"></i></span></div></div>'};
 
 /* ===== labs: tiny interactive explorers (no libraries) ===== */
 var LAB={};

@@ -38,6 +38,12 @@ function _derive(src,names,cols){return src.map(function(r,i){var c=cols[i%cols.
 var _PC=[['#ef6c00','#fff3e0'],['#6a1b9a','#ffd45a'],['#00897b','#fff59d'],['#c62828','#ffe0b2'],['#1565c0','#ffd54f'],['#ad1457','#f8bbd0'],['#33691e','#ffee58'],['#4527a0','#b2ff59'],['#00838f','#ffab40'],['#e65100','#e1f5fe'],['#2e7d32','#ffcc80'],['#283593','#ffd740']];
 RB.Apex={k:'p',dk:'#3a1500',bg:['#b4410a','#3a1500'],mk:'sig',ro:_derive(RB.Axiom.ro,['Slope','Lim','Parab','Asymp','Radian','Sine','Cosa','Tangy','Secant','Vector','Matrix','Integra','Derive','Logan','Expo','Polar','Conic','Ellipse','Hyper','Calcula','Zeno','Newtonia','Leibniz'],_PC)};
 RB.Quanta={k:'q',dk:'#032a36',bg:['#0a6e8a','#032a36'],mk:'atom',ro:_derive(RB.Voltaic.ro,['Qubit','Joule','Newt','Hertz','Tesla','Gauss','Watt','Ohmi','Coulomb','Farady','Henrik','Kelvin','Pascal','Bohr','Curie','Planck','Maxwell','Lenz','Quark','Photon','Neutrino','Boson','Higgs'],_PC.slice().reverse())};
+/* limited-time season characters (ids 100+): only found in the season pack; vaulted when the season ends */
+var SEAS_INFO={id:'season',name:'Frostbyte Season',start:'2026-11-01',end:'2027-01-06',cost:150};
+var SEAS=[[100,'Flurry',0,'sprite','#b3e5fc','#ffffff',''],[101,'Mittens',1,'cat','#90caf9','#ff5252',''],[102,'Glacia',2,'wiz','#4dd0e1','#e0f7fa','staff'],[103,'Yetibyte',3,'drake','#eceff1','#40c4ff','wings'],[104,'Aurorus',4,'knight','#1a237e','#69f0ae','staff'],[105,'Solstice',5,'nova','#fff8e1','#ffab40','staff']];
+['Voltaic','Stratus','Axiom','Apex','Quanta'].forEach(function(k){SEAS.forEach(function(r){RB[k].ro.push(r.slice())})});
+function isSeason(id){return /\d{3}$/.test(id)}
+function seasonOn(){var d=(typeof today==='function')?today():new Date().toISOString().slice(0,10);return d>=SEAS_INFO.start&&d<SEAS_INFO.end}
 function _hx(c){c=c.replace('#','');return[parseInt(c.substr(0,2),16),parseInt(c.substr(2,2),16),parseInt(c.substr(4,2),16)]}
 function _mx(a,b,t){var x=_hx(a),y=_hx(b);return '#'+[0,1,2].map(function(i){var v=Math.round(x[i]+(y[i]-x[i])*t);return (v<16?'0':'')+v.toString(16)}).join('')}
 RB.Vertex=RB.Axiom;

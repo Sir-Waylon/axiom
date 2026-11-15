@@ -120,11 +120,11 @@ function finishSess(){
  var z=Z;if(!z||z.fin)return;if(tmr){clearInterval(tmr);tmr=null}
  if(z.nofb){z.steps.forEach(function(s){if(s.k!=='try')return;var it=s.it;if(!it.done){if(answered(it)){it.ok=isOk(it);it.done=true}else{it.done=true;it.ok=false;it.skipped=true}}
   if(!it.skipped){it.gain=award(it.q,it.ok,0,false);if(it.ok){z.right++;z.earned+=it.gain}else z.wrong++}else S.miss[it.id]=1})}
- z.fin=true;addMins(z);if(z.kind==='mission'&&!missionDone()){S.msn=today();S.xp+=25;S.coins+=15;S.dxp[today()]=(S.dxp[today()]||0)+25;z.earned+=25;z.chest=1}
+ z.fin=true;addMins(z);if(z.kind==='mission'&&!missionDone()){S.msn=today();S.xp+=25;S.coins+=60;S.dxp[today()]=(S.dxp[today()]||0)+25;z.earned+=25;z.chest=1}
  var tries=z.steps.filter(function(s){return s.k==='try'&&s.it.done&&!s.it.skipped});
  z.pct=z.nofb?Math.round(100*z.right/Math.max(1,z.steps.filter(function(s){return s.k==='try'}).length)):(tries.length?Math.round(100*tries.filter(function(s){return s.it.ok}).length/tries.length):0);
- if(z.kind==='lesson'){var us=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};if(!us.d[z.lesson.id]){us.d[z.lesson.id]=1;S.xp+=20;S.coins+=10;S.dxp[today()]=(S.dxp[today()]||0)+20;z.earned+=20;dq().l+=z.lesson.cards.length}}
- if(z.kind==='unit'){var u2=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};u2.best=Math.max(u2.best||0,z.pct);if(z.pct>=70&&!u2.pass){u2.pass=1;S.xp+=40;S.coins+=20;z.earned+=40;z.first=1}}
+ if(z.kind==='lesson'){var us=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};if(!us.d[z.lesson.id]){us.d[z.lesson.id]=1;S.xp+=20;S.coins+=50;S.dxp[today()]=(S.dxp[today()]||0)+20;z.earned+=20;dq().l+=z.lesson.cards.length}}
+ if(z.kind==='unit'){var u2=S.un[z.unit.id]=S.un[z.unit.id]||{d:{}};u2.best=Math.max(u2.best||0,z.pct);if(z.pct>=70&&!u2.pass){u2.pass=1;S.xp+=40;S.coins+=80;z.earned+=40;z.first=1}}
  if(z.kind!=='blitz'&&z.right>=10&&z.wrong===0){S.perfect++}
  S.days[today()]=1;checkBadges();save();hud();drawSess();
  if(z.kind==='unit'&&z.pct>=70||z.kind==='lesson'||z.pct===100)burst(true)}
@@ -179,7 +179,7 @@ function drawResults(top){
  var right=tr.filter(function(x){return x.it.ok}).length,miss=all.filter(function(x){return x.it.done&&!x.it.ok}).map(function(x){return x.it});
  h+='<div class="card" style="text-align:center">'+mascot(S.cos.on.av,pass&&z.pct>=60?'cheer':'think',88)+'<div class="score">'+(z.kind==='lesson'?'Lesson done':z.pct+'%')+'</div>'+(z.chest?'<p><b>Mission complete! +25 XP</b></p>':'')+(z.kind==='unit'?'<p><b>'+(z.pct>=70?(z.first?'Unit passed! +40 XP':'Unit passed'):'Pass mark is 70%. Review the lessons and try again.')+'</b></p>':'')+'<p class="mute">'+right+' correct · +'+z.earned+' XP'+(z.kind==='blitz'?'':'')+'</p></div>';
  if(Object.keys(by).length>1){h+='<div class="card"><h3>By topic</h3>';Object.keys(by).forEach(function(t){var p=by[t];h+='<div class="bar2"><span>'+esc(TOP[t].name)+'</span><span class="tr"><i style="width:'+(100*p[0]/p[1])+'%"></i></span><span>'+p[0]+'/'+p[1]+'</span></div>'});h+='</div>'}
- if(window.calCard)h+=calCard(all);if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
+ if(window.calCard)h+=calCard(all);if(window.packCard)h+=packCard();if(miss.length){h+='<div class="card"><h3>Missed</h3>';miss.forEach(function(it){h+='<details><summary>'+esc(it.q.q.slice(0,120))+'</summary><div class="in">'+(it.q.fig?figSVG(it.q.fig):'')+(it.q.svg?'<div class="figw">'+it.q.svg+'</div>':'')+'<p><b>Answer:</b> '+esc(ansText(it.q))+'</p>'+(it.q.sol?it.q.sol.map(function(t,k){return '<div class="step"><b>'+(k+1)+'</b> '+esc(t)+'</div>'}).join(''):(it.q.w?'<p>'+esc(it.q.w)+'</p>':''))+'</div></details>'});h+='</div>'}
  var sheet='<div class="sheet plain"><div class="sheet-in"><div class="row">'+(miss.length?'<button class="btn sec" id="rtry">Practice misses</button>':'')+'<span class="sp"></span><button class="btn" id="done">Done</button></div></div></div>';
  s.innerHTML=h+'</div>'+sheet;
  s.dataset.miss=miss.map(function(i){return i.id}).join(',')}

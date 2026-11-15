@@ -274,3 +274,6 @@ ul.links{list-style:none;margin:0;padding:0}ul.links a{display:block;padding:12p
 .seg:disabled{opacity:.6;cursor:default}
 select{min-height:48px;font-size:16px;max-width:100%;border-radius:12px;padding:8px 12px;border:2px solid var(--line,#d8dbe8);background:var(--surface);color:var(--ink)}
 @media(forced-colors:active){.seg.on{outline:3px solid Highlight}}
+
+.odds{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}.odds caption{text-align:left;font-weight:700;padding:4px 0}.odds th,.odds td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right}.odds th:first-child,.odds td:first-child{text-align:left}
+.oddsw{overflow-x:auto;margin-top:8px}.pkc .row{gap:12px;align-items:center}
