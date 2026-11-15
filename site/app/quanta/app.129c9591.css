@@ -254,6 +254,27 @@ ul.links{list-style:none;margin:0;padding:0}ul.links a{display:block;padding:12p
 .smenu .mi2{padding:8px 10px 10px;border-top:1px solid var(--line);margin-top:4px}
 .smenu .conf{margin:0}
 
+/* tap-to-fill blanks: big targets, steady layout */
+.tpl{line-height:2.6;font-size:17px}
+.bl{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;min-height:44px;min-width:88px;max-width:100%;box-sizing:border-box;margin:2px 3px;padding:6px 12px;border:2px dashed var(--pri);border-radius:12px;background:var(--surface);font:inherit;font-weight:600;color:var(--ink);cursor:pointer;text-align:center;word-break:break-word}
+.bl.fill{border-style:solid;background:var(--pri-soft)}
+.bl.cur{border-style:solid;box-shadow:0 0 0 3px var(--pri-soft2,rgba(91,75,255,.28));animation:blp 1.4s ease-in-out infinite}
+@keyframes blp{50%{box-shadow:0 0 0 6px rgba(91,75,255,.12)}}
+@media(prefers-reduced-motion:reduce){.bl.cur{animation:none}}
+.bl.ok{border-color:var(--ok,#1a9d5c);background:var(--ok-soft,#e5f7ec)}.bl.bad{border-color:var(--bad,#d6403f);background:var(--bad-soft,#fdeaea)}
+.pf td .bl{min-width:70px}
+.chips.bank{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;padding:10px;border-radius:14px;background:var(--sunk)}
+.ch{min-height:44px;padding:8px 14px;touch-action:manipulation}
+.ch.used{opacity:.35;border-style:dashed;pointer-events:none}
+.bkh{margin:14px 0 0}
+/* choice chips replacing short selects */
+.segs{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0}
+.seg{min-height:44px;padding:8px 14px;border:2px solid var(--line,#d8dbe8);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;touch-action:manipulation}
+.seg.on{border-color:var(--pri);background:var(--pri-soft);box-shadow:inset 0 0 0 1px var(--pri)}
+.seg:disabled{opacity:.6;cursor:default}
+select{min-height:48px;font-size:16px;max-width:100%;border-radius:12px;padding:8px 12px;border:2px solid var(--line,#d8dbe8);background:var(--surface);color:var(--ink)}
+@media(forced-colors:active){.seg.on{outline:3px solid Highlight}}
+
 /* ===== roster, boxes, banners ===== */
 .mas.rf{overflow:visible}
 .rf .rbob{animation:rbob 2.6s ease-in-out infinite}@keyframes rbob{50%{transform:translateY(-1.6px)}}

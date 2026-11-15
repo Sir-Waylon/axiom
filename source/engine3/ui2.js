@@ -44,7 +44,7 @@ function libRoot(){var o=order(),first=o.o.filter(function(t){return o.pr[t]!==u
 var TTL={guide:'Study guide',flash:'Flashcards',labs:'Labs',notes:'Reference notes',stations:'Stations',written:'Written answers',plan:'Test-day plan',gloss:'Glossary',proofs:'Proofs'};
 var _vl=viewLibrary;viewLibrary=function(){if(V.lib==null)return libRoot();sub.lib=V.lib;if(V.lib==='guide')return crumb('lib','Study guide')+guideHTML();
  if(V.lib==='flash'&&window.flashView)return crumb('lib','Flashcards')+flashView();if(V.lib==='labs'&&window.labsView)return crumb('lib','Labs')+labsView();if(V.lib==='graph'&&window.graphView)return crumb('lib','Graphing calculator')+graphView();
- var h=_vl.apply(this,arguments);return crumb('lib',TTL[V.lib]||'Library')+h.replace(/^<div class="seg"[\s\S]*?<\/div>/,'')};
+ var h=_vl.apply(this,arguments);return crumb('lib',TTL[V.lib]||'Library')+h.replace(/^<div class="(?:seg|crumb)"[\s\S]*?<\/div>/,'')};
 /* ---- navigation, search ---- */
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-nav],[data-back]');if(!b)return;
  if(b.dataset.back){V[b.dataset.back]=null;if(window.flashStop)flashStop();route();window.scrollTo(0,0);return}

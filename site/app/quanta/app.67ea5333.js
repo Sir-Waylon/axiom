@@ -1226,7 +1226,7 @@ var CH={init:function(it){var q=it.q;it.bl=blanksOf(q).map(function(){return nul
  render:function(it,rev){var q=it.q,b=bankOf(q),h='<div class="itx">',n=0,mk=function(bi,idx){var w=it.bl[idx],cl='bl'+(it.cur===idx&&!rev?' cur':'')+(w!==null?' fill':'')+(rev?(b[w]===blanksOf(q)[idx]?' ok':' bad'):'');return '<button class="'+cl+'" data-bl="'+idx+'" aria-label="'+esc((w!==null?b[w]:'blank '+(idx+1))+(it.cur===idx&&!rev?', selected':''))+'"'+(rev?' disabled':'')+'>'+(w!==null?esc(b[w]):'&nbsp;')+'</button>'};
   if(q.type==='chips'){var t=q.tpl.split(/\{(\d+)\}/);h+='<p class="tpl">';t.forEach(function(p,i){h+=i%2?mk(0,+p):esc(p)});h+='</p>'}
   else{h+='<table class="pf"><tr><th>Statement</th><th>Reason</th></tr>';q.rows.forEach(function(r,ri){h+='<tr>';[0,1].forEach(function(c){h+='<td>'+(c===0?(ri+1)+'. ':'')+(q.hide[ri].indexOf(c)>-1?mk(0,n++):esc(r[c]))+'</td>'});h+='</tr>'});h+='</table>'}
-  if(!rev){h+='<div class="chips bank">';it.bk.forEach(function(bi){if(it.bl.indexOf(bi)<0)h+='<button class="ch" data-bk="'+bi+'">'+esc(b[bi])+'</button>'});h+='</div>'}
+  if(!rev){h+='<p class="small mute bkh">Tap a word to place it in the highlighted blank. Tap a filled blank to take its word back.</p><div class="chips bank" role="group" aria-label="Word bank">';it.bk.forEach(function(bi){if(it.bl.indexOf(bi)<0)h+='<button class="ch" data-bk="'+bi+'">'+esc(b[bi])+'</button>';else h+='<button class="ch used" disabled tabindex="-1" aria-hidden="true">'+esc(b[bi])+'</button>'});h+='</div>'}
   return h+'</div>'},
  ok:function(it){var q=it.q,b=bankOf(q),c=blanksOf(q);return it.bl.every(function(w,i){return w!==null&&b[w]===c[i]})},done:function(it){return it.bl.every(function(w){return w!==null})},ans:function(q){return blanksOf(q).join(' · ')}};
 IT.chips=CH;IT.proof=CH;
@@ -3508,6 +3508,21 @@ document.addEventListener('change',function(e){var t=e.target;if(t.dataset&&t.da
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('prt'))close()});
 })();
 
+/* Select redesign: short native <select> lists in stations/graph tables become tappable choice chips.
+   The real <select> stays in the DOM (hidden) so existing handlers keep working; long lists stay as big native menus. */
+(function(){
+var busy=0,q=0;
+function enh(sel){if(sel.dataset.enh||sel.multiple)return;var o=[].slice.call(sel.options);if(o.length<2||o.length>7||!(sel.dataset.s||sel.dataset.gt))return;
+ var lens=o.reduce(function(a,x){return a+x.text.length},0);if(lens>90)return;
+ sel.dataset.enh='1';var g=document.createElement('div');g.className='segs';g.setAttribute('role','radiogroup');g.setAttribute('aria-label',sel.getAttribute('aria-label')||(sel.closest('label')&&sel.closest('label').textContent.trim().slice(0,60))||'Choose one');
+ o.forEach(function(x,i){if(x.value===''&&i===0&&/^(—|-|choose|select|pick|\.\.\.)/i.test(x.text.trim()))return;var b=document.createElement('button');b.type='button';b.className='seg'+(x.selected&&sel.value===x.value?' on':'');b.setAttribute('role','radio');b.setAttribute('aria-checked',sel.value===x.value?'true':'false');b.textContent=x.text;b.dataset.v=x.value;if(sel.disabled)b.disabled=true;
+  b.addEventListener('click',function(){if(sel.disabled)return;sel.value=x.value;sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}));[].forEach.call(g.children,function(c){var on=c.dataset.v===sel.value;c.classList.toggle('on',on);c.setAttribute('aria-checked',on?'true':'false')})});g.appendChild(b)});
+ sel.hidden=true;sel.parentNode.insertBefore(g,sel.nextSibling)}
+function run(){q=0;if(busy)return;busy=1;try{[].forEach.call(document.querySelectorAll('select[data-s],select[data-gt]'),enh)}finally{busy=0}}
+new MutationObserver(function(){if(!q){q=1;(window.requestAnimationFrame||setTimeout)(run)}}).observe(document.documentElement,{childList:true,subtree:true});
+run();
+})();
+
 /* ===== compact navigation: nested menus with search for Practice, Library and Me; breadcrumbs; collapsed settings ===== */
 (function(){
 var CU=window.__cu,V={me:null,lib:null,prac:null},Q={q:{},open:{}};
@@ -3554,7 +3569,7 @@ function libRoot(){var o=order(),first=o.o.filter(function(t){return o.pr[t]!==u
 var TTL={guide:'Study guide',flash:'Flashcards',labs:'Labs',notes:'Reference notes',stations:'Stations',written:'Written answers',plan:'Test-day plan',gloss:'Glossary',proofs:'Proofs'};
 var _vl=viewLibrary;viewLibrary=function(){if(V.lib==null)return libRoot();sub.lib=V.lib;if(V.lib==='guide')return crumb('lib','Study guide')+guideHTML();
  if(V.lib==='flash'&&window.flashView)return crumb('lib','Flashcards')+flashView();if(V.lib==='labs'&&window.labsView)return crumb('lib','Labs')+labsView();if(V.lib==='graph'&&window.graphView)return crumb('lib','Graphing calculator')+graphView();
- var h=_vl.apply(this,arguments);return crumb('lib',TTL[V.lib]||'Library')+h.replace(/^<div class="seg"[\s\S]*?<\/div>/,'')};
+ var h=_vl.apply(this,arguments);return crumb('lib',TTL[V.lib]||'Library')+h.replace(/^<div class="(?:seg|crumb)"[\s\S]*?<\/div>/,'')};
 /* ---- navigation, search ---- */
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-nav],[data-back]');if(!b)return;
  if(b.dataset.back){V[b.dataset.back]=null;if(window.flashStop)flashStop();route();window.scrollTo(0,0);return}
