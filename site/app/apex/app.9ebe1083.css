@@ -277,6 +277,11 @@ select{min-height:48px;font-size:16px;max-width:100%;border-radius:12px;padding:
 
 .odds{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}.odds caption{text-align:left;font-weight:700;padding:4px 0}.odds th,.odds td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right}.odds th:first-child,.odds td:first-child{text-align:left}
 .oddsw{overflow-x:auto;margin-top:8px}.pkc .row{gap:12px;align-items:center}
+/* lesson deep-dive panel */
+details.dd{margin-top:14px;border:2px solid var(--pri-soft,#e4e0ff);border-radius:14px;background:var(--surface)}
+details.dd>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px;padding:8px 14px;font-weight:700;color:var(--pri);list-style:none}
+details.dd>summary::-webkit-details-marker{display:none}details.dd>summary::before{content:"+";font-weight:800;width:18px;text-align:center}details.dd[open]>summary::before{content:"\2212"}
+.ddb{padding:0 14px 12px}.ddx h4{margin:12px 0 4px;font-size:.95rem}.ddx p{margin:4px 0;line-height:1.55}.ddx ol{margin:4px 0 4px 20px;padding:0}.ddx li{margin:3px 0;line-height:1.5}
 
 /* ===== roster, boxes, banners ===== */
 .mas.rf{overflow:visible}

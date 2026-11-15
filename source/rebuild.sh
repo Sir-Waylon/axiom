@@ -23,6 +23,7 @@ for f,b,t,a in [('apex-math','Apex','Algebra 2 → Calculus',['#b4410a','#ffe9dc
     json.dump(p,open('events/'+f+'/pack.json','w'),ensure_ascii=False,separators=(',',':'))
 P
 python3 src/addref.py events/circuit-lab-b/pack.json events/meteorology-b/pack.json
+for d in circuit-lab-b meteorology-b apex-math geometry-readiness quanta-physics; do python3 src/applydd.py events/$d/pack.json 'src/dd/*.json'; done
 HUBNAME=Skyvolt APPNAME=Skyvolt python3 build_open.py out/_app_skyvolt circuit=events/circuit-lab-b/pack.json meteorology=events/meteorology-b/pack.json
 mkdir -p events/apex-merged && python3 src/mergeapex.py events/geometry-readiness/pack.json events/apex-math/pack.json events/apex-merged/pack.json
 HUBNAME=Axiom APPNAME=Axiom python3 build_open.py out/_app_axiom apex=events/apex-merged/pack.json quanta=events/quanta-physics/pack.json
