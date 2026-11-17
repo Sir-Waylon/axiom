@@ -97,7 +97,7 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
 <header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
 <main id="main" tabindex="-1">{body}</main>
 <footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li></ul></nav>
-<p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom).</p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc..</p></div></footer>
+<p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom).</p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc.</p></div></footer>
 {'<script src="/account.js" defer></script>' if path=='account' else ''}<script src="/nav.js" defer></script>{tail}
 </body></html>'''
 def chips(l):return '<ul class="chips">'+''.join(f'<li><span class="pill">{html.escape(x)}</span></li>' for x in l)+'</ul>'
