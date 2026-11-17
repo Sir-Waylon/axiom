@@ -10,7 +10,7 @@ function cnt(o){return Object.keys(o).length}
 function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
 var KEY='scioly:'+P.meta.id;
 var S={xp:0,coins:0,best:0,days:{},dxp:{},seen:{},miss:{},stat:{},plan:{},known:{},badges:{},un:{},lr:{},theme:'auto',mbest:0,shorts:0,total:0,right:0,perfect:0,v:1};
-try{var _o=SEC?SEC.state:JSON.parse(localStorage.getItem(KEY)||'null');if(_o&&typeof _o==='object')for(var _k in _o)S[_k]=_o[_k]}catch(e){}
+try{var _o=SEC?SEC.state:JSON.parse(localStorage.getItem(KEY)||'null');if(_o&&typeof _o==='object')for(var _k in _o)if(_k!=='__proto__'&&_k!=='constructor'&&_k!=='prototype')S[_k]=_o[_k]}catch(e){}
 (function(){var ok=typeof S.xp==='number'&&typeof S.coins==='number'&&S.xp>=0&&S.coins>=0&&S.xp<=60*(S.total|0)+2*Object.keys(S.lr||{}).length+60&&S.coins<=2*S.xp+20;if(!ok){S.xp=0;S.coins=0;S.dxp={};S.cos=null;S.lr={}}})();
 function save(){var s=JSON.stringify(S);if(SEC)SEC.save(s);else try{localStorage.setItem(KEY,s)}catch(e){}}
 

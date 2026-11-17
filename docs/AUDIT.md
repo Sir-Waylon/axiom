@@ -41,3 +41,28 @@ Status key: Fixed, Open, Needs a human.
 ## Accessibility
 - Fixed: dialogs have roles and labels and close with Escape.
 - Open: screen-reader pass with a real device.
+
+## Security, technical and legal audit, November 17, 2026
+Scope: the full client bundle, the accounts and friends API, headers, privacy and terms, and the features added this month (practice screen, packs, friend polling, username suggestions, print sheets, lesson deep dives). Method: code reading, grep for dangerous sinks, backend test suite (all pass), browser load tests on all four trainers, stubbed end-to-end test of friend requests.
+
+Security
+- Fixed: state merged from local storage, cloud saves and backup files could carry `__proto__`, `constructor` or `prototype` keys and alter the state object; those keys are now skipped.
+- Checked: no `eval`, `new Function`, `document.write` in the app; user-supplied names (usernames, nicknames) are escaped or limited to `[a-z0-9_]` before being placed in HTML; new code (choice chips, print sheets, friend banner, suggestions) uses `textContent` or `esc()`.
+- Checked: CSP still forbids inline scripts and third-party hosts other than Google sign-in; new files are bundled, so no policy change was needed. Printing uses the browser's own print dialog; nothing is uploaded.
+- New API routes: `GET /api/friends/ping` (own data only, two small queries) and `GET /api/friends/suggest` (sign-in plus a username required, rate limited to 90 per hour, 3 to 16 characters, LIKE patterns escaped, prefix or one-typo matches only, at most 5 results). Trade-off: suggestions let a signed-in user test whether a username exists, which the friend-request route deliberately hides. The rate limit makes bulk guessing slow; accounts are for students 13 and up and usernames are already shown to friends and in leagues. Open: if this is a concern, restrict suggestions to people in the same class or league.
+- Open: the server cannot verify answers (the question bank lives in the browser), so XP and league scores can be cheated by a determined user; this is documented in ONLINE_PLAY.md and XP per sync is capped server-side.
+- Open: set the `PEPPER` secret on the Workers project, add the production origins to the Google OAuth client, and rotate the pepper only with a plan for password resets.
+
+Technical
+- Fixed: duplicated "back" header on library pages; the two "How sure?" rows that were both injected into the practice footer; footer overlapping the question on small phones; break timer counted time away from the site.
+- Added: arrangement caching (an answer order is never repeated back to back), duplicate removal inside a session, and recent-question spreading across sessions (already in the coach).
+- Added: polling for friend requests only while the tab is visible and signed in (every 10 seconds); stops when hidden. Cost is about 2 small D1 reads per poll, which suits a class-size group on the free plan; revisit with Durable Objects/WebSockets if usage grows past a few hundred concurrent students.
+- Open: Firefox, Safari and iOS were not available in the test environment; only Chromium was exercised. Run the manual checklist in docs/ACCESSIBILITY.md on real devices.
+
+Legal and policy
+- Fixed: the site said it avoids loot boxes while the shop has random cosmetic packs. The statement now says what is true: packs cost only coins earned by studying, can never be bought with money, hold cosmetics only, publish their drop rates (tables in the shop), guarantee a rare character within a set number of packs, and say when a seasonal pack leaves the shop.
+- Fixed: the earlier note "odds are shown" was not true until the odds tables were added this month; the tables use the same numbers the game rolls with.
+- Updated: privacy policy (November 17, 2026) now lists the letters typed into "Add a friend" and the 10-second request check.
+- Checked: no real-money purchases, no ads, no trackers; students 13 and up; guests store nothing off-device; account deletion exists. Character names and art are original; no third-party game characters, logos or Science Olympiad materials are copied. "Science Olympiad" is used only to describe the events the content prepares for; a trademark disclaimer is on the About and AI disclosure pages.
+- Open (needs a person): school-district review of the student-data terms (California student privacy laws apply to operators of services used for school purposes), a named contact email on a domain the coach controls, and counsel review of the privacy policy and terms before wider distribution.
+- Open: Frostbyte season packs use limited-time framing; keep the window long and avoid countdown pressure, and have a specialist review before adding more seasonal content.

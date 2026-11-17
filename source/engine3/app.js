@@ -132,7 +132,7 @@ function shopHTML(){
  return gh+'<p class="mute small">'+S.coins+' coins · looks only, no advantages</p>'+sec('Characters',AV,'av',function(x){return mascot(x[0],'happy',56,S.cos.on.ac)})+sec('Hats',AC,'ac',function(x){return mascot(S.cos.on.av,'happy',56,x[0])})+sec('Themes',TH,'th',function(x){return '<i class="sw" style="background:'+x[3]+'"></i>'})+sec('Titles',TI,'ti',function(){return ''})}
 function afterMe(){if(sub.me==='friends'&&SEC&&SEC.share)SEC.share(myCard()).then(function(t){var e=$('mc');if(e)e.value=t});
  if(sub.me==='settings'){$('u-th').value=S.theme;$('u-xl').value=A11.xl||0;$('u-rm').checked=!!A11.rm;$('u-snd').checked=A11.snd!==false;$('u-hc').checked=!!A11.hc;$('u-dys').checked=!!A11.dys;$('u-focus').checked=!!A11.focus}}
-function doRestore(o){if(!o||typeof o.xp!=='number')throw 0;for(var k in o)S[k]=o[k];save();hud();applyCos();applyTheme();toast('Restored');route()}
+function doRestore(o){if(!o||typeof o.xp!=='number')throw 0;for(var k in o)if(k!=='__proto__'&&k!=='constructor'&&k!=='prototype')S[k]=o[k];save();hud();applyCos();applyTheme();toast('Restored');route()}
 function exportNow(){var go2=function(txt){var b=new Blob([txt],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=P.meta.id+'-backup.json';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},500);toast('Backup downloaded')};
  if(SEC&&SEC.pack)SEC.pack(S).then(go2);else go2(JSON.stringify(S))}
 function importText(txt){txt=txt.trim();try{if(SEC&&SEC.unpack)SEC.unpack(txt).then(doRestore,function(){toast('That backup is not valid for this trainer')});else doRestore(JSON.parse(txt))}catch(x){toast('Not a valid backup')}}
