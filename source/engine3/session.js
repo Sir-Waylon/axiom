@@ -6,6 +6,11 @@ function mkItem(id,extra){
  else if(q.type==='short')it.val='';
  else if(q.type==='order'){it.pool=shuf(q.items.map(function(_,i){return i}));it.seq=[]}
  else if(q.type==='match'){it.rperm=shuf(q.pairs.map(function(_,i){return i}));it.mp={};it.pick=null}
+ /* never show the same arrangement twice in a row: reshuffle options/items until they differ from last time */
+ S.arr=S.arr||{};var cur=it.perm||it.pool||it.rperm,last=S.arr[id];
+ if(cur&&cur.length>2){var key=function(a){return a.join('.')},idf=function(a){return a.every(function(v,i){return v===i})},pos=function(a){return a.indexOf(0)};
+  for(var t=0;t<12&&(key(cur)===last||(it.pool&&idf(cur))||(it.rperm&&idf(cur))||(it.perm&&S.arrp&&S.arrp[id]===pos(cur)&&cur.length>2&&t<8));t++){cur=shuf(cur);if(it.perm)it.perm=cur;else if(it.pool)it.pool=cur;else it.rperm=cur}
+  S.arr[id]=key(cur);S.arrp=S.arrp||{};if(it.perm)S.arrp[id]=pos(cur);var ks=Object.keys(S.arr);if(ks.length>2500){ks.slice(0,500).forEach(function(k){delete S.arr[k];if(S.arrp)delete S.arrp[k]})}}
  if(extra)for(var k in extra)it[k]=extra[k];return it}
 function isOk(it){var q=it.q;
  if(q.type==='mcq')return it.sel.length===1&&it.sel[0]===0;
@@ -44,8 +49,13 @@ function qBody(it,rev){
   var ph=q.num?(q.num.u?'Number and unit':'Number'):'Your answer';
   h+='<div class="ans"><input id="sv" type="text" inputmode="'+(q.num?'text':'text')+'" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+esc(ph)+'" value="'+esc(it.val)+'"'+(rev?' disabled class="'+(it.ok?'ok':'bad')+'"':'')+'></div>'}
  else if(q.type==='order'){
-  h+='<div class="chips">';it.seq.forEach(function(v,k){h+='<button class="ch '+(rev?(v===k?'ok':'bad'):'')+'" data-sq="'+k+'"'+(rev?' disabled':'')+'>'+esc(q.items[v])+'</button>'});
-  h+='</div><div class="chips">';it.pool.forEach(function(v){if(it.seq.indexOf(v)<0)h+='<button class="ch" data-po="'+v+'">'+esc(q.items[v])+'</button>'});h+='</div>'}
+  var n=q.items.length,ds=!!rev;
+  h+='<div class="ord" role="group" aria-label="Put these in order"><div class="ordh"><b>First</b><span class="small mute">Put the steps in order, top to bottom</span></div><ol class="slots">';
+  for(var k=0;k<n;k++){var v=it.seq[k];
+   if(v!==undefined)h+='<li class="slot filled '+(rev?(v===k?'ok':'bad'):'')+'" data-slot="'+k+'"><span class="n">'+(k+1)+'</span><button class="oc" data-sq="'+k+'"'+(ds?' disabled':'')+' aria-label="'+esc(q.items[v])+', position '+(k+1)+'. Tap to take it back."><span class="grip" data-drag="'+k+'" aria-hidden="true">\u2807</span><span class="ot">'+esc(q.items[v])+'</span></button>'+(ds?'<span class="mk" aria-hidden="true">'+(v===k?'\u2713':'\u2717')+'</span>':'<span class="mv"><button data-up="'+k+'" aria-label="Move up"'+(k===0?' disabled':'')+'>\u25B2</button><button data-dn="'+k+'" aria-label="Move down"'+(k===it.seq.length-1?' disabled':'')+'>\u25BC</button></span>')+'</li>';
+   else h+='<li class="slot empty" data-slot="'+k+'"><span class="n">'+(k+1)+'</span><span class="ph">'+(k===it.seq.length?'Tap or drag an item here':'')+'</span></li>'}
+  h+='</ol><div class="ordh"><b>Last</b></div></div>';
+  if(!rev){h+='<p class="small mute bkh">Tap an item to add it to the next box, or drag it by the dots into any box. Tap a placed item to take it back.</p><div class="chips bank" role="group" aria-label="Items to place">';it.pool.forEach(function(v){if(it.seq.indexOf(v)<0)h+='<button class="ch oi" data-po="'+v+'"><span class="grip" data-dragpo="'+v+'" aria-hidden="true">\u2807</span>'+esc(q.items[v])+'</button>'});h+='</div>'}}
  else if(q.type==='match'){
   h+='<div class="mt"><div class="chips" style="flex-direction:column">';
   q.pairs.forEach(function(p,i){var pi=it.mp[i]!==undefined;h+='<button class="ch" data-ml="'+i+'"'+(pi?' data-p="1"':'')+(it.pick===i?' style="outline:3px solid var(--sel)"':'')+(rev?' disabled':'')+'>'+esc(p[0])+'</button>'});
@@ -202,6 +212,8 @@ document.addEventListener('click',function(e){
   if(q.type==='multi'){if(k>-1)it.sel.splice(k,1);else it.sel.push(oi);drawSess();return}
   it.sel=[oi];if(z.nofb){drawSess();if(z.kind==='unit'||z.kind==='mock'){}return}resolveIt(it);drawSess();return}
  var sq=t.closest('[data-sq]');if(sq&&!it.done){it.seq.splice(+sq.dataset.sq,1);drawSess();return}
+ var up=t.closest('[data-up]');if(up&&!it.done){var u=+up.dataset.up;if(u>0){var tm=it.seq[u];it.seq[u]=it.seq[u-1];it.seq[u-1]=tm}drawSess();return}
+ var dn=t.closest('[data-dn]');if(dn&&!it.done){var d=+dn.dataset.dn;if(d<it.seq.length-1){var t2=it.seq[d];it.seq[d]=it.seq[d+1];it.seq[d+1]=t2}drawSess();return}
  var po=t.closest('[data-po]');if(po&&!it.done){it.seq.push(+po.dataset.po);drawSess();return}
  var ml=t.closest('[data-ml]');if(ml&&!it.done){var li=+ml.dataset.ml;if(it.mp[li]!==undefined)delete it.mp[li];it.pick=li;drawSess();return}
  var mr=t.closest('[data-mr]');if(mr&&!it.done){var ri=+mr.dataset.mr;for(var kk in it.mp)if(it.mp[kk]===ri)delete it.mp[kk];if(it.pick!==null){it.mp[it.pick]=ri;it.pick=null}drawSess();return}

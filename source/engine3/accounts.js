@@ -45,5 +45,32 @@ document.addEventListener('click',function(e){var t=e.target,b=t.closest&&t.clos
  if(b.dataset.fa){api('POST','/friends/accept',{username:b.dataset.fa}).then(function(j){if(!j.error){ACC.fr=j;route()}});return}
  if(b.dataset.fr){var fu=b.dataset.fr;window.askOk('Remove '+fu+'?','You can add them again later.','Remove',function(){api('POST','/friends/remove',{username:fu}).then(function(j){if(!j.error){ACC.fr=j;route()}})});return}});
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')push(true)});
+/* --- instant friend requests + username suggestions --- */
+var known=null,timer=0,nSeen=-1;
+function signed(){return ACC.mode==='in'&&ACC.me&&ACC.me.username}
+function norm(u){return String(u||'').trim().toLowerCase().replace(/^@/,'').replace(/\s+/g,'').replace(/[^a-z0-9_]/g,'')}
+function banner(names){var old=document.getElementById('frq');if(old)old.remove();if(!names.length)return;var d=document.createElement('div');d.id='frq';d.setAttribute('role','alert');
+ d.innerHTML='<div class="frqt"><b>'+esc(names[0])+'</b>'+(names.length>1?' and '+(names.length-1)+' more want':' wants')+' to be friends</div><div class="frqb"><button class="btn sm" data-qa="'+esc(names[0])+'">Accept</button><button class="btn sm sec" data-qd="1">Later</button></div>';document.body.appendChild(d)}
+function ping(){if(!signed()||document.visibilityState!=='visible')return;api('GET','/friends/ping').then(function(j){if(!j||j.error||!j.inc)return;var inc=j.inc,first=known===null;
+  if(!first){var fresh=inc.filter(function(n){return known.indexOf(n)<0});if(fresh.length)banner(inc);}
+  if(first&&inc.length)banner(inc);
+  var changed=first||inc.join()!==known.join()||(nSeen>=0&&j.n!==nSeen);known=inc;nSeen=j.n;
+  if(changed)friends();
+  if(!inc.length){var b=document.getElementById('frq');if(b)b.remove()}})}
+function loop(){clearInterval(timer);timer=setInterval(ping,10000)}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')ping()});
+window.addEventListener('focus',ping);window.addEventListener('online',ping);
+setTimeout(function(){loop();ping()},3000);
+document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-qa],[data-qd],[data-sg]');if(!t)return;
+ if(t.dataset.qa){api('POST','/friends/accept',{username:t.dataset.qa}).then(function(j){if(!j.error){ACC.fr=j;known=(j.incoming||[]).map(function(x){return x.username});toast('You and '+t.dataset.qa+' are friends');banner(known);route()}});return}
+ if(t.dataset.qd){var b=document.getElementById('frq');if(b)b.remove();return}
+ if(t.dataset.sg){var i=document.getElementById('fru');if(i){i.value=t.dataset.sg;i.focus()}var s=document.getElementById('frsug');if(s)s.innerHTML=''}});
+var st=0;
+document.addEventListener('input',function(e){if(!e.target||e.target.id!=='fru')return;var i=e.target,q=norm(i.value);clearTimeout(st);var box=document.getElementById('frsug');if(!box){box=document.createElement('div');box.id='frsug';box.className='segs';box.setAttribute('aria-live','polite');i.parentNode.parentNode.insertBefore(box,i.parentNode.nextSibling)}
+ if(q.length<3){box.innerHTML='';return}
+ st=setTimeout(function(){api('GET','/friends/suggest?q='+encodeURIComponent(q)).then(function(j){var cur=norm(i.value);if(cur!==q||!j||!j.names)return;box.innerHTML=j.names.length?'<span class="small mute" style="align-self:center">Did you mean</span>'+j.names.map(function(n){return '<button type="button" class="seg" data-sg="'+esc(n)+'">'+esc(n)+'</button>'}).join(''):''})},250)});
+/* clean the typed name before it is sent */
+var _fetchNorm=true;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#fra');if(!b)return;var i=document.getElementById('fru');if(i)i.value=norm(i.value)},true);
+
 boot();
 })();

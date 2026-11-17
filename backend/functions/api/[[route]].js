@@ -179,6 +179,28 @@ async function friendList(env, uid) {
   };
 }
 A['GET /friends'] = async (req, env, s) => J(await friendList(env, s.uid));
+/* light-weight poll (2 small queries) so a new friend request can pop up within seconds without reloading the full list */
+A['GET /friends/ping'] = async (req, env, s) => {
+  const inc = (await env.DB.prepare("SELECT u.username FROM friends f JOIN users u ON u.id=f.a WHERE f.b=? AND f.status='pending' LIMIT 20").bind(s.uid).all()).results.map((r) => r.username);
+  const n = (await env.DB.prepare("SELECT COUNT(*) c FROM friends WHERE (a=? OR b=?) AND status='ok'").bind(s.uid, s.uid).first()).c;
+  return J({ inc, n });
+};
+/* username suggestions ("did you mean"): prefix matches and one-typo matches only, signed-in users with a username, rate limited */
+const lev1 = (a, b) => { if (a === b) return true; if (Math.abs(a.length - b.length) > 1) return false; let i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++; const x = a.slice(i), y = b.slice(i); return x.length === y.length ? x.slice(1) === y.slice(1) : x.length > y.length ? x.slice(1) === y : y.slice(1) === x; };
+A['GET /friends/suggest'] = async (req, env, s) => {
+  if (!s.username) return J({ names: [] });
+  if (!(await rate(env, 'sg:' + s.uid, 90, 3600))) return J({ names: [] }, 429);
+  const q = String(new URL(req.url).searchParams.get('q') || '').trim().toLowerCase().replace(/^@/, '').replace(/[^a-z0-9_]/g, '');
+  if (q.length < 3 || q.length > 16) return J({ names: [] });
+  const esc = (x) => x.replace(/[%_\\]/g, '\\$&');
+  const pre = (await env.DB.prepare("SELECT username FROM users WHERE username LIKE ? ESCAPE '\\' AND id<>? LIMIT 5").bind(esc(q) + '%', s.uid).all()).results.map((r) => r.username);
+  let names = pre;
+  if (names.length < 3) {
+    const cand = (await env.DB.prepare("SELECT username FROM users WHERE (username LIKE ? ESCAPE '\\' OR username LIKE ? ESCAPE '\\') AND id<>? LIMIT 150").bind(esc(q.slice(0, 1)) + '%', '%' + esc(q.slice(-3)), s.uid).all()).results.map((r) => r.username);
+    names = [...new Set([...pre, ...cand.filter((u) => lev1(q, u))])].slice(0, 5);
+  }
+  return J({ names });
+};
 const target = async (env, b) => { const u = String(b.username || '').trim().toLowerCase(); return ok_user(u) ? env.DB.prepare('SELECT id FROM users WHERE username=?').bind(u).first() : null; };
 A['POST /friends/request'] = async (req, env, s) => {
   if (!s.username) return J({ error: 'Pick a username first.' }, 400);

@@ -17,6 +17,7 @@ function lockIds(n){var d=dayN(),c=[];for(var id in S.mem){if(QI[id]===undefined
  c.sort(function(a,b){return a[1]-b[1]});return c.slice(0,n).map(function(x){return x[0]})}
 var _s3=startSess;startSess=function(o){
  if(o)o.a0=window.actNow();
+ if(o&&o.steps){var sn={};o.steps=o.steps.filter(function(x){if(x.k!=='try'||x.lock||x.skipped)return true;if(sn[x.it.id])return false;sn[x.it.id]=1;return true})}
  if(o&&o.kind==='mission'&&!o.lkd&&o.steps){o.lkd=1;var ids=lockIds(3);if(ids.length){var rest=o.steps.filter(function(s){return !(s.k==='try'&&ids.indexOf(s.it.id)>-1)});o.steps=ids.map(function(id){return {k:'try',it:mkItem(id),lock:1}}).concat(rest)}}
  return _s3.apply(this,arguments)};
 /* end of mission: ask the missed ones again after the other items in between */
