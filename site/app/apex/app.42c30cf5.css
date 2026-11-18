@@ -572,3 +572,18 @@ h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus,h3[tabindex="-1"]:focus,[data-fo
 .gsl{grid-template-columns:22px 1fr 52px 34px}.gpl{border:0;background:var(--pri-soft,#eef);border-radius:8px;height:28px;cursor:pointer;color:inherit;font-size:11px}
 
 .devchip{position:fixed;left:8px;bottom:70px;z-index:90;background:#b3261e;color:#fff;border:0;border-radius:999px;padding:4px 10px;font:700 11px system-ui;letter-spacing:.06em;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+/* ---- lab workbench box (labbox.js) ---- */
+.lbx{display:grid;gap:12px;grid-template-columns:minmax(0,1fr);align-items:start}
+.lstage{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;min-width:0}
+.lstage .lintro{margin:0 0 8px}
+.lstage .lsvg{max-width:none;margin:0;border-radius:14px}
+.ltot{margin-top:10px;border-radius:14px;background:#17212b;color:#f4f7fa;padding:10px 14px}
+.ltot .labr{margin:0;font-size:14px;line-height:1.5}.ltot .labr b{color:#fff}
+.lpanel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px 14px 12px;min-width:0}
+.lph{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pri);padding:10px 0 4px;border-bottom:2px solid var(--pri);margin-bottom:8px}
+.lpanel .row{margin:10px 0}.lpanel .btn{border-radius:12px}
+@media(min-width:820px){.lbx{grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr)}.lstage{position:sticky;top:8px}}
+/* old purple drawing colours follow the trainer accent */
+svg [fill="#5b4bff"],svg [fill="#5B4BFF"]{fill:var(--pri)}svg [stroke="#5b4bff"],svg [stroke="#5B4BFF"]{stroke:var(--pri)}
+svg [fill^="rgba(91,75,255"]{fill:color-mix(in srgb,var(--pri) 28%,transparent)}svg [stroke^="rgba(91,75,255"]{stroke:color-mix(in srgb,var(--pri) 40%,transparent)}
+.lstage .lsvg{border:0;background:transparent}
