@@ -66,3 +66,13 @@ Legal and policy
 - Checked: no real-money purchases, no ads, no trackers; students 13 and up; guests store nothing off-device; account deletion exists. Character names and art are original; no third-party game characters, logos or Science Olympiad materials are copied. "Science Olympiad" is used only to describe the events the content prepares for; a trademark and non-affiliation notice was added to the footer of every site page on November 17, 2026 (it did not exist before this audit).
 - Open (needs a person): school-district review of the student-data terms (California student privacy laws apply to operators of services used for school purposes), a named contact email on a domain the coach controls, and counsel review of the privacy policy and terms before wider distribution.
 - Open: Frostbyte season packs use limited-time framing; keep the window long and avoid countdown pressure, and have a specialist review before adding more seasonal content.
+
+## Apex honors audit (Nov 17 2026): Algebra 2 / Trigonometry for PAUSD Math Validation
+Scope: topics fn, qd2, pl, ra, ex, lg, sq, tc, tg, ti, iv, id, tl, cn, pp (2,009 questions before this pass).
+Findings (script: audit_honors.py in the kit):
+- Every question was typed-answer; no multiple choice, ordering or matching in the honors range.
+- 936 solutions were under 50 characters (answer without reasoning); about 126 short answers rely on text keys.
+- Thin coverage of identities (30), inverse trig (58), angle formulas (54) relative to their weight on honors exams.
+- Few level-3 (exam-hardest) items in iv, id, ti, cn.
+Action: src/mkhonors.py generates verified items (answers computed with Python math, never hand-typed), merged by applyextra into apex-math. First batch = 109 questions (82 typed, 23 multiple choice, 2 ordering, 2 matching) across 14 topics, each with concept-first multi-step solutions.
+Still open: expand thin existing solutions (936), more level-3 items, and a pass comparing topic order with the PAUSD honors course outline. The Geometry Honors textbook and symbolic logic slides remain reference only.
