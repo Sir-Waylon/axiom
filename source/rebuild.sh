@@ -29,4 +29,4 @@ HUBNAME=Skyvolt APPNAME=Skyvolt python3 build_open.py out/_app_skyvolt circuit=e
 mkdir -p events/apex-merged && python3 src/mergeapex.py events/geometry-readiness/pack.json events/apex-math/pack.json events/apex-merged/pack.json
 HUBNAME=Axiom APPNAME=Axiom python3 build_open.py out/_app_axiom apex=events/apex-merged/pack.json quanta=events/quanta-physics/pack.json
 mkdir -p out/_app_axiom/geometry && printf '<!doctype html><meta charset=utf-8><meta http-equiv=refresh content="0;url=../apex/"><title>Moved</title><a href="../apex/">Vertex is now part of Apex</a>' > out/_app_axiom/geometry/index.html
-python3 mksite.py skyvolt out/_app_skyvolt out/skyvolt && python3 mksite.py axiom out/_app_axiom out/axiom
+node icons_png.js out/_app_skyvolt out/_app_axiom && python3 mksite.py skyvolt out/_app_skyvolt out/skyvolt && python3 mksite.py axiom out/_app_axiom out/axiom

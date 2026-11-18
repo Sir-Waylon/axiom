@@ -203,7 +203,7 @@ var RC=[['#2fbf5b','#0b6b2c','#dcf7e5'],['#2f8cff','#0a4fb8','#dfeeff'],['#9b4df
 var ODDS_LO=[57.1,27.6,10.0,3.9,0.9,0.5],ODDS_HI=[46.3,26.4,15.3,7.2,2.95,1.85];
 var REFUND=[15,30,60,120,300,600],BOX_COST=100,LUCK_MIN=30;
 var RB={
-Voltaic:{k:'v',dk:'#06251a',bg:['#0f6b44','#06251a'],mk:'bolt',ro:[
+Voltaic:{k:'v',dk:'#10261d',bg:['#2D6A4F','#10261d'],mk:'bolt',ro:[
  [0,'Sparky',-1,'bot','#19b36b','#ffe14a','antenna'],
  [1,'Ohmie',0,'cat','#37b6a3','#ffe27a','probe'],[2,'Resi',0,'dino','#8bc34a','#ffb02e','wrench'],[3,'Capa',0,'owl','#4dabf7','#ffd43b',''],[4,'Diode',0,'fox','#ff7043','#ffe0b2','bolt'],[5,'Gizmo',0,'bot','#26c6da','#ff5252','antenna'],[6,'Fuse',0,'pilot','#ffb300','#37474f',''],
  [7,'Amp',1,'hood','#2e7d32','#b9f6ca','probe'],[8,'Henri',1,'knight','#607d8b','#ffd54f','wrench'],[9,'Farad',1,'wiz','#3949ab','#ffee58','staff'],[10,'Coil',1,'drake','#00acc1','#ffd740','bolt'],[11,'Relay',1,'bot','#7e57c2','#69f0ae','antenna'],
@@ -211,7 +211,7 @@ Voltaic:{k:'v',dk:'#06251a',bg:['#0f6b44','#06251a'],mk:'bolt',ro:[
  [16,'Dynamo',3,'drake','#fb8c00','#fff59d','bolt'],[17,'Capacitron',3,'bot','#1e88e5','#ffea00','antenna,wings'],[18,'Lumina',3,'nova','#00c853','#ffff8d','staff'],
  [19,'Overload',4,'drake','#d50000','#ffd600','bolt'],[20,'Megawatt',4,'knight','#6200ea','#18ffff','wrench'],
  [21,'Supercon',5,'nova','#e0f7fa','#b388ff','staff'],[22,'Plasmo',5,'wiz','#f3e5f5','#40c4ff','staff']]},
-Stratus:{k:'s',dk:'#0b2a4d',bg:['#1c6fc4','#0b2a4d'],mk:'cloud',ro:[
+Stratus:{k:'s',dk:'#032b44',bg:['#0077B6','#032b44'],mk:'cloud',ro:[
  [0,'Puff',-1,'sprite','#7ec8ff','#ffffff',''],
  [1,'Drizzle',0,'sprite','#64b5f6','#e1f5fe',''],[2,'Zephyr',0,'cat','#80cbc4','#ffffff','umbrella'],[3,'Dewey',0,'owl','#90caf9','#fff59d',''],[4,'Mistral',0,'pilot','#4fc3f7','#ff8a65',''],[5,'Fogg',0,'bot','#b0bec5','#ffd54f','antenna'],[6,'Sunny',0,'fox','#ffca28','#ff7043','umbrella'],
  [7,'Squall',1,'hood','#3f51b5','#80d8ff','staff'],[8,'Isobar',1,'knight','#546e7a','#81d4fa','umbrella'],[9,'Cirrus',1,'wiz','#5c6bc0','#e3f2fd','staff'],[10,'Hailey',1,'dino','#26c6da','#ffffff',''],[11,'Barometer',1,'bot','#26a69a','#ffab91','antenna'],
@@ -219,7 +219,7 @@ Stratus:{k:'s',dk:'#0b2a4d',bg:['#1c6fc4','#0b2a4d'],mk:'cloud',ro:[
  [16,'Thunderhead',3,'drake','#37474f','#ffeb3b','bolt,wings'],[17,'Aurora',3,'wiz','#00bfa5','#ea80fc','staff'],[18,'Nimbus',3,'sprite','#9fa8da','#fff176','bolt'],
  [19,'Cyclone',4,'nova','#0277bd','#e1f5fe','umbrella'],[20,'Eyewall',4,'knight','#263238','#ff5252','staff'],
  [21,'Zenith',5,'nova','#e3f2fd','#80d8ff','staff'],[22,'Halcyon',5,'sprite','#f3e5f5','#b2ebf2','']]},
-Axiom:{k:'x',dk:'#17104d',bg:['#3a2fc4','#17104d'],mk:'tri',ro:[
+Axiom:{k:'x',dk:'#3a1517',bg:['#BC4749','#3a1517'],mk:'tri',ro:[
  [0,'Delta',-1,'bot','#6c5bff','#ffd45a','antenna'],
  [1,'Sigma',0,'cat','#7e57c2','#ffe082','compass'],[2,'Theta',0,'owl','#26a69a','#ffd45a','book'],[3,'Radi',0,'fox','#ef6c00','#fff3e0','compass'],[4,'Vertex',0,'dino','#43a047','#ffeb3b','tri'],[5,'Slope',0,'pilot','#5c6bc0','#ffab40',''],[6,'Quark',0,'bot','#ec407a','#fff59d','antenna'],
  [7,'Proof',1,'hood','#512da8','#ffd45a','book'],[8,'Euclid',1,'knight','#455a64','#ffd45a','compass'],[9,'Gauss',1,'wiz','#3949ab','#ffe082','staff'],[10,'Pythia',1,'drake','#00897b','#ffd45a','tri'],[11,'Lemma',1,'bot','#8e24aa','#b2ff59','antenna'],
@@ -231,8 +231,8 @@ Axiom:{k:'x',dk:'#17104d',bg:['#3a2fc4','#17104d'],mk:'tri',ro:[
 
 function _derive(src,names,cols){return src.map(function(r,i){var c=cols[i%cols.length];return [r[0],names[i],r[2],r[3],c[0],c[1],r[6]]})}
 var _PC=[['#ef6c00','#fff3e0'],['#6a1b9a','#ffd45a'],['#00897b','#fff59d'],['#c62828','#ffe0b2'],['#1565c0','#ffd54f'],['#ad1457','#f8bbd0'],['#33691e','#ffee58'],['#4527a0','#b2ff59'],['#00838f','#ffab40'],['#e65100','#e1f5fe'],['#2e7d32','#ffcc80'],['#283593','#ffd740']];
-RB.Apex={k:'p',dk:'#3a1500',bg:['#b4410a','#3a1500'],mk:'sig',ro:_derive(RB.Axiom.ro,['Slope','Lim','Parab','Asymp','Radian','Sine','Cosa','Tangy','Secant','Vector','Matrix','Integra','Derive','Logan','Expo','Polar','Conic','Ellipse','Hyper','Calcula','Zeno','Newtonia','Leibniz'],_PC)};
-RB.Quanta={k:'q',dk:'#032a36',bg:['#0a6e8a','#032a36'],mk:'atom',ro:_derive(RB.Voltaic.ro,['Qubit','Joule','Newt','Hertz','Tesla','Gauss','Watt','Ohmi','Coulomb','Farady','Henrik','Kelvin','Pascal','Bohr','Curie','Planck','Maxwell','Lenz','Quark','Photon','Neutrino','Boson','Higgs'],_PC.slice().reverse())};
+RB.Apex={k:'p',dk:'#3a1517',bg:['#BC4749','#3a1517'],mk:'sig',ro:_derive(RB.Axiom.ro,['Slope','Lim','Parab','Asymp','Radian','Sine','Cosa','Tangy','Secant','Vector','Matrix','Integra','Derive','Logan','Expo','Polar','Conic','Ellipse','Hyper','Calcula','Zeno','Newtonia','Leibniz'],_PC)};
+RB.Quanta={k:'q',dk:'#032a36',bg:['#0F4C5C','#032a36'],mk:'atom',ro:_derive(RB.Voltaic.ro,['Qubit','Joule','Newt','Hertz','Tesla','Gauss','Watt','Ohmi','Coulomb','Farady','Henrik','Kelvin','Pascal','Bohr','Curie','Planck','Maxwell','Lenz','Quark','Photon','Neutrino','Boson','Higgs'],_PC.slice().reverse())};
 /* limited-time season characters (ids 100+): only found in the season pack; vaulted when the season ends */
 var SEAS_INFO={id:'season',name:'Frostbyte Season',start:'2026-11-01',end:'2027-01-06',cost:150};
 var SEAS=[[100,'Flurry',0,'sprite','#b3e5fc','#ffffff',''],[101,'Mittens',1,'cat','#90caf9','#ff5252',''],[102,'Glacia',2,'wiz','#4dd0e1','#e0f7fa','staff'],[103,'Yetibyte',3,'drake','#eceff1','#40c4ff','wings'],[104,'Aurorus',4,'knight','#1a237e','#69f0ae','staff'],[105,'Solstice',5,'nova','#fff8e1','#ffab40','staff']];

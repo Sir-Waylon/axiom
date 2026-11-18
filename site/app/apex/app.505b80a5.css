@@ -339,8 +339,8 @@ table.odds{margin-top:8px}table.odds th[scope=row]{font-weight:400}table.odds td
 .rv.r5 .rv-av,.rv.r4 .rv-av,.rv.r3 .rv-av{filter:drop-shadow(0 0 14px var(--rc))}
 .rv-av{display:grid;place-items:center;margin:8px 0}.rv-av .mas{margin:0}
 .rv-box[hidden],.rv-out[hidden]{display:none}
-.luck .bar i{background:var(--pri-t,#0b7a45);min-width:4px}
-.stl .bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin:6px 0}.stl .bar i{display:block;height:100%;background:var(--pri-t,#0b7a45);border-radius:99px}.stl{margin:10px 0}
+.luck .bar i{background:var(--pri-t,var(--pri));min-width:4px}
+.stl .bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin:6px 0}.stl .bar i{display:block;height:100%;background:var(--pri-t,var(--pri));border-radius:99px}.stl{margin:10px 0}
 
 /* ===== character motion (idle life, like a collectible mascot) ===== */
 .rf .rbody{transform-origin:32px 90px;transform-box:view-box;animation:rsq 2.6s ease-in-out infinite}@keyframes rsq{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,.985)}}

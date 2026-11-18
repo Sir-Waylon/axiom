@@ -20,17 +20,17 @@ nq=sum(len(p['questions']) for p in packs);nt=sum(len(p['topics']) for p in pack
 nl=sum(sum(len(u['lessons']) for u in p['units']) for p in packs);npf=sum(len(p.get('proofs',[])) for p in packs)
 def fmt(n):return f"{n//100*100:,}+"
 if site=='skyvolt':
-    B=dict(name='Skyvolt',pri='#0b7a45',pri_d='#46d98b',acc='#1a62c8',acc_d='#7bb6ff',gold='#ffb703',
+    B=dict(name='Skyvolt',**{k:v for k,v in json.load(open(K+'src/brand.json'))['sites'][site.capitalize()].items() if k!='tint'},
         h1='Circuits and weather, one small win at a time.',
         sub='Short interactive lessons start with ideas a 5th grader already knows and climb to high-school exam level. Built for Science Olympiad Circuit Lab and Meteorology.',
-        tracks=[('Voltaic','Circuit Lab B','#0b7a45',[t['name'] for t in packs[0]['topics']]),('Stratus','Meteorology B','#1a62c8',[t['name'] for t in packs[1]['topics']])],
+        tracks=[('Voltaic','Circuit Lab B','#2D6A4F',[t['name'] for t in packs[0]['topics']]),('Stratus','Meteorology B','#0077B6',[t['name'] for t in packs[1]['topics']])],
         what='circuits, Ohm’s law, Kirchhoff, capacitors, logic, fronts, soundings, severe storms and more',stations=True,
         exam='a high-school physics or Earth-science exam written by an electrical engineer or a meteorologist')
 else:
-    B=dict(name='Axiom',pri='#4b3bd9',pri_d='#a99dff',acc='#8a5a00',acc_d='#ffd23f',gold='#ffd23f',
+    B=dict(name='Axiom',**{k:v for k,v in json.load(open(K+'src/brand.json'))['sites'][site.capitalize()].items() if k!='tint'},
         h1='Math, engineering and physics, one small win at a time.',
         sub='Short interactive lessons start with ideas a 5th grader already knows and climb to high-school exam level. Two tracks: Apex, from Algebra 1 through Calculus III, and Quanta, from 8th-grade physics through electrical engineering.',
-        tracks=[('Apex','Algebra 1 → Calculus III','#b4410a',[t['name'] for t in packs[0]['topics']]),('Quanta','Physics and electrical engineering','#0a6e8a',[t['name'] for t in packs[1]['topics']])],
+        tracks=[('Apex','Algebra 1 → Calculus III','#BC4749',[t['name'] for t in packs[0]['topics']]),('Quanta','Physics and electrical engineering','#0F4C5C',[t['name'] for t in packs[1]['topics']])],
         what='equations, proofs, similarity, polynomials, logarithms, trigonometry, limits, derivatives, circuits, motion, energy and waves',stations=False,
         exam='a high-school math or physics exam written by a mathematician, physicist or electrical engineer')
 for a,b_,m in [(B['pri'],'#ffffff',4.5),('#14213d','#fbfbf8',7),('#46506b','#fbfbf8',4.5),(B['acc'],'#fbfbf8',4.5),('#eef0fb','#10142b',7),(B['pri_d'],'#10142b',4.5),(B['acc_d'],'#10142b',4.5)]:
@@ -99,7 +99,7 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="{B['pri']}">
 <title>{html.escape(title)}</title><meta name="description" content="{d}"><meta property="og:title" content="{html.escape(title)}"><meta property="og:description" content="{d}"><meta property="og:type" content="website">
-<link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/site.css">{head}</head><body>
+<link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="stylesheet" href="/site.css">{head}</head><body>
 <a class="skip" href="#main">Skip to main content</a>
 <header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
 <main id="main" tabindex="-1">{body}</main>
@@ -295,7 +295,7 @@ W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/inde
 W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
-W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
+W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
