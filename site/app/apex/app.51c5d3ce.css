@@ -587,3 +587,17 @@ h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus,h3[tabindex="-1"]:focus,[data-fo
 svg [fill="#5b4bff"],svg [fill="#5B4BFF"]{fill:var(--pri)}svg [stroke="#5b4bff"],svg [stroke="#5B4BFF"]{stroke:var(--pri)}
 svg [fill^="rgba(91,75,255"]{fill:color-mix(in srgb,var(--pri) 28%,transparent)}svg [stroke^="rgba(91,75,255"]{stroke:color-mix(in srgb,var(--pri) 40%,transparent)}
 .lstage .lsvg{border:0;background:transparent}
+/* touch steppers (labbox.js): big − / + buttons and a tap-or-drag track instead of a thin slider */
+.lst{display:block!important;margin:12px 0}
+.lst>span{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:.95rem;margin-bottom:6px}
+.lst{position:relative}.lst>output{position:absolute;right:0;top:0;font:800 1.05rem var(--sans);color:var(--pri)}
+.lst>span+input,.lst>input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.lst output{font-variant-numeric:tabular-nums}
+.lstr{display:flex;align-items:center;gap:10px}
+.lstb{flex:none;width:48px;height:48px;border-radius:14px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--pri);font:800 24px/1 var(--sans);cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.lstb:active{transform:translateY(2px);border-bottom-width:2px}
+.ltrk{position:relative;flex:1;height:48px;border-radius:14px;background:var(--sunk);touch-action:none;cursor:pointer;overflow:visible}
+.ltrk i{position:absolute;left:0;top:0;bottom:0;border-radius:14px;background:color-mix(in srgb,var(--pri) 22%,transparent);pointer-events:none}
+.ltrk b{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--pri);border:3px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.35);pointer-events:none}
+/* option chips in a lab panel read as big tap tiles */
+.lpanel .chip,.lpanel [data-lc]{min-height:44px;padding:8px 14px;border-radius:14px}
