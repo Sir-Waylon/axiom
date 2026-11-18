@@ -19,6 +19,10 @@
   Cache-Control: no-cache
 /site.css
   Cache-Control: public, max-age=3600
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/app/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
 /app/app.*
   Cache-Control: public, max-age=31536000, immutable
 /app/*/app.*

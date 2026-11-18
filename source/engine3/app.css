@@ -1,7 +1,15 @@
 /* ===== app3: calm, friendly, game-like. light + dark ===== */
-:root{--bg:#f7f7f5;--surface:#fff;--sunk:#efefec;--ink:#1d2127;--mute:#626b78;--line:#e4e4df;--pri:#5b4bff;--pri-ink:#fff;--pri-soft:#eceaff;--ok:#0a6e43;--ok-soft:#dcf6ea;--bad:#b3263a;--bad-soft:#ffe6e9;--gold:#f0a000;--gold-soft:#fff2cf;--sel:#4a4de0;--sel-soft:#e8e9ff;--r:16px;--sh:0 1px 2px rgba(20,24,35,.06),0 8px 24px rgba(20,24,35,.06);--sans:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color-scheme:light}
+:root{--bg:#f7f7f5;--surface:#fff;--sunk:#efefec;--ink:#1d2127;--mute:#626b78;--line:#e4e4df;--pri:#5b4bff;--pri-ink:#fff;--pri-soft:#eceaff;--ok:#0a6e43;--ok-soft:#dcf6ea;--bad:#b3263a;--bad-soft:#ffe6e9;--gold:#f0a000;--gold-soft:#fff2cf;--sel:#4a4de0;--sel-soft:#e8e9ff;--r:16px;--sh:0 1px 2px rgba(20,24,35,.06),0 8px 24px rgba(20,24,35,.06);--sans:'Inter','Open Sans','Ubuntu',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--disp:'Inter Display','Inter','Open Sans','Ubuntu',system-ui,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color-scheme:light}
 :root[data-theme="dark"]{--bg:#12141a;--surface:#1b1e27;--sunk:#161922;--ink:#eceef3;--mute:#a1a9b8;--line:#2b303d;--pri-soft:#26254a;--ok:#4fd19b;--ok-soft:#14352a;--bad:#ff8590;--bad-soft:#3b1d22;--gold:#ffc24a;--gold-soft:#3a3013;--sel:#8e92ff;--sel-soft:#23264a;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color-scheme:dark}
 @media(prefers-color-scheme:dark){:root[data-theme="auto"]{--bg:#12141a;--surface:#1b1e27;--sunk:#161922;--ink:#eceef3;--mute:#a1a9b8;--line:#2b303d;--pri-soft:#26254a;--ok:#4fd19b;--ok-soft:#14352a;--bad:#ff8590;--bad-soft:#3b1d22;--gold:#ffc24a;--gold-soft:#3a3013;--sel:#8e92ff;--sel-soft:#23264a;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);color-scheme:dark}}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(__FONT__inter-400.woff) format('woff')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(__FONT__inter-500.woff) format('woff')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(__FONT__inter-600.woff) format('woff')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(__FONT__inter-700.woff) format('woff')}
+@font-face{font-family:'Inter Display';font-style:normal;font-weight:600;font-display:swap;src:url(__FONT__interd-600.woff) format('woff')}
+@font-face{font-family:'Inter Display';font-style:normal;font-weight:700;font-display:swap;src:url(__FONT__interd-700.woff) format('woff')}
+h1,h2,h3,.brand b{font-family:var(--disp);letter-spacing:-.012em}.chip,.timer,.odds td,.num{font-variant-numeric:tabular-nums}
+body{font-feature-settings:'calt' 1,'kern' 1}
 *{box-sizing:border-box}html{font-size:100%;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer}

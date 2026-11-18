@@ -6,11 +6,14 @@ out=sys.argv[1];packs=[a.split('=',1) for a in sys.argv[2:]]
 shutil.rmtree(out,ignore_errors=True);os.makedirs(out)
 css=open(d+'app.css',encoding='utf8').read()+open(d+'roster.css',encoding='utf8').read()+open(d+'widgets.css',encoding='utf8').read()
 rd=lambda f:open(d+f,encoding='utf8').read()
-ver=hashlib.sha1((css+''.join(rd(f) for f in os.listdir(d))).encode()).hexdigest()[:8]
+ver=hashlib.sha1((css+''.join(rd(f) for f in os.listdir(d) if os.path.isfile(d+f))).encode()).hexdigest()[:8]
 files=['sw.js','manifest.webmanifest','icon.svg','hub.css','index.html']
 ICON=('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#5b4bff"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>' if os.environ.get('HUBNAME')!='Axiom' else '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M0 0h64v44L44 64H0z" fill="#5b4bff"/><path d="M32 10 52 52H12z" fill="none" stroke="#fff" stroke-width="4"/><path d="M22 40h20" stroke="#ffd23f" stroke-width="4"/><circle cx="32" cy="28" r="3.5" fill="#ffd23f"/></svg>')
 open(out+'/icon.svg','w').write(ICON)
 open(out+'/manifest.webmanifest','w').write(json.dumps({"name":os.environ.get("APPNAME","Trainers"),"short_name":os.environ.get("APPNAME","Trainers"),"start_url":"./","display":"standalone","background_color":"#ffffff","theme_color":"#5b4bff","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}))
+GL={'circuit':'<path d="M35 8 19 36h12l-4 20 20-30H34z" fill="#fff"/>','meteorology':'<path d="M20 44a10 10 0 0 1 2-19 14 14 0 0 1 27 4 8 8 0 0 1-1 15z" fill="#fff"/><path d="M33 38 27 49h6l-2 8 9-12h-6l3-7z" fill="#ffd23f"/>','apex':'<path d="M32 10 52 52H12z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><circle cx="32" cy="34" r="4" fill="#ffd23f"/>','quanta':'<circle cx="32" cy="32" r="5" fill="#ffd23f"/><ellipse cx="32" cy="32" rx="22" ry="9" fill="none" stroke="#fff" stroke-width="3.5"/><ellipse cx="32" cy="32" rx="22" ry="9" fill="none" stroke="#fff" stroke-width="3.5" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="22" ry="9" fill="none" stroke="#fff" stroke-width="3.5" transform="rotate(120 32 32)"/>'}
+def tabicon(slug,col):
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="'+col+'"/>'+GL.get(slug,GL['circuit'])+'</svg>'
 allf=[]
 cards=''
 for slug,pp in packs:
@@ -24,13 +27,15 @@ for slug,pp in packs:
     js='(function(){"use strict";\n'+js+'\n})();' if os.environ.get('WRAP') else js
     hj=hashlib.sha1(js.encode()).hexdigest()[:8];hc=ver
     open(f'{D}/app.{hj}.js','w',encoding='utf8').write(js)
-    open(f'{D}/app.{hc}.css','w',encoding='utf8').write(css)
-    open(f'{D}/index.html','w',encoding='utf8').write(f'<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#5b4bff"><link rel="manifest" href="{P_}manifest.webmanifest"><link rel="icon" href="{P_}icon.svg"><title>{m["title"]}</title><link rel="stylesheet" href="app.{hc}.css"></head><body class="ok"><script src="app.{hj}.js"></script><script src="{P_}reg.js"></script></body></html>')
+    open(f'{D}/icon.svg','w').write(tabicon(slug,m.get('accent',['#5b4bff'])[0]))
+    open(f'{D}/app.{hc}.css','w',encoding='utf8').write(css.replace('__FONT__',P_+'fonts/' if not ROOT else 'fonts/'))
+    shutil.copytree(d+'fonts',out+'/fonts',dirs_exist_ok=True)
+    open(f'{D}/index.html','w',encoding='utf8').write(f'<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="{m.get('accent',['#5b4bff'])[0]}"><link rel="manifest" href="{P_}manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><title>{m["title"]}</title><link rel="stylesheet" href="app.{hc}.css"></head><body class="ok"><script src="app.{hj}.js"></script><script src="{P_}reg.js"></script></body></html>')
     allf+= [S_ or './',f'{S_}app.{hj}.js',f'{S_}app.{hc}.css']
     acc=m.get('accent',['#5b4bff','#eceaff']);cards+=f'<a class="c" href="{slug}/" style="--b:{acc[0]};--s:{acc[1]}"><i></i><div><b>{m.get("brand",m["title"])}</b><span>{m.get("tagline","")}</span></div></a>'
 open(out+'/reg.js','w').write("if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0)navigator.serviceWorker.register((document.currentScript.src.replace(/reg\\.js.*/,''))+'sw.js').catch(function(){});try{var h=location.hash,l=localStorage.getItem('vx:last');if((h==='#me'||h==='#practice')&&/^\\/app\\/?(index\\.html)?$/.test(location.pathname)&&l&&/^\\/app\\/[a-z0-9-]+\\/$/.test(l))location.replace(l+h)}catch(e){}")
 open(out+'/sw.js','w').write(f"""const V='tr-{ver}-{hashlib.sha1(''.join(allf).encode()).hexdigest()[:6]}';
-const PRE={json.dumps(list(dict.fromkeys(['./','icon.svg','manifest.webmanifest','hub.css','reg.js']+allf)))};
+const PRE={json.dumps(list(dict.fromkeys(['./','icon.svg','manifest.webmanifest','hub.css','reg.js']+['fonts/inter-400.woff','fonts/inter-600.woff','fonts/inter-700.woff','fonts/interd-700.woff']+allf)))};
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(V).then(c=>c.addAll(PRE)).then(()=>self.skipWaiting()))}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))}});
 self.addEventListener('fetch',e=>{{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin||new URL(r.url).pathname.startsWith('/api/'))return;
@@ -50,6 +55,8 @@ open(out+'/_headers','w').write("""/*
 /*/index.html
   Cache-Control: no-cache
 /*/app.*
+  Cache-Control: public, max-age=31536000, immutable
+/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 """)
 print('built',out,ver)

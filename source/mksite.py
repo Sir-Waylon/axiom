@@ -41,7 +41,14 @@ CSS='''
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10142b;--tx:#eef0fb;--mut:#b4b9d6;--card:#1a1f3f;--line:#2f3566;--pri:%(pri_d)s;--onpri:#10142b;--acc:%(acc_d)s;--soft:#222850;--ring:#ffd23f}}
 :root[data-theme=dark]{--bg:#10142b;--tx:#eef0fb;--mut:#b4b9d6;--card:#1a1f3f;--line:#2f3566;--pri:%(pri_d)s;--onpri:#10142b;--acc:%(acc_d)s;--soft:#222850;--ring:#ffd23f}
 [hidden]{display:none!important}*{box-sizing:border-box}html{-webkit-text-size-adjust:100%%;text-size-adjust:100%%;scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--tx);font:1rem/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/inter-400.woff) format('woff')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/inter-500.woff) format('woff')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/inter-600.woff) format('woff')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/inter-700.woff) format('woff')}
+@font-face{font-family:'Inter Display';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/interd-600.woff) format('woff')}
+@font-face{font-family:'Inter Display';font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/interd-700.woff) format('woff')}
+h1,h2,h3,.brand b{font-family:'Inter Display','Inter',system-ui,sans-serif;letter-spacing:-.012em}
+body{margin:0;background:var(--bg);color:var(--tx);font:1rem/1.6 "Inter","Open Sans","Ubuntu",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:var(--acc);text-underline-offset:3px}a:hover{text-decoration-thickness:2px}
 :focus-visible{outline:3px solid var(--ring);outline-offset:3px;border-radius:6px}
 .skip{position:absolute;left:12px;top:-60px;background:var(--pri);color:var(--onpri);padding:10px 16px;border-radius:10px;z-index:99;font-weight:700}.skip:focus{top:12px}
@@ -288,7 +295,7 @@ W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/inde
 W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
-W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg')
+W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
@@ -313,6 +320,10 @@ W('_headers',f"""/*
   Cache-Control: no-cache
 /site.css
   Cache-Control: public, max-age=3600
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/app/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
 /app/app.*
   Cache-Control: public, max-age=31536000, immutable
 /app/*/app.*
