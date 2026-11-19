@@ -601,3 +601,18 @@ svg [fill^="rgba(91,75,255"]{fill:color-mix(in srgb,var(--pri) 28%,transparent)}
 .ltrk b{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--pri);border:3px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.35);pointer-events:none}
 /* option chips in a lab panel read as big tap tiles */
 .lpanel .chip,.lpanel [data-lc]{min-height:44px;padding:8px 14px;border-radius:14px}
+/* ---- why.js: automatic explanation panel ---- */
+.deepx{margin:12px 0;padding:12px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
+.deepx .dxh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.wlp{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.wlp .seg{min-height:44px;border-radius:12px;padding:6px 14px}
+.wsw{margin:0 0 8px;font-size:.9rem;color:var(--mute)}
+.wdg{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,#d33f4f 12%,var(--surface));border-left:4px solid #d33f4f;margin:8px 0;font-size:.95rem}
+.wsec{margin:10px 0}.wsec h4{margin:0 0 2px;font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;color:var(--pri)}.wsec p{margin:0;line-height:1.5}
+.wvd summary{cursor:pointer;font-weight:700;color:var(--pri);padding:6px 0}
+.wvw{position:relative;margin:6px 0}.wv{width:100%;max-width:420px;display:block;margin:0 auto;background:var(--surface);border-radius:14px;border:1px solid var(--line)}
+.wv .s{stroke:var(--pri);stroke-width:3;fill:none;stroke-linecap:round}.wv .s2{stroke:var(--mute);stroke-width:3;fill:none;stroke-linecap:round}
+.wv .g{stroke:var(--line);stroke-width:1.5;fill:none}.wv .g2{stroke:var(--mute);stroke-width:1.5;fill:none}.wv .g3{stroke:var(--line);stroke-width:1.2;fill:none;stroke-dasharray:3 3}
+.wv .f{fill:color-mix(in srgb,var(--pri) 30%,transparent);stroke:var(--pri);stroke-width:2}.wv .f2{fill:color-mix(in srgb,var(--pri) 22%,transparent);stroke:var(--pri);stroke-width:2}
+.wv .dot{fill:var(--pri)}.wv .hole{fill:var(--surface);stroke:var(--pri);stroke-width:2.5}.wv .k{stroke:var(--mute)}.wv .bk{fill:var(--surface);stroke:var(--mute);stroke-width:2}.wv .rz{stroke:var(--mute);stroke-width:2.5;fill:none}
+.wv .t{font:700 12px var(--sans);fill:var(--ink)}.wv .t2{font:600 9.5px var(--sans);fill:var(--mute)}
+.wrp{position:absolute;right:6px;top:6px;min-height:32px;padding:2px 10px;font-size:.8rem}

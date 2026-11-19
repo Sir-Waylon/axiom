@@ -76,3 +76,9 @@ Findings (script: audit_honors.py in the kit):
 - Few level-3 (exam-hardest) items in iv, id, ti, cn.
 Action: src/mkhonors.py generates verified items (answers computed with Python math, never hand-typed), merged by applyextra into apex-math. First batch = 109 questions (82 typed, 23 multiple choice, 2 ordering, 2 matching) across 14 topics, each with concept-first multi-step solutions.
 Still open: expand thin existing solutions (936), more level-3 items, and a pass comparing topic order with the PAUSD honors course outline. The Geometry Honors textbook and symbolic logic slides remain reference only.
+
+## Automatic explanations after a wrong answer (Nov 18 2026)
+- Behaviour: a wrong answer shows "Not yet" for about one second, then the review opens by itself (not in mock exams, untimed no-feedback sessions, or auto-advance mode).
+- engine3/why.js adds, above the step-by-step solution: (1) a diagnosis of the likely slip for numeric answers (sign, factor of 2, power of ten, degrees vs radians, reciprocal, off by one, rounding); (2) the subject mental model, analogy and common trap from engine3/whydata.js (written per topic for all Apex and Quanta topics; Circuit and Meteorology reuse the lesson "Go deeper" text); (3) a small animated picture for topics where motion helps (balance, slope, growth, area, parabola, right triangle, unit circle, sine wave, limit, derivative, integral, histogram, projectile, pendulum, travelling wave, vectors, current loop, pressure); animations are removed when reduced-motion is on.
+- "How I learn" switch: Picture / Steps / Story / Quick, saved on the device (S.lp). A second miss on the same question switches the style on purpose and says so.
+- Limitations: the picture set is generic per topic (not per question); Circuit/Meteorology topics without a matching lesson card show no concept text; no per-option explanation of why a chosen wrong choice is wrong yet.
