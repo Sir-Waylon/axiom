@@ -73,6 +73,8 @@ function panel(q,it){
  else if(m==='story')h+=sec('Think of it like this',ana)+sec('The idea',idea)+(v||'')+sec('Watch out',trap);
  else h+=sec('The idea',idea)+sec('Watch out',trap)+(v?('<details class="wvd"><summary>Watch it (animation)</summary>'+v+'</details>'):'')+sec('Think of it like this',ana);
  return h+'</div>'}
+/* topic overview for lesson cards that have no card-level Go-deeper text yet (Apex, Quanta) */
+window.topicDD=function(z){var id=z&&z.unit&&z.unit.id,w=id&&WHY[id];if(!w)return null;return {why:w[0],analogy:w[1],trap:w[2],vis:vis(id,!!(window.A11&&A11.rm))}};
 /* ---- hook into the review screen ---- */
 var _d=drawSess;
 drawSess=function(){_d.apply(this,arguments);try{

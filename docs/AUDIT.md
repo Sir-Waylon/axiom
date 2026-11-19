@@ -82,3 +82,8 @@ Still open: expand thin existing solutions (936), more level-3 items, and a pass
 - engine3/why.js adds, above the step-by-step solution: (1) a diagnosis of the likely slip for numeric answers (sign, factor of 2, power of ten, degrees vs radians, reciprocal, off by one, rounding); (2) the subject mental model, analogy and common trap from engine3/whydata.js (written per topic for all Apex and Quanta topics; Circuit and Meteorology reuse the lesson "Go deeper" text); (3) a small animated picture for topics where motion helps (balance, slope, growth, area, parabola, right triangle, unit circle, sine wave, limit, derivative, integral, histogram, projectile, pendulum, travelling wave, vectors, current loop, pressure); animations are removed when reduced-motion is on.
 - "How I learn" switch: Picture / Steps / Story / Quick, saved on the device (S.lp). A second miss on the same question switches the style on purpose and says so.
 - Limitations: the picture set is generic per topic (not per question); Circuit/Meteorology topics without a matching lesson card show no concept text; no per-option explanation of why a chosen wrong choice is wrong yet.
+
+## Nov 18 follow-up
+- "Go deeper" on lesson cards: cards with no card-level text (all Apex cards except 11, all Quanta except 5) now show a Topic overview (mental model, analogy, trap, animated picture) from whydata.js, labelled "topic overview" so it is not mistaken for card-specific text. Card-level text still takes priority.
+- Rounded corners: one scale (12 small, 16 medium, 20 large, pill) appended to app.css.
+- Accent colour is inlined in each trainer's head so the first paint no longer flashes the old purple.

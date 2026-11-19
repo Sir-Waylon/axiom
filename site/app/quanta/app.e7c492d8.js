@@ -3582,7 +3582,7 @@ var _d=drawSess;
 function sec(h,body){return body?'<div class="ddx"><h4>'+h+'</h4>'+body+'</div>':''}
 function para(t){return '<p>'+esc(t)+'</p>'}
 function ddHTML(dd){var h='';
- h+=sec('Why it works',dd.why?para(dd.why):'');
+ h+=sec('Why it works',dd.why?para(dd.why):'');if(dd.vis)h+=sec('Watch it',dd.vis);
  h+=sec('Picture it',dd.pic?para(dd.pic):'');
  h+=sec('Think of it like this',dd.analogy?para(dd.analogy):'');
  if(dd.ways&&dd.ways.length)h+=sec('Another way to see it',dd.ways.map(function(w){return '<p><b>'+esc(w[0])+':</b> '+esc(w[1])+'</p>'}).join(''));
@@ -3590,8 +3590,8 @@ function ddHTML(dd){var h='';
  h+=sec('Watch out',dd.trap?para(dd.trap):'');
  h+=sec('Remember it',dd.tip?para(dd.tip):'');
  return h}
-drawSess=function(){_d.apply(this,arguments);try{var z=Z;if(!z||z.fin)return;var st=z.steps[z.i];if(!st||st.k!=='card'||!st.c||!st.c.dd)return;var s=document.getElementById('sess'),card=s&&s.querySelector('.lesson-card');if(!card||card.querySelector('.dd'))return;
- var d=document.createElement('details');d.className='dd';d.innerHTML='<summary>Go deeper <span class="small mute">optional</span></summary><div class="ddb">'+ddHTML(st.c.dd)+'</div>';card.appendChild(d)}catch(e){}};
+drawSess=function(){_d.apply(this,arguments);try{var z=Z;if(!z||z.fin)return;var st=z.steps[z.i];if(!st||st.k!=='card'||!st.c)return;var dd=st.c.dd||(window.topicDD&&topicDD(z));if(!dd)return;var s=document.getElementById('sess'),card=s&&s.querySelector('.lesson-card');if(!card||card.querySelector('.dd'))return;
+ var d=document.createElement('details');d.className='dd';d.innerHTML='<summary>Go deeper <span class="small mute">'+(st.c.dd?'optional':'topic overview')+'</span></summary><div class="ddb">'+ddHTML(dd)+'</div>';card.appendChild(d)}catch(e){}};
 })();
 
 /* Ordering questions: drag cards by the dots into numbered boxes (touch and mouse). Taps still work; up/down arrows reorder for keyboards. */
@@ -4855,6 +4855,8 @@ function panel(q,it){
  else if(m==='story')h+=sec('Think of it like this',ana)+sec('The idea',idea)+(v||'')+sec('Watch out',trap);
  else h+=sec('The idea',idea)+sec('Watch out',trap)+(v?('<details class="wvd"><summary>Watch it (animation)</summary>'+v+'</details>'):'')+sec('Think of it like this',ana);
  return h+'</div>'}
+/* topic overview for lesson cards that have no card-level Go-deeper text yet (Apex, Quanta) */
+window.topicDD=function(z){var id=z&&z.unit&&z.unit.id,w=id&&WHY[id];if(!w)return null;return {why:w[0],analogy:w[1],trap:w[2],vis:vis(id,!!(window.A11&&A11.rm))}};
 /* ---- hook into the review screen ---- */
 var _d=drawSess;
 drawSess=function(){_d.apply(this,arguments);try{

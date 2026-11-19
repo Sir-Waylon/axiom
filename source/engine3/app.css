@@ -309,3 +309,9 @@ details.dd>summary::-webkit-details-marker{display:none}details.dd>summary::befo
 .dgh{position:fixed;z-index:200;pointer-events:none;padding:10px 14px;border-radius:12px;background:var(--surface);border:2px solid var(--pri);box-shadow:0 10px 26px rgba(20,24,40,.28);font-weight:600;opacity:.95;transform:rotate(-1.5deg)}
 #frq{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:120;max-width:420px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;padding:12px 14px;border-radius:14px;background:var(--ink);color:var(--bg);box-shadow:0 12px 30px rgba(20,24,40,.35);animation:sup .22s ease-out both}
 #frq .frqb{display:flex;gap:8px}#frq .btn.sec{background:transparent;color:var(--bg);border-color:rgba(255,255,255,.5)}
+/* ---- final pass: one rounded-corner scale (12 small, 16 medium, 20 large, pill) ---- */
+:root{--r:20px;--r-s:12px;--r-m:16px}
+input,select,textarea,.tag,details,.fml,.step,.help,.ddx,.explain .step,.fig,.figw,kbd,code,.smenu,.mi,.toast,table{border-radius:var(--r-s)}
+.sheet{border-radius:22px 22px 0 0}.sheet.plain{border-radius:0}
+.sheet .btn,.card .btn,.opt,.slot,.bank .it{border-radius:var(--r-m)}
+summary{border-radius:var(--r-s)}
