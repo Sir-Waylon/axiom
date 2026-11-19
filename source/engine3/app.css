@@ -315,3 +315,7 @@ input,select,textarea,.tag,details,.fml,.step,.help,.ddx,.explain .step,.fig,.fi
 .sheet{border-radius:22px 22px 0 0}.sheet.plain{border-radius:0}
 .sheet .btn,.card .btn,.opt,.slot,.bank .it{border-radius:var(--r-m)}
 summary{border-radius:var(--r-s)}
+/* compact ordering slots on short screens so the item bank stays in view */
+@media(max-height:800px){.slots{gap:6px;padding:8px}.slot{min-height:42px;padding:2px 8px 2px 6px}.slot .n{width:24px;height:24px;font-size:.8rem}}
+/* narrow phones: tighter header chips so the trainer name is not clipped */
+@media(max-width:400px){.bar-in{gap:6px}.bar-in .chip,.bar-in .pill,.bar-in [id=hst],.bar-in [id=hco]{padding:4px 8px;gap:4px}.bar-in .brand img,.bar-in .brand svg{width:30px;height:30px}}
