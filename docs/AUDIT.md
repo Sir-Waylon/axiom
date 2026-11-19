@@ -87,3 +87,11 @@ Still open: expand thin existing solutions (936), more level-3 items, and a pass
 - "Go deeper" on lesson cards: cards with no card-level text (all Apex cards except 11, all Quanta except 5) now show a Topic overview (mental model, analogy, trap, animated picture) from whydata.js, labelled "topic overview" so it is not mistaken for card-specific text. Card-level text still takes priority.
 - Rounded corners: one scale (12 small, 16 medium, 20 large, pill) appended to app.css.
 - Accent colour is inlined in each trainer's head so the first paint no longer flashes the old purple.
+
+## KaTeX (Nov 18 2026)
+- Loaded from jsDelivr, pinned to 0.16.11, in each trainer head (CSS + two deferred scripts). engine3/math.js typesets new screens as they appear (MutationObserver, throttled, no re-render loop). Delimiters: \( \), \[ \], $$ $$. Single $ is not a delimiter (money questions).
+- Not used: the integrity="sha384-..." values supplied in the request. They are not valid SRI digests, and a wrong digest makes the browser refuse the file, so math would never load. To add SRI, copy the real hashes from https://katex.org/docs/browser or compute them from the downloaded files and add them to the three tags in build_open.py.
+- The inline onload="renderMathInElement(...)" from the snippet cannot run under our CSP (no inline scripts); math.js does the same job.
+- CSP now allows https://cdn.jsdelivr.net/npm/katex@0.16.11/ for script, style and fonts. Privacy page lists jsDelivr. Offline/blocked: plain text remains.
+- Safer later option: self-host KaTeX under engine3/vendor and drop the third-party host (students' IPs would then never reach a CDN).
+- Content migration still to do: existing questions use Unicode (x², √, π). Write new maths as \(x^2\) and convert gradually.
