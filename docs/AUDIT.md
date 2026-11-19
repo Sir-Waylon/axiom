@@ -95,3 +95,8 @@ Still open: expand thin existing solutions (936), more level-3 items, and a pass
 - CSP now allows https://cdn.jsdelivr.net/npm/katex@0.16.11/ for script, style and fonts. Privacy page lists jsDelivr. Offline/blocked: plain text remains.
 - Safer later option: self-host KaTeX under engine3/vendor and drop the third-party host (students' IPs would then never reach a CDN).
 - Content migration still to do: existing questions use Unicode (x², √, π). Write new maths as \(x^2\) and convert gradually.
+
+## Apex honors batch 2 (Nov 18 2026)
+src/mkhonors2.py: 75 more computed items (41 level 2, 34 level 3): composition, inverses, transformations, even/odd, vertex form, complex modulus and conjugates, remainder/factor theorem, end behaviour, rational equations and domains, half-life, change of base, log equations with extraneous roots, geometric sums, recursive sequences, sigma notation, radian conversion, graph equations from amplitude/period, half-angle and double-angle, inverse trig ranges, Law of Sines/Cosines choice, conic equations, polar and parametric. Types: 49 typed, 22 multiple choice, 3 select-all, 1 ordering. Honors-range total added so far: 184 (batch 1 + 2). Regression: all four trainers bad = 0.
+Note: numeric tolerance `tol` is relative, so rounded decimals with small values need tol of about 0.004.
+Still open: thin solutions on the original 936, matching items in batch 2, and an outline check against the PAUSD honors syllabus.

@@ -16,7 +16,7 @@ python3 src_met/mkmet.py events/meteorology-b/pack.json >/dev/null;python3 src/a
 for t in apex:apex-math quanta:quanta-physics; do k=${t%%:*}; d=${t##*:}; python3 src_adv/mkadv.py $k events/$d/pack.json >/dev/null; python3 src/shortify.py events/$d/pack.json; python3 src/mkunits.py events/$d/pack.json >/dev/null; done
 for t in circuit-lab-b:wid_circuit geometry-readiness:wid_geo meteorology-b:wid_met apex-math:wid_apex quanta-physics:wid_quanta; do python3 src/applywid.py events/${t%%:*}/pack.json ${t##*:}; done
 python3 src/scen.py events/geometry-readiness/pack.json && python3 src/scen.py events/apex-math/pack.json
-python3 src/mkhonors.py && python3 src/applyextra.py events/apex-math/pack.json 'src/audit_apex/*.json'
+python3 src/mkhonors.py && python3 src/mkhonors2.py && python3 src/applyextra.py events/apex-math/pack.json 'src/audit_apex/*.json'
 python3 - <<'P'
 import json
 for f,b,t,a in [('apex-math','Apex','Algebra 2 → Calculus',['#BC4749','#F7E9D7']),('quanta-physics','Quanta','Electrical engineering and physics',['#0F4C5C','#FFE9D2'])]:
