@@ -4,6 +4,9 @@ sys.path.insert(0,os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','
 from gen import *
 import figs
 def ri(a,b):return R.randint(a,b)
+def at(v,a):
+    # engine tolerance is RELATIVE; convert an absolute +/-a into a relative tolerance (exact match when v is 0)
+    return 0 if not v else round(a/abs(v)+0.0005,4)
 DIR=[('north',0),('northeast',45),('east',90),('southeast',135),('south',180),('southwest',225),('west',270),('northwest',315)]
 def _bad(good,pool,n=3):
     o=[x for x in pool if x!=good];R.shuffle(o);return o[:n]
@@ -34,10 +37,10 @@ def th1():
 def th2():
     m=ri(1,8);return NUM('light',2,'th2',f"Lightning is about {m} miles away. About how many seconds should pass between flash and thunder?",m*5,["1 mile ≈ 5 seconds.",f"{m} × 5 = {m*5}."],b=0)
 def cb1():
-    T=ri(50,95);dep=ri(2,25);return NUM('clouds',2,'cb1',f"Surface temperature is {T}°F and dew point is {T-dep}°F. Estimate the cloud base height above ground (ft). (About 400 ft per °F of spread.)",dep*400,["Spread = T − Td.",f"{T} − {T-dep} = {dep} °F.",f"{dep} × 400 = {dep*400} ft."],tol=1,b=.5)
+    T=ri(50,95);dep=ri(2,25);return NUM('clouds',2,'cb1',f"Surface temperature is {T}°F and dew point is {T-dep}°F. Estimate the cloud base height above ground (ft). (About 400 ft per °F of spread.)",dep*400,["Spread = T − Td.",f"{T} − {T-dep} = {dep} °F.",f"{dep} × 400 = {dep*400} ft."],tol=0.05,b=.5)
 def wc1():
     T=R.choice([20,10,0,-10,5,15]);V=R.choice([10,15,20,25,30]);wc=35.74+0.6215*T-35.75*V**.16+0.4275*T*V**.16
-    return NUM('winter',3,'wc1',f"NWS wind chill formula: 35.74 + 0.6215T − 35.75V^0.16 + 0.4275TV^0.16. Find the wind chill (nearest °F) for T = {T}°F and wind V = {V} mph.",round(wc),["Plug into the formula; compute V^0.16 first.",f"V^0.16 = {V**.16:.3f}.",f"Result ≈ {wc:.1f} → {round(wc)}."],tol=1.01,b=1.4)
+    return NUM('winter',3,'wc1',f"NWS wind chill formula: 35.74 + 0.6215T − 35.75V^0.16 + 0.4275TV^0.16. Find the wind chill (nearest °F) for T = {T}°F and wind V = {V} mph.",round(wc),["Plug into the formula; compute V^0.16 first.",f"V^0.16 = {V**.16:.3f}.",f"Result ≈ {wc:.1f} → {round(wc)}."],tol=at(round(wc),0.5),b=1.4)
 def ef1():
     ws=R.choice([70,80,90,100,120,130,150,160,175,190,210]);ef=0 if ws<=85 else 1 if ws<=110 else 2 if ws<=135 else 3 if ws<=165 else 4 if ws<=200 else 5
     return MC('torn',2,'ef1',f"A tornado's estimated peak wind is {ws} mph. What is its EF rating? (EF0 65–85, EF1 86–110, EF2 111–135, EF3 136–165, EF4 166–200, EF5 over 200)",f"EF{ef}",[f"EF{k}" for k in range(6) if k!=ef][:3] if ef not in(1,2) else [f"EF{k}" for k in range(6) if k!=ef][1:4],[f"Find {ws} mph in the table.",f"It fits EF{ef}."],b=.2)
@@ -57,18 +60,18 @@ def rp1():
     t=R.choice([2,5,10,25,50,100]);return NUM('precip',2,'rp1',f"A {t}-year flood has what percent chance of happening in any single year?",100/t,["Annual chance = 1 ÷ return period.",f"1 ÷ {t} = {100/t:g}%."],tol=.02,b=.2)
 def rp2():
     n=R.choice([10,30,50]);p=round((1-.99**n)*100)
-    return NUM('precip',3,'rp2',f"A 100-year flood has a 1% chance each year. What is the chance (nearest %) of at least one in {n} years?",p,["P(none) = 0.99^n.",f"0.99^{n} = {.99**n:.3f}.",f"1 − {.99**n:.3f} = {1-.99**n:.2f} → {p}%."],tol=1.01,b=1.3)
+    return NUM('precip',3,'rp2',f"A 100-year flood has a 1% chance each year. What is the chance (nearest %) of at least one in {n} years?",p,["P(none) = 0.99^n.",f"0.99^{n} = {.99**n:.3f}.",f"1 − {.99**n:.3f} = {1-.99**n:.2f} → {p}%."],tol=at(p,0.5),b=1.3)
 def mo1():
     dist=ri(20,150);sp=R.choice([15,20,25,30,40,50]);t=dist/sp
     return NUM('tstorm',2,'mo1',f"A storm is {dist} miles away and moves toward you at {sp} mph. How long until it arrives (hours, nearest tenth)?",round(t,1),["time = distance ÷ speed.",f"{dist} ÷ {sp} = {t:.2f} h."],tol=.06,b=.3)
 def cf1():
-    F=R.choice([-10,0,14,32,50,68,86,95,104]);return NUM('dh',1,'cf1',f"Convert {F}°F to °C (nearest degree).",round((F-32)*5/9),["C = (F − 32) × 5/9.",f"({F} − 32) × 5/9 = {(F-32)*5/9:.1f}."],tol=1.01,b=0)
+    F=R.choice([-10,0,14,32,50,68,86,95,104]);return NUM('dh',1,'cf1',f"Convert {F}°F to °C (nearest degree).",round((F-32)*5/9),["C = (F − 32) × 5/9.",f"({F} − 32) × 5/9 = {(F-32)*5/9:.1f}."],tol=at(round((F-32)*5/9),0.5),b=0)
 def cf2():
-    C=R.choice([-20,-5,0,10,20,25,30,35,40]);return NUM('dh',1,'cf2',f"Convert {C}°C to °F.",C*9/5+32,["F = C × 9/5 + 32.",f"{C} × 9/5 + 32 = {C*9/5+32:g}."],tol=.6,b=0)
+    C=R.choice([-20,-5,0,10,20,25,30,35,40]);return NUM('dh',1,'cf2',f"Convert {C}°C to °F.",C*9/5+32,["F = C × 9/5 + 32.",f"{C} × 9/5 + 32 = {C*9/5+32:g}."],tol=at(C*9/5+32,0.6),b=0)
 def pr1():
     mb=R.choice([960,980,1000,1013,1020,1030]);return NUM('maps',3,'pr1',f"Convert {mb} millibars to inches of mercury (nearest hundredth). (1 inHg = 33.86 mb)",round(mb/33.8639,2),["inHg = mb ÷ 33.86.",f"{mb} ÷ 33.86 = {mb/33.8639:.2f}."],tol=.03,b=1)
 def kt1():
-    k=R.choice([20,35,50,65,80,100]);return NUM('winds',2,'kt1',f"Convert {k} knots to mph (nearest whole). (1 knot ≈ 1.15 mph)",round(k*1.15),["mph = knots × 1.15.",f"{k} × 1.15 = {k*1.15:.1f}."],tol=1.01,b=.1)
+    k=R.choice([20,35,50,65,80,100]);return NUM('winds',2,'kt1',f"Convert {k} knots to mph (nearest whole). (1 knot ≈ 1.15 mph)",round(k*1.15),["mph = knots × 1.15.",f"{k} × 1.15 = {k*1.15:.1f}."],tol=at(round(k*1.15),0.5),b=.1)
 def lr1():
     h=ri(1,9)*1000;return NUM('upper',3,'lr1',f"A rising dry (unsaturated) air parcel cools about 5.5°F per 1000 ft. By how many °F does it cool rising {h} ft?",h/1000*5.5,["Dry adiabatic rate ≈ 5.5°F per 1000 ft.",f"{h//1000} × 5.5 = {h/1000*5.5:g}."],tol=.06,b=.6)
 def sw1():
