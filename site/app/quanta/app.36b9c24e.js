@@ -627,12 +627,29 @@ function nextAdaptiveOld(){
  var order=[z.lvl,z.lvl===1?2:z.lvl-1,3,2,1];
  for(var k=0;k<order.length;k++){var ids=pickPool([t],1,[order[k]]).filter(function(id){return z.seenQ.indexOf(id)<0});if(ids.length)return ids[0]}
  var any=pickPool(z.topics,3).filter(function(id){return z.seenQ.indexOf(id)<0});return any[0]}
-function lessonSteps(u,L){var st=[],have={};
- L.cards.forEach(function(c){st.push({k:'card',c:c});var id=c.q;if(!id){var cw=W3(c.h+' '+c.t),bs=1,bq=null;QS.forEach(function(q){if(q.t!==u.id||q.l>2||(q.type!=='mcq'&&q.type!=='short')||have[q.id])return;var s=overlap(cw,W3(q.q));if(s>bs){bs=s;bq=q.id}});id=bq}
-  if(id){have[id]=1;st.push({k:'try',it:mkItem(id)})}});return st}
+/* Lessons adapt to what the student already knows:
+   new    = not yet learned: teach (card), show a worked example, then a try
+   build  = partly known: card, then a try
+   review = already learned or mastered: retrieval first (try before the card); the card only comes back as a refresher after a miss, then one stretch question */
+function lessonMode(u,L){var m=mastery(u.id),dn=S.un[u.id]&&S.un[u.id].d&&S.un[u.id].d[L.id];
+ if(dn||(m.n>=8&&m.acc>=.75))return 'review';if(m.n>=4&&m.acc>=.55)return 'build';return 'new'}
+var LMODE={new:'New material',build:'Building up',review:'Quick revision'};
+function lessonSteps(u,L,mode){var st=[],have={};mode=mode||lessonMode(u,L);
+ L.cards.forEach(function(c){var id=c.q,ex=null,cw=W3(c.h+' '+c.t),rk=[];
+  QS.forEach(function(q){if(q.t!==u.id||q.l>2||(q.type!=='mcq'&&q.type!=='short')||have[q.id])return;rk.push([overlap(cw,W3(q.q)),q])});
+  rk.sort(function(a,b){return b[0]-a[0]||a[1].l-b[1].l});
+  if(!id&&rk.length&&rk[0][0]>1){var tr=rk[0][1];if(mode==='new'){var lo=rk.filter(function(r){return r[0]>1&&r[1].l===1})[0];if(lo)tr=lo[1]}id=tr.id}
+  if(mode==='new'){var tq=id&&QS[QI[id]],lim=tq?tq.l:2;var e=rk.filter(function(r){return r[1].id!==id&&r[1].sol&&r[1].sol.length>=2&&r[1].l<=lim})[0];if(e)ex=e[1].id}
+  var ut=u.title+' · '+LMODE[mode];
+  if(mode==='review'&&id){have[id]=1;st.push({k:'try',it:mkItem(id),refresh:c,ut:ut});return}
+  st.push({k:'card',c:c,ut:ut});
+  if(ex){have[ex]=1;st.push({k:'explain',it:mkItem(ex),ex:1,solo:1,st:0,sh:1})}
+  if(id){have[id]=1;st.push({k:'try',it:mkItem(id)})}});
+ if(mode==='review'){var hard=pickPool([u.id],6,[3]).concat(pickPool([u.id],6,[2])).filter(function(i){return !have[i]})[0];if(hard)st.push({k:'try',it:mkItem(hard),ut:u.title+' · Stretch'})}
+ return st}
 function startLesson(uid,lid){
- var u=UN.filter(function(x){return x.id===uid})[0],L=u.lessons.filter(function(x){return x.id===lid})[0];
- startSess({kind:'lesson',title:L.title,unit:u,lesson:L,steps:lessonSteps(u,L),remed:true})}
+ var u=UN.filter(function(x){return x.id===uid})[0],L=u.lessons.filter(function(x){return x.id===lid})[0],mode=lessonMode(u,L);
+ startSess({kind:'lesson',title:L.title,unit:u,lesson:L,lmode:mode,steps:lessonSteps(u,L,mode),remed:true})}
 function startUnitTest(uid){
  var u=UN.filter(function(x){return x.id===uid})[0];
  var ids=mixByLevel([uid],8,[.35,.4,.25]);
@@ -655,7 +672,7 @@ function resolveIt(it){
  if(!it.follow&&!it.cnt){it.cnt=1;Z.doneM++}
  if(it.ok){burst();xpFloat(it.gain)}}
 function advance(){
- if(!Z)return;var s0=Z.steps[Z.i];if(s0){if(s0.k==='card'&&!s0.cnt){s0.cnt=1;Z.doneM++}else if(s0.k==='try'&&!s0.follow&&s0.it&&!s0.it.cnt&&(Z.nofb||s0.it.done)){s0.it.cnt=1;Z.doneM++}}Z.i++;
+ if(!Z)return;var s0=Z.steps[Z.i];if(s0){if(s0.k==='card'&&!s0.cnt){s0.cnt=1;Z.doneM++}else if(s0.k==='try'&&!s0.follow&&s0.it&&!s0.it.cnt&&(Z.nofb||s0.it.done)){s0.it.cnt=1;Z.doneM++}if(s0.k==='try'&&s0.refresh&&!s0.rf&&s0.it.done&&!s0.it.ok){s0.rf=1;Z.steps.splice(Z.i+1,0,{k:'card',c:s0.refresh,ut:(Z.unit?Z.unit.title:'')+' · Refresher'});Z.mains++}}Z.i++;
  if(Z.adaptive&&Z.i>=Z.steps.length&&Z.seenQ.length<Z.N)appendAdaptive();
  if(Z.i>=Z.steps.length)return finishSess();
  drawSess();window.scrollTo(0,0)}
@@ -690,7 +707,7 @@ function drawSess(){
  else if(st.k==='explain'){var it=st.it,q=it.q,hc=helpCard(q);
   if(st.ex){var q2=st.it.q;h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,'think',52)+'<h2>Worked example</h2></div>'+(q2.svg?'<div class="fig">'+q2.svg+'</div>':'')+'<p class="lc" style="font-size:1.1rem"><b>'+esc(q2.q)+'</b></p>';
    var ss=q2.sol&&q2.sol.length?q2.sol:[q2.w||''];ss.slice(0,st.sh).forEach(function(t,k){h+='<div class="step"><b>Step '+(k+1)+'</b> '+clz(t,k===st.sh-1)+'</div>'});var mr=st.sh<ss.length;if(!mr)h+='<p class="small"><b>Answer:</b> '+esc(ansText(q2))+'</p>';
-   sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(mr?'exs':'exb')+'">'+(mr?'Next step':'Back to my question')+'</button></div></div></div>';h+='</div>'}
+   sheet='<div class="sheet plain"><div class="sheet-in"><div><button class="btn block" id="'+(mr?'exs':'exb')+'">'+(mr?'Next step':(st.solo?'Now you try':'Back to my question'))+'</button></div></div></div>';h+='</div>'}
   else if(st.simple){var qs=st.it.q,hs=helpCard(qs),mn=qs.type==='mcq'||qs.type==='multi'?st.it.sel.map(function(i){return qs.o[i]}).join('; '):qs.type==='short'?st.it.val:'',sl=qs.sol&&qs.sol.length?qs.sol:(qs.w?[qs.w]:[]);
    h+='<div class="card explain"><div class="row">'+mascot(S.cos.on.av,st.it.ok?'cheer':'think',52)+'<h2>'+(st.it.ok?'Why that works':'How to get it')+'</h2></div>'+(qs.svg?'<div class="fig">'+qs.svg+'</div>':'')+'<p class="lc" style="font-size:1.05rem"><b>'+esc(qs.q)+'</b></p><p class="small mute">'+(mn?'You answered <b>'+esc(mn)+'</b>. ':'')+'Correct: <b>'+esc(ansText(qs))+'</b></p>';
    if(hs)h+='<div class="step"><b>Key idea · '+esc(hs.h)+'</b><p class="lc" style="font-size:1.05rem">'+esc(hs.t)+'</p>'+(hs.f?'<div class="fml">'+esc(hs.f)+'</div>':'')+'</div>';
@@ -745,7 +762,7 @@ document.addEventListener('click',function(e){
  if(z.menu&&!t.closest('.smenu')&&id!=='smn'){z.menu=0;var mm=s.querySelector('.smenu');if(mm)mm.remove();var mb=$('smn');if(mb)mb.setAttribute('aria-expanded','false')}
  if(id==='smn'){z.menu=!z.menu;drawSess();return}
  if(id==='go'){advance();return}
- if(st.k==='explain'){if(id==='exd'){var srcd=st.src,wasOk=st.it.ok,itd=st.it,sk=st.skipq;Z.steps.splice(Z.i,1);Z.i=srcd;if(!wasOk&&sk)requeue(itd);advance();return}if(id==='exb'){var src=st.src;Z.steps.splice(Z.i,1);Z.i=src;drawSess();return}if(id==='exq'){var ez=easier(st.it.q);Z.seenQ.push(ez);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(ez),follow:true,scaf:true},{k:'explain',it:st.it,st:1,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}else if(id==='exn'){st.st=1;drawSess()}else if(id==='exs'){st.sh++;drawSess()}else if(id==='exf'){retryThen(st.it)}return}
+ if(st.k==='explain'){if(id==='exd'){var srcd=st.src,wasOk=st.it.ok,itd=st.it,sk=st.skipq;Z.steps.splice(Z.i,1);Z.i=srcd;if(!wasOk&&sk)requeue(itd);advance();return}if(id==='exb'){if(st.solo){Z.steps.splice(Z.i,1);drawSess();window.scrollTo(0,0);return}var src=st.src;Z.steps.splice(Z.i,1);Z.i=src;drawSess();return}if(id==='exq'){var ez=easier(st.it.q);Z.seenQ.push(ez);Z.steps.splice(Z.i+1,0,{k:'try',it:mkItem(ez),follow:true,scaf:true},{k:'explain',it:st.it,st:1,sh:1});Z.i++;drawSess();window.scrollTo(0,0)}else if(id==='exn'){st.st=1;drawSess()}else if(id==='exs'){st.sh++;drawSess()}else if(id==='exf'){retryThen(st.it)}return}
  var it=st.it,q=it.q;
  var o=t.closest('.opt');
  if(o&&!it.done){var oi=+o.dataset.oi,k=it.sel.indexOf(oi);

@@ -103,3 +103,9 @@ Still open: thin solutions on the original 936, matching items in batch 2, and a
 
 ## Thin Apex solutions (Nov 18 2026)
 src/mkenrich.py adds a concept-first "Idea:" step to very short solutions, chosen by question shape (46 rules: Vieta, percent growth, half-life, log meaning, arithmetic vs geometric sequences, sectors, asymptotes, polar to rectangular, and so on). 803 of the 936 thin honors-range solutions now start with the idea; 141 remain thin and need hand-written reasoning. The lead-ins are general to the problem type and never state anything about the specific numbers.
+
+## Nov 20: adaptive lessons, tolerance fix, KaTeX loading
+- Lessons now adapt to mastery (engine3/session.js `lessonMode`): **new** = card → worked example (stepwise reveal) → easy try; **build** = card → try; **review** (lesson done, or ≥8 answers at ≥75%) = retrieval first, the card returns as a "Refresher" only after a miss, then one stretch question.
+- Meteorology numeric tolerances written as absolute (±1) were read as relative (wind chill −35 accepted 0 to −70). Converted with `at()` in src_met/q_gen.py.
+- KaTeX is injected from math.js after page load, so a stalled CDN cannot delay first paint or DOMContentLoaded (tested with a hanging CDN: interactive in ~300 ms).
+- src/qaudit.py checks packs for duplicate options, bad tokens, tolerance range, match/order sanity. Open finding: in Meteorology the correct MCQ option is the longest in 84% of questions (Circuit 38%); rebalance pending (inputs in scratchpad/lenfix).
