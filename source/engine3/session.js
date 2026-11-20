@@ -105,6 +105,9 @@ function lessonSteps(u,L,mode){var st=[],have={};mode=mode||lessonMode(u,L);
   st.push({k:'card',c:c,ut:ut});
   if(ex){have[ex]=1;st.push({k:'explain',it:mkItem(ex),ex:1,solo:1,st:0,sh:1})}
   if(id){have[id]=1;st.push({k:'try',it:mkItem(id)})}});
+ if(mode==='new'){var dd=window.topicDD&&topicDD({unit:u}),first=L===u.lessons[0],last=L===u.lessons[u.lessons.length-1];
+  if(dd&&first)st.unshift({k:'card',c:{h:'The big idea',t:dd.why+(dd.analogy?' Think of it this way: '+dd.analogy:'')},ut:u.title+' · Big picture'});
+  if(dd&&last&&dd.trap)st.push({k:'card',c:{h:'Watch out for this',t:dd.trap},ut:u.title+' · Common trap'})}
  if(mode==='review'){var hard=pickPool([u.id],6,[3]).concat(pickPool([u.id],6,[2])).filter(function(i){return !have[i]})[0];if(hard)st.push({k:'try',it:mkItem(hard),ut:u.title+' · Stretch'})}
  return st}
 function startLesson(uid,lid){
