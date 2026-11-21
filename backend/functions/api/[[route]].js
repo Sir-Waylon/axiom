@@ -36,6 +36,7 @@ function pwProblem(pw, email, user) {
 function weekKey(d = new Date()) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); const day = (t.getUTCDay() + 6) % 7; t.setUTCDate(t.getUTCDate() - day); return t.toISOString().slice(0, 10); }
 
 async function rate(env, key, max, win) {
+  key = (await sha((env.PEPPER || '') + '|' + key)).slice(0, 32); // one-way hash: no raw IP or login name is stored
   const now = Math.floor(Date.now() / 1000), w = Math.floor(now / win);
   const r = await env.DB.prepare('SELECT w,n FROM rl WHERE k=?').bind(key).first();
   if (r && r.w === w) { if (r.n >= max) return false; await env.DB.prepare('UPDATE rl SET n=n+1 WHERE k=?').bind(key).run(); }

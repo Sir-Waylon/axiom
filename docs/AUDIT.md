@@ -129,3 +129,6 @@ src/mkenrich.py adds a concept-first "Idea:" step to very short solutions, chose
 - Level counter verified: need(l)=40l²+60l; Level = l+1; ring % and "XP to next" correct at boundaries; level-up modal fires once.
 - New `GET /api/xp` (per-pack XP for the account). Me/Profile/header show a combined "Voltaxis level" across trainers; progress, looks and streak refresh when the tab regains focus (max once per 45 s). Both sites share the D1 database `voltaxis-accounts`, so one account works on Skyvolt and Axiom (each site still signs in separately because cookies are per site).
 - Skyvolt ↔ Axiom links: footer sentence + landing band on the sites, "More from Voltaxis" row in the Me tab. The sister URL is the current host name with `skyvolt`↔`axiom` swapped; set `meta.sisterUrl` if the real domains differ.
+
+## Nov 21 — privacy policy
+Rewrote guest-mode text (sign-in is now required), added shared Skyvolt/Axiom account, shop/odds, anti-abuse counters, no-E2E-encryption, parent/teacher deletion, breach notice; fixed 30-day session claim (8h). Backend: rate-limit keys are now peppered SHA-256 hashes (previously raw IP/login id).
