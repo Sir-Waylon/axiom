@@ -162,6 +162,12 @@ A['POST /sync'] = async (req, env, s) => {
   else await env.DB.prepare('UPDATE users SET pub=? WHERE id=?').bind(JSON.stringify(pub), s.uid).run();
   return J({ ok: 1, upd: now });
 };
+/* XP per trainer for this account, so every trainer can show one combined level */
+A['GET /xp'] = async (req, env, s) => {
+  const rows = (await env.DB.prepare('SELECT pack,xp FROM saves WHERE uid=?').bind(s.uid).all()).results;
+  const packs = {}; let total = 0; for (const r of rows) { packs[r.pack] = r.xp; total += r.xp; }
+  return J({ total, packs });
+};
 A['GET /save'] = async (req, env, s) => {
   const pack = new URL(req.url).searchParams.get('pack') || ''; if (!/^[a-z0-9-]{3,40}$/.test(pack)) return J({ error: 'bad pack' }, 400);
   const r = await env.DB.prepare('SELECT data,upd FROM saves WHERE uid=? AND pack=?').bind(s.uid, pack).first();

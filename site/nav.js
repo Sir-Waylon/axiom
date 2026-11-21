@@ -1,4 +1,5 @@
 (function(){"use strict";
+(function(){var h=location.hostname.toLowerCase(),me="axiom",ot="skyvolt";if(h.indexOf(me)<0)return;var u=location.protocol+"//"+h.replace(me,ot)+(location.port?":"+location.port:"")+"/";[].forEach.call(document.querySelectorAll("[data-sister]"),function(a){a.href=u;a.rel="noopener"});[].forEach.call(document.querySelectorAll("[data-sister-wrap]"),function(w){w.hidden=false})})();
 function ck(){var m=document.cookie.split("; ").filter(function(c){return c.indexOf("__Host-csrf=")===0})[0];return m?m.slice(12):""}
 fetch("/api/me",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(j){if(!j||!j.username)return;
 function lo(){fetch("/api/logout",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json","x-csrf":ck()},body:"{}"}).then(function(){location.reload()})}

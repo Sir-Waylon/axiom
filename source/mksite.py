@@ -36,6 +36,7 @@ else:
 for a,b_,m in [(B['pri'],'#ffffff',4.5),('#14213d','#fbfbf8',7),('#46506b','#fbfbf8',4.5),(B['acc'],'#fbfbf8',4.5),('#eef0fb','#10142b',7),(B['pri_d'],'#10142b',4.5),(B['acc_d'],'#10142b',4.5)]:
     assert cr(a,b_)>=m,(site,a,b_,cr(a,b_))
 N=B['name']
+SIS,SISD=(('Axiom','Math &amp; Physics trainers (Apex, Quanta)') if N=='Skyvolt' else ('Skyvolt','Circuit Lab &amp; Meteorology trainers'))
 CSS='''
 :root{--bg:#fbfbf8;--tx:#14213d;--mut:#46506b;--card:#fff;--line:#d8dbe8;--pri:%(pri)s;--onpri:#fff;--acc:%(acc)s;--gold:%(gold)s;--soft:#eef0fb;--r:18px;--ring:#1a62c8}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#10142b;--tx:#eef0fb;--mut:#b4b9d6;--card:#1a1f3f;--line:#2f3566;--pri:%(pri_d)s;--onpri:#10142b;--acc:%(acc_d)s;--soft:#222850;--ring:#ffd23f}}
@@ -104,7 +105,7 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
 <header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
 <main id="main" tabindex="-1">{body}</main>
 <footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li></ul></nav>
-<p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom).</p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc.</p></div></footer>
+<p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom). <span data-sister-wrap hidden>Also try <a data-sister href="#">{SIS}: {SISD}</a>.</span></p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc.</p></div></footer>
 {'<script src="/account.js" defer></script>' if path=='account' else ''}<script src="/nav.js" defer></script>{tail}
 </body></html>'''
 def chips(l):return '<ul class="chips">'+''.join(f'<li><span class="pill">{html.escape(x)}</span></li>' for x in l)+'</ul>'
@@ -134,6 +135,7 @@ def landing():
 <section class="s alt" id="topics"><div class="wrap"><h2>What you will learn</h2><p class="lead">{B['what'][0].upper()+B['what'][1:]}.</p><div class="grid">{tr}</div></div></section>
 <section class="s"><div class="wrap"><h2>Features</h2><div class="grid">{fh}</div></div></section>
 <section class="s"><div class="wrap"><div class="note" role="note"><b>Created with AI assistance.</b> The lessons, questions, explanations and code were produced with an AI model (Claude, by Anthropic) under the direction of a Science Olympiad coach, and checked with automated tests. Errors are still possible, so confirm important facts with your textbook or teacher. <a href="/ai-disclosure/">Read the full disclosure</a>{REPOLINK}.</div></div></section>
+<section class="s" data-sister-wrap hidden><div class="wrap" style="text-align:center"><h2>Also from Voltaxis</h2><p class="lead" style="font-size:1rem">{SISD}, with the same account.</p><div class="cta" style="justify-content:center"><a class="btn sec" data-sister href="#">Visit {SIS}</a></div></div></section>
 <section class="s alt"><div class="wrap" style="text-align:center"><h2>Start practicing today.</h2><div class="cta" style="justify-content:center"><a class="btn" href="/app/">Start learning</a><a class="btn sec" href="/account/">Sign in</a></div></div></section>'''
     body=body.replace('{REPOLINK}',REPOLINK)
     return page('index',f'{N}: {B["h1"]}',body,cur='/')
@@ -231,6 +233,7 @@ def account():
 </div>'''
     return page('account',f'Sign in · {N}',b,f'Sign in to {N}, or create a free account.')
 NAVJS=r'''(function(){"use strict";
+(function(){var h=location.hostname.toLowerCase(),me="__ME__",ot="__OT__";if(h.indexOf(me)<0)return;var u=location.protocol+"//"+h.replace(me,ot)+(location.port?":"+location.port:"")+"/";[].forEach.call(document.querySelectorAll("[data-sister]"),function(a){a.href=u;a.rel="noopener"});[].forEach.call(document.querySelectorAll("[data-sister-wrap]"),function(w){w.hidden=false})})();
 function ck(){var m=document.cookie.split("; ").filter(function(c){return c.indexOf("__Host-csrf=")===0})[0];return m?m.slice(12):""}
 fetch("/api/me",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(j){if(!j||!j.username)return;
 function lo(){fetch("/api/logout",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json","x-csrf":ck()},body:"{}"}).then(function(){location.reload()})}
@@ -297,7 +300,7 @@ W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/inde
 W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
-W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS);shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
+W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS.replace('__ME__',N.lower()).replace('__OT__',SIS.lower()));shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client https://cdn.jsdelivr.net/npm/katex@0.16.11/; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style https://cdn.jsdelivr.net/npm/katex@0.16.11/; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net/npm/katex@0.16.11/; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"

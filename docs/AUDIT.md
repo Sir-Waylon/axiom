@@ -122,3 +122,10 @@ src/mkenrich.py adds a concept-first "Idea:" step to very short solutions, chose
 - engine3/arcade.js: Gold Quest (chests with published odds, bot-labelled leaderboard, pirate-ambush forced questions), Boss Raid (attack questions; every third turn a timed "dodge" question), Rocket Run (tap falling stars; gates stop the run and force a question). Reduced motion respected; keys 1-4 answer; coins are cosmetic only. Reachable from Play → Solo, Practice and the online menu.
 - Limit: arcade modes run on the device against labelled bots; class/versus rooms still use the server-synchronised quiz (the server scores only correct/incorrect and time).
 - Bug found by the centering audit: the Profile page threw (`metacog.js cal()` expected S.cal keys 1-3, `lock.js` creates {g,t,s}). cal() now fills missing keys. Layout audit (t130.js) of every tab and Me sub-page at 390/820/1280 px: all blocks symmetric, no overflow.
+
+## Nov 21: offline math, cross-trainer progress, sister links
+- engine3/math.js: if KaTeX cannot load (CDN blocked/offline) after ~6 s, LaTeX is converted to readable Unicode (`plainTeX`: fractions, roots, powers, subscripts, Greek, relations). Tested with the CDN aborted.
+- Bug fixed: the startup sanity check wiped XP and coins to 0 when coins > 2×XP + 20 (online/arcade coin rewards could trigger it). It now only clamps impossible values.
+- Level counter verified: need(l)=40l²+60l; Level = l+1; ring % and "XP to next" correct at boundaries; level-up modal fires once.
+- New `GET /api/xp` (per-pack XP for the account). Me/Profile/header show a combined "Voltaxis level" across trainers; progress, looks and streak refresh when the tab regains focus (max once per 45 s). Both sites share the D1 database `voltaxis-accounts`, so one account works on Skyvolt and Axiom (each site still signs in separately because cookies are per site).
+- Skyvolt ↔ Axiom links: footer sentence + landing band on the sites, "More from Voltaxis" row in the Me tab. The sister URL is the current host name with `skyvolt`↔`axiom` swapped; set `meta.sisterUrl` if the real domains differ.

@@ -11,9 +11,12 @@ function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+
 var KEY='scioly:'+P.meta.id;
 var S={xp:0,coins:0,best:0,days:{},dxp:{},seen:{},miss:{},stat:{},plan:{},known:{},badges:{},un:{},lr:{},theme:'auto',mbest:0,shorts:0,total:0,right:0,perfect:0,v:1};
 try{var _o=SEC?SEC.state:JSON.parse(localStorage.getItem(KEY)||'null');if(_o&&typeof _o==='object')for(var _k in _o)if(_k!=='__proto__'&&_k!=='constructor'&&_k!=='prototype')S[_k]=_o[_k]}catch(e){}
-(function(){var ok=typeof S.xp==='number'&&typeof S.coins==='number'&&S.xp>=0&&S.coins>=0&&S.xp<=60*(S.total|0)+2*Object.keys(S.lr||{}).length+60&&S.coins<=2*S.xp+20;if(!ok){S.xp=0;S.coins=0;S.dxp={};S.cos=null;S.lr={}}})();
+/* sanity limits: clamp impossible values instead of wiping progress (coins only unlock looks, so they are not capped by XP) */
+(function(){var cap=60*(S.total|0)+2*Object.keys(S.lr||{}).length+60;if(typeof S.xp!=='number'||!(S.xp>=0))S.xp=0;if(S.xp>cap)S.xp=cap;if(typeof S.coins!=='number'||!(S.coins>=0))S.coins=0;if(S.coins>1e6)S.coins=1e6;if(!S.dxp||typeof S.dxp!=='object')S.dxp={};if(!S.lr||typeof S.lr!=='object')S.lr={}})();
 function save(){var s=JSON.stringify(S);if(SEC)SEC.save(s);else try{localStorage.setItem(KEY,s)}catch(e){}}
 
+/* link to the sister site (Skyvolt <-> Axiom): same host name with the site name swapped; meta.sisterUrl overrides it */
+function sisterUrl(){var m=P.meta||{};if(m.sisterUrl)return m.sisterUrl;var h=location.hostname,a=(m.site||'').toLowerCase(),b=(m.sister||'').toLowerCase();if(!a||!b||h.toLowerCase().indexOf(a)<0)return '';return location.protocol+'//'+h.toLowerCase().replace(a,b)+(location.port?':'+location.port:'')+'/'}
 /* ---- levels ---- */
 var LV=P.meta.levels||['Static Spark','Wire Wrapper','Breadboarder','Bench Tech','Circuit Builder','Logic Architect','Field Engineer','Kirchhoff Master'];
 function lvOf(xp){var l=0;while(xp>=need(l+1))l++;return l}
