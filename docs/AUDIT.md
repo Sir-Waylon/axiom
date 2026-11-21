@@ -132,3 +132,9 @@ src/mkenrich.py adds a concept-first "Idea:" step to very short solutions, chose
 
 ## Nov 21 — privacy policy
 Rewrote guest-mode text (sign-in is now required), added shared Skyvolt/Axiom account, shop/odds, anti-abuse counters, no-E2E-encryption, parent/teacher deletion, breach notice; fixed 30-day session claim (8h). Backend: rate-limit keys are now peppered SHA-256 hashes (previously raw IP/login id).
+
+## Nov 21 — mega audit, part 1
+- Site pages (both sites, 8+ pages each at 360/768/1280, axe-core WCAG 2.2 AA + best practice, 370 links): fixed trainer pages having no h1 and weak titles, a low-contrast link in the landing note, tiny checkboxes.
+- Questions: arithmetic recheck of 2,286 worked equations (0 real errors); show/value match on 4,057 numeric keys (0); expert read of 210 stratified questions found 4 certain issues.
+- Real bug class found and fixed: for prefixed units (mA, kΩ, ms, µF, kWh) some answers were stored in the displayed unit while the grader expects base units, so a correct typed answer could be marked wrong and the "Answer:" line was nonsense (e.g. 20000 ms). `src/unitfix.py` now normalises at build (21 Circuit questions). Fuse-rating questions now list the standard ratings (exact match); binary-sum answers graded exactly; est-014/kvl-092/cir-031 keys corrected; cir-151 reason fixed; Apex wording fixes (lm-010, sr-009, ra-123, tc-098).
+- Not changed (judgement calls): some Quanta/Apex items go beyond Division B (calculus, Gauss's law); a few level labels look one step high.

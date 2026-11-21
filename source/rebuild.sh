@@ -13,7 +13,7 @@ for f,b,t,a in [('circuit-lab-b','Voltaic','Circuit Lab B · Science Olympiad',[
     json.dump(p,open('events/'+f+'/pack.json','w'),ensure_ascii=False,separators=(',',':'))
 P
 python3 src_met/mkmet.py events/meteorology-b/pack.json >/dev/null;python3 src/applyfix.py events/meteorology-b/pack.json src/fixes_met.json;python3 src/applyextra.py events/meteorology-b/pack.json 'src/audit_met/*.json';python3 -c "import json;f='events/meteorology-b/pack.json';p=json.load(open(f));p['meta']['stations']='met';p['meta']['names']=['Cumulo','Nimbus','Isobar','Gale','Cirrus','Twister','Cirrus Ghost','Stormcaller','Supercell','Stormwarden','Aurora'];json.dump(p,open(f,'w'),ensure_ascii=False,separators=(',',':'))"; python3 src/shortify.py events/meteorology-b/pack.json; python3 src/mkunits.py events/meteorology-b/pack.json >/dev/null
-for t in apex:apex-math quanta:quanta-physics; do k=${t%%:*}; d=${t##*:}; python3 src_adv/mkadv.py $k events/$d/pack.json >/dev/null; python3 src/shortify.py events/$d/pack.json; python3 src/mkunits.py events/$d/pack.json >/dev/null; done
+for t in apex:apex-math quanta:quanta-physics; do k=${t%%:*}; d=${t##*:}; python3 src_adv/mkadv.py $k events/$d/pack.json >/dev/null; python3 src/shortify.py events/$d/pack.json; python3 src/mkunits.py events/$d/pack.json >/dev/null; done; python3 src/applyfix.py events/quanta-physics/pack.json src/fixes_qua.json
 for t in circuit-lab-b:wid_circuit geometry-readiness:wid_geo meteorology-b:wid_met apex-math:wid_apex quanta-physics:wid_quanta; do python3 src/applywid.py events/${t%%:*}/pack.json ${t##*:}; done
 python3 src/scen.py events/geometry-readiness/pack.json && python3 src/scen.py events/apex-math/pack.json
 python3 src/mkenrich.py && python3 src/mkhonors.py && python3 src/mkhonors2.py && python3 src/applyextra.py events/apex-math/pack.json 'src/audit_apex/*.json'
@@ -24,7 +24,7 @@ for f,b,t,a in [('apex-math','Apex','Algebra 2 → Calculus',['#BC4749','#F7E9D7
     json.dump(p,open('events/'+f+'/pack.json','w'),ensure_ascii=False,separators=(',',':'))
 P
 python3 src/addref.py events/circuit-lab-b/pack.json events/meteorology-b/pack.json
-for d in circuit-lab-b meteorology-b apex-math geometry-readiness quanta-physics; do python3 src/applydd.py events/$d/pack.json 'src/dd/*.json'; done
+for d in circuit-lab-b meteorology-b apex-math geometry-readiness quanta-physics; do python3 src/applydd.py events/$d/pack.json 'src/dd/*.json'; python3 src/unitfix.py events/$d/pack.json; done
 python3 src/palette.py
 HUBNAME=Skyvolt APPNAME=Skyvolt python3 build_open.py out/_app_skyvolt circuit=events/circuit-lab-b/pack.json meteorology=events/meteorology-b/pack.json
 mkdir -p events/apex-merged && python3 src/mergeapex.py events/geometry-readiness/pack.json events/apex-math/pack.json events/apex-merged/pack.json

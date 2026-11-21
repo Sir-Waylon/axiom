@@ -2,7 +2,7 @@
 (function(){
 var M=P.meta;
 if(M.accent){var r=document.documentElement.style;r.setProperty('--pri',M.accent[0]);r.setProperty('--pri-soft','color-mix(in srgb,'+M.accent[0]+' 14%,var(--surface))');r.setProperty('--sel','var(--pri-t)')}
-try{var tt=$('ttl');if(tt)tt.textContent=M.brand||M.title;var og=$('org');if(og)og.textContent=M.tagline||(M.org+' · '+M.year);document.title=(M.brand||M.title)}catch(e){}
+try{var tt=$('ttl');if(tt)tt.textContent=M.brand||M.title;var og=$('org');if(og)og.textContent=M.tagline||(M.org+' · '+M.year);document.title=(M.brand||M.title)+' trainer'+(M.site?' · '+M.site.charAt(0).toUpperCase()+M.site.slice(1):'')}catch(e){}
 
 var LM={par:'par',tri:'tri',rt:'pyth',cir:'insc',lin:'line',crd:'line',sim:'scale',trn:'trn',virpe:'ohm',static:'coul',circ:'sp',logic:'gate',diode:'diode'};
 document.addEventListener('click',function(e){var c=e.target.closest&&e.target.closest('.clz');if(c)c.classList.add('on')});

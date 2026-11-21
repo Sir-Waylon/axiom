@@ -78,7 +78,7 @@ a.trk{display:block;color:var(--tx);text-decoration:none}a.trk:hover{border-colo
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;padding:0;list-style:none}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--mut);font-size:.95rem}footer ul{display:flex;flex-wrap:wrap;gap:4px 20px;list-style:none;padding:0;margin:0 0 10px}footer a{color:var(--tx);display:inline-block;padding:8px 0}
 .doc{max-width:760px;margin:0 auto;padding:36px 0 56px}.doc h2{margin-top:32px;font-size:1.45rem}.doc li{margin:6px 0}.doc table{border-collapse:collapse;width:100%%;font-size:.95rem}.doc th,.doc td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.doc th{background:var(--soft)}
-.note{background:var(--soft);border-left:5px solid var(--pri);border-radius:10px;padding:12px 16px;margin:16px 0}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--acc)}.note a{color:var(--tx);font-weight:700}.note{background:var(--soft);border-left:5px solid var(--pri);border-radius:10px;padding:12px 16px;margin:16px 0}
 form.acc{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:24px;max-width:460px;margin:0 auto}
 .fld{display:block;margin:0 0 14px}.fld span{display:block;font-weight:700;margin-bottom:4px}.fld small{color:var(--mut)}
 input[type=text],input[type=email],input[type=password]{width:100%%;min-height:48px;border:2px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;background:var(--bg);color:var(--tx)}
