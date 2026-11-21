@@ -116,3 +116,8 @@ src/mkenrich.py adds a concept-first "Idea:" step to very short solutions, chose
 - Sessions are browser-session cookies (no Max-Age) and expire server-side after 8 h (`SESSION_TTL`); sign-out clears both cookies. Backend tests pass.
 - Site: "Create an account" CTAs are now "Sign in" (and become "Sign out" when signed in); guest mode wording removed from the account, privacy and terms pages. Account creation stays available as a link inside the sign-in form.
 - Limit: the gate is a UI gate (the study content is a static public file). The API enforces sign-in for server data.
+
+## Nov 20: multiplayer menus and Arcade
+- Join / Versus / Host menus restyled Kahoot-style (engine3/widgets.css): colour-coded cards, big code box, centered, no horizontal overflow at 390 px.
+- engine3/arcade.js: Gold Quest (chests with published odds, bot-labelled leaderboard, pirate-ambush forced questions), Boss Raid (attack questions; every third turn a timed "dodge" question), Rocket Run (tap falling stars; gates stop the run and force a question). Reduced motion respected; keys 1-4 answer; coins are cosmetic only. Reachable from Play → Solo, Practice and the online menu.
+- Limit: arcade modes run on the device against labelled bots; class/versus rooms still use the server-synchronised quiz (the server scores only correct/incorrect and time).
