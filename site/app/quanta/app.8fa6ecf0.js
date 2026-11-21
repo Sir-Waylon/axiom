@@ -3320,7 +3320,7 @@ document.addEventListener('click',function(e){if(!Z||Z.fin)return;var st=Z.steps
 /* ===== study tactics: confidence check (calibration) and "why does it work?" self-explanation =====
    Both are optional and quick. Confidence ratings never change your score. They show whether you know what you know. */
 (function(){
-function cal(){if(!S.cal)S.cal={1:[0,0],2:[0,0],3:[0,0]};return S.cal}
+function cal(){var c=S.cal||(S.cal={});for(var k=1;k<4;k++)if(!c[k])c[k]=[0,0];return c}
 var LBL={1:'Guess',2:'Think so',3:'Sure'};
 function reasonOpts(q){var w=String(q.w||'');if(!w)return null;var pool=QS.filter(function(x){return x.t===q.t&&x.id!==q.id&&x.w&&x.w!==w&&x.fp!==q.fp&&x.type!=='sim'&&String(x.w).length<140});
  if(pool.length<2||w.length>160)return null;var h=0,s=q.id;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;var a=pool[h%pool.length],b=pool[(h*7+3)%pool.length];if(a===b)b=pool[(h+1)%pool.length];if(a===b||a.w===b.w)return null;
