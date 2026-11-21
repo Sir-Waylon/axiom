@@ -110,3 +110,9 @@ src/mkenrich.py adds a concept-first "Idea:" step to very short solutions, chose
 - KaTeX is injected from math.js after page load, so a stalled CDN cannot delay first paint or DOMContentLoaded (tested with a hanging CDN: interactive in ~300 ms).
 - Lessons also open (new mode) with a "big idea" card and end with a "watch out" trap card from WHY[unit]; WHY now covers all Circuit and Meteorology units too.
 - src/qaudit.py checks packs for duplicate options, bad tokens, tolerance range, match/order sanity. Fixed: in Meteorology the correct MCQ option was the longest in 84% of questions; 354 options rewritten (src/audit_met/zlenfix.json, sorts after m*.json so it applies to the generated xm ids), now 24% (chance). Also removed 3 duplicate questions and fixed ambiguous match items (Meteorology hurricane names, Apex tg-xh1068 periods).
+
+## Nov 20: sign-in every time
+- Trainers show a full-screen sign-in gate (accounts.js `gate()`, focus-trapped, rest of the page `inert`) whenever the API is reachable and nobody is signed in. If the API cannot be reached (offline, file://), the gate is skipped and progress stays on the device.
+- Sessions are browser-session cookies (no Max-Age) and expire server-side after 8 h (`SESSION_TTL`); sign-out clears both cookies. Backend tests pass.
+- Site: "Create an account" CTAs are now "Sign in" (and become "Sign out" when signed in); guest mode wording removed from the account, privacy and terms pages. Account creation stays available as a link inside the sign-in form.
+- Limit: the gate is a UI gate (the study content is a static public file). The API enforces sign-in for server data.

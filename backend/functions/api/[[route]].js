@@ -42,14 +42,16 @@ async function rate(env, key, max, win) {
   else await env.DB.prepare('INSERT INTO rl(k,w,n) VALUES(?,?,1) ON CONFLICT(k) DO UPDATE SET w=excluded.w,n=1').bind(key, w).run();
   return true;
 }
-const cookie = (name, val, age, http) => `${name}=${val}; Path=/; Max-Age=${age}; Secure; SameSite=Lax${http ? '; HttpOnly' : ''}`;
+/* session cookies: no Max-Age, so the browser forgets them when it closes; the server also expires a session after SESSION_TTL */
+const SESSION_TTL = 8 * 3600;
+const cookie = (name, val, age, http) => `${name}=${val}; Path=/;${age === null ? '' : ` Max-Age=${age};`} Secure; SameSite=Lax${http ? '; HttpOnly' : ''}`;
 function getCookie(req, n) { const m = (req.headers.get('cookie') || '').split(/;\s*/).find((c) => c.startsWith(n + '=')); return m ? m.slice(n.length + 1) : null; }
 
 async function newSession(env, uid) {
-  const tok = hex(rnd(32)), csrf = hex(rnd(16)), exp = Math.floor(Date.now() / 1000) + 30 * 86400;
+  const tok = hex(rnd(32)), csrf = hex(rnd(16)), exp = Math.floor(Date.now() / 1000) + SESSION_TTL;
   await env.DB.prepare('INSERT INTO sessions(h,uid,exp,csrf) VALUES(?,?,?,?)').bind(await sha(tok), uid, exp, csrf).run();
   await env.DB.prepare('DELETE FROM sessions WHERE uid=? AND h NOT IN (SELECT h FROM sessions WHERE uid=? ORDER BY exp DESC LIMIT 5)').bind(uid, uid).run();
-  return { 'set-cookie': [cookie('__Host-sid', tok, 30 * 86400, true), cookie('__Host-csrf', csrf, 30 * 86400, false)] };
+  return { 'set-cookie': [cookie('__Host-sid', tok, null, true), cookie('__Host-csrf', csrf, null, false)] };
 }
 function withCookies(h) { const r = new Headers(); for (const [k, v] of Object.entries(h)) Array.isArray(v) ? v.forEach((x) => r.append(k, x)) : r.set(k, v); return r; }
 function out(o, s, h) { const res = J(o, s); if (h && h['set-cookie']) h['set-cookie'].forEach((c) => res.headers.append('set-cookie', c)); return res; }

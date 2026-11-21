@@ -1,5 +1,5 @@
 /* ===== online play: class games (join with a code) and versus (real player, or a labelled bot) =====
-   Talks to /api/room/* and /api/vs/*. Guests are fine: no account needed. Only a nickname and correct/incorrect + timing are sent.
+   Talks to /api/room/* and /api/vs/*. Players must be signed in. Only a nickname and correct/incorrect + timing are sent.
    Honest limit: questions are graded in the browser, so this is for fun and class use, not for exams. Coins earned here are cosmetic. */
 (function(){
 var OG=null,poll=null,raf=0,off=0,NK='ognick';

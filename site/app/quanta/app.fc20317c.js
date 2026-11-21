@@ -1478,7 +1478,7 @@ document.addEventListener('click',function(e){if(e.target.id==='sw-set'){var w=s
 })();
 
 /* ===== online play: class games (join with a code) and versus (real player, or a labelled bot) =====
-   Talks to /api/room/* and /api/vs/*. Guests are fine: no account needed. Only a nickname and correct/incorrect + timing are sent.
+   Talks to /api/room/* and /api/vs/*. Players must be signed in. Only a nickname and correct/incorrect + timing are sent.
    Honest limit: questions are graded in the browser, so this is for fun and class use, not for exams. Coins earned here are cosmetic. */
 (function(){
 var OG=null,poll=null,raf=0,off=0,NK='ognick';
@@ -2729,15 +2729,14 @@ var pt=null;function push(now){if(ACC.mode!=='in'||!ACC.me||!ACC.me.username)ret
 var _sv=save;save=function(){var r=_sv.apply(this,arguments);push();return r};
 function friends(){return api('GET','/friends').then(function(j){if(!j.error){ACC.fr=j;if(cur==='me'&&sub.me==='friends')route()}})}
 function boot(){fetch('/api/config',{credentials:'same-origin'}).then(function(r){if(!r.ok||!/json/.test(r.headers.get('content-type')||''))throw 0;return r.json()}).then(function(c){ACC.g=c.google;return api('GET','/me')}).then(function(j){if(j.__s===200){setMe(j);pull().then(friends)}else if(j.__s===401){ACC.mode='out';loadG()}else throw 0;if(cur==='me')route()}).catch(function(){ACC.mode='none'})}
-function loadG(){if(!ACC.g||window.google||document.getElementById('gsi'))return;var s=document.createElement('script');s.id='gsi';s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=function(){if(cur==='me'&&sub.me==='friends')afterMe()};document.head.appendChild(s)}
+function loadG(){if(!ACC.g||window.google||document.getElementById('gsi'))return;var s=document.createElement('script');s.id='gsi';s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=function(){gate();if(cur==='me'&&sub.me==='friends')afterMe()};document.head.appendChild(s)}
 function auth(j){if(j.error){toast(j.error);ACC.busy=false;return}setMe(j);ACC.f={mode:'in'};ACC.busy=false;pull().then(friends);route()}
 function field(id,label,type,ph,auto){return '<label class="fld"><span>'+label+'</span><input id="'+id+'" type="'+type+'" placeholder="'+(ph||'')+'" autocomplete="'+auto+'" value="'+esc(ACC.f[id]||'')+'" '+(type==='text'?'autocapitalize="none" spellcheck="false"':'')+'></label>'}
 function html(){
  if(ACC.mode==='unknown')return '<div class="card"><p class="mute">Loading…</p></div>';
- if(!ACC.me){var up=ACC.f.mode==='up';return '<div class="card acc"><h3>Play with friends</h3><div class="seg"><button data-am="in" aria-current="'+!up+'">Sign in</button><button data-am="up" aria-current="'+up+'">Create account</button></div>'+
-  (up?field('email','Email','email','','email')+field('username','Username','text','','username'):field('email','Email or username','text','','username'))+field('password','Password','password',up?'10+ characters':'','current-password')+'<button class="btn" id="acg" style="width:100%">'+(up?'Create account':'Sign in')+'</button>'+(ACC.g?'<div class="or"><span>or</span></div><div id="gbtn" style="display:flex;justify-content:center"></div>':'')+'</div>'}
+ if(!ACC.me)return '<div class="card"><p class="mute">Sign in to see friends and your league.</p></div>';
  if(ACC.me.needUsername)return '<div class="card acc"><h3>Pick a username</h3>'+field('username','Username','text','','username')+'<button class="btn" id="acu" style="width:100%">Save</button></div>';
- var fr=ACC.fr||{league:[],incoming:[],outgoing:[]},h='<div class="card"><div class="row">'+mascot(S.cos.on.av,'happy',48)+'<div style="flex:1"><b>'+esc(ACC.me.username)+'</b><div class="small mute">'+(ACC.last?'Saved to your account':'Syncs automatically')+'</div></div><button class="btn sec sm" id="aco">Sign out</button></div></div>';
+ var fr=ACC.fr||{league:[],incoming:[],outgoing:[]},h='<div class="card"><div class="row">'+mascot(S.cos.on.av,'happy',48)+'<div style="flex:1"><b>'+esc(ACC.me.username)+'</b><div class="small mute">'+(ACC.last?'Saved to your account':'Syncs automatically')+'</div></div><button class="btn sec sm" data-so="1">Sign out</button></div></div>';
  h+='<div class="card"><h3>Add a friend</h3><div class="row"><input id="fru" class="grow" placeholder="Their username" autocapitalize="none" spellcheck="false"><button class="btn sm" id="fra">Add</button></div>'+(fr.incoming.length?'<div style="margin-top:10px">'+fr.incoming.map(function(x){return '<div class="row" style="padding:6px 0"><span style="flex:1"><b>'+esc(x.username)+'</b> wants to be friends</span><button class="btn sm" data-fa="'+esc(x.username)+'">Accept</button><button class="btn sec sm" data-fr="'+esc(x.username)+'" aria-label="Decline">×</button></div>'}).join('')+'</div>':'')+(fr.outgoing.length?'<p class="small mute" style="margin-top:8px">Waiting: '+fr.outgoing.map(function(x){return esc(x.username)}).join(', ')+'</p>':'')+'</div>';
  h+='<div class="card"><h3>This week</h3>'+(fr.league.length?fr.league.map(function(r,i){return '<div class="row lg'+(r.me?' me':'')+'"><span class="rk">'+(i+1)+'</span>'+mascot(r.av||'a0','happy',34,'c0')+'<span style="flex:1;min-width:0"><b>'+esc(r.username)+'</b><span class="small mute"> Lv '+(r.lv||1)+' · '+(r.st||0)+'d</span></span><b>'+r.wk+' XP</b>'+(r.me?'':'<button class="iconbtn" data-fr="'+esc(r.username)+'" aria-label="Remove friend">×</button>')+'</div>'}).join(''):'<p class="mute small">Add a friend to start a league.</p>')+'</div>';
  h+=nCard();
@@ -2749,15 +2748,16 @@ var NT=null;function nCard(){if(NT===null){NT={load:1};api('GET','/notify').then
  return '<div class="card"><h3>Streak reminder email</h3><p class="small">One email at most per day, only if you have a streak and have not studied yet. It goes to '+esc(NT.email||'your account email')+'. Every email has a one-click unsubscribe link.</p><div class="row"><label class="small" for="ntr">Send at</label><select id="ntr">'+o+'</select><button class="btn sm'+(NT.on?' sec':'')+'" id="ntb">'+(NT.on?'Turn off':'Turn on')+'</button></div>'+(NT.on?'<p class="small mute">On. Time zone: '+esc(NT.tz||'')+'.</p>':'')+'</div>'}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#ntb');if(!b||!NT)return;var on=!NT.on,hr=+($('ntr')?$('ntr').value:NT.hr),tz='America/Los_Angeles';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||tz}catch(x){}
  api('POST','/notify',{on:on,hr:hr,tz:tz}).then(function(j){if(j.error)return toast(j.error);NT.on=j.on;NT.hr=j.hr;NT.tz=j.tz;toast(j.on?'Reminder email on':'Reminder email off');route()})});
+window.__ACC=ACC;
 var _vm=viewMe;viewMe=function(){var h=_vm();if(sub.me!=='friends'||ACC.mode==='none')return h;return seg([['profile','Profile'],['shop','Shop'],['friends','Friends'],['settings','Settings']],'me')+html()};
 var _am=afterMe;afterMe=function(){_am.apply(this,arguments);if(sub.me==='friends'&&ACC.mode==='out'&&ACC.g&&window.google&&$('gbtn')&&!$('gbtn').firstChild){google.accounts.id.initialize({client_id:ACC.g,callback:function(r){api('POST','/google',{credential:r.credential}).then(auth)},ux_mode:'popup'});google.accounts.id.renderButton($('gbtn'),{theme:'outline',size:'large',shape:'pill',width:280})}};
 document.addEventListener('input',function(e){var t=e.target;if(t.closest&&t.closest('.acc')&&t.id)ACC.f[t.id]=t.value});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.closest&&e.target.closest('.acc')){var b=$('acg')||$('acu');if(b)b.click()}if(e.key==='Enter'&&e.target.id==='fru')$('fra').click()});
 document.addEventListener('click',function(e){var t=e.target,b=t.closest&&t.closest('button,a');if(!b)return;
- if(b.dataset.am){ACC.f.mode=b.dataset.am;route();return}
+ if(b.dataset.am){ACC.f.mode=b.dataset.am;route();gate();return}
  if(b.id==='acg'&&!ACC.busy){ACC.busy=true;var up=ACC.f.mode==='up';api('POST',up?'/signup':'/login',up?{email:ACC.f.email,username:ACC.f.username,password:ACC.f.password}:{id:ACC.f.email,password:ACC.f.password}).then(function(j){ACC.f.password='';auth(j)});return}
  if(b.id==='acu'){api('POST','/username',{username:ACC.f.username}).then(function(j){if(j.error)return toast(j.error);ACC.me.username=j.username;ACC.me.needUsername=false;push(true);friends();route()});return}
- if(b.id==='aco'){api('POST','/logout').then(function(){ACC.me=null;ACC.fr=null;NT=null;ACC.mode='out';loadG();route()});return}
+ if(b.id==='aco'||b.dataset.so){api('POST','/logout').then(function(){ACC.me=null;ACC.fr=null;NT=null;ACC.mode='out';ACC.f={mode:'in'};loadG();route();gate()});return}
  if(b.id==='acd'){e.preventDefault();window.askOk('Delete your account?','Your cloud save is deleted. Progress on this device stays.','Delete',function(){api('POST','/delete').then(function(){ACC.me=null;ACC.fr=null;ACC.mode='out';route();toast('Account deleted')})});return}
  if(b.id==='fra'){var u=($('fru').value||'').trim().toLowerCase();if(u)api('POST','/friends/request',{username:u}).then(function(j){toast(j.error||'Request sent');friends()});return}
  if(b.dataset.fa){api('POST','/friends/accept',{username:b.dataset.fa}).then(function(j){if(!j.error){ACC.fr=j;route()}});return}
@@ -2789,6 +2789,29 @@ document.addEventListener('input',function(e){if(!e.target||e.target.id!=='fru')
  st=setTimeout(function(){api('GET','/friends/suggest?q='+encodeURIComponent(q)).then(function(j){var cur=norm(i.value);if(cur!==q||!j||!j.names)return;box.innerHTML=j.names.length?'<span class="small mute" style="align-self:center">Did you mean</span>'+j.names.map(function(n){return '<button type="button" class="seg" data-sg="'+esc(n)+'">'+esc(n)+'</button>'}).join(''):''})},250)});
 /* clean the typed name before it is sent */
 var _fetchNorm=true;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#fra');if(!b)return;var i=document.getElementById('fru');if(i)i.value=norm(i.value)},true);
+
+/* --- sign-in gate: the trainer is only usable while signed in. The session lasts until the browser closes (or 8 h). --- */
+var GN=(P.meta&&(P.meta.short||P.meta.title||P.meta.name))||'your trainer';
+function gateHtml(){var up=ACC.f.mode==='up';
+ if(ACC.mode==='unknown')return '<div class="gcard"><p class="mute" role="status">Checking your sign-in…</p></div>';
+ if(ACC.me&&ACC.me.needUsername)return '<form class="gcard acc" novalidate><h2 id="gt">Pick a username</h2><p class="small mute">Friends find you by this name.</p>'+field('username','Username','text','','username')+'<button class="btn" id="acu" type="button">Save</button></form>';
+ return '<form class="gcard acc" novalidate aria-labelledby="gt"><h2 id="gt">'+(up?'Create your account':'Sign in')+'</h2><p class="small mute">'+(up?'Free. You must be 13 or older.':'Sign in to open '+esc(GN)+'. You will sign in again next time you open it.')+'</p>'+
+  (up?field('email','Email','email','','email')+field('username','Username','text','','username'):field('email','Email or username','text','','username'))+field('password','Password','password',up?'10+ characters':'','current-password')+
+  '<button class="btn" id="acg" type="button">'+(up?'Create account':'Sign in')+'</button>'+(ACC.g?'<div class="or"><span>or</span></div><div id="gbtn" class="gbtnw"></div>':'')+
+  '<p class="small gsw">'+(up?'Already have an account? <button type="button" class="lnk" data-am="in">Sign in</button>':'New here? <button type="button" class="lnk" data-am="up">Create an account</button>')+'</p></form>'}
+function gate(){var need=location.protocol!=='file:'&&(ACC.mode==='unknown'||ACC.mode==='out'||(ACC.me&&ACC.me.needUsername)),g=document.getElementById('gate');
+ if(!need){if(g){g.remove();[].forEach.call(document.body.children,function(n){n.removeAttribute('inert')})}return}
+ if(!g){g=document.createElement('div');g.id='gate';g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label','Sign in');document.body.appendChild(g)}
+ [].forEach.call(document.body.children,function(n){if(n!==g&&n.tagName!=='SCRIPT')n.setAttribute('inert','')})
+ var act=document.activeElement&&document.activeElement.id,pos=null;try{pos=document.activeElement.selectionStart}catch(e){}
+ g.innerHTML=gateHtml();
+ if(ACC.mode==='out'&&ACC.g&&window.google&&document.getElementById('gbtn')){google.accounts.id.initialize({client_id:ACC.g,callback:function(r){api('POST','/google',{credential:r.credential}).then(auth)},ux_mode:'popup'});google.accounts.id.renderButton(document.getElementById('gbtn'),{theme:'outline',size:'large',shape:'pill',width:280})}
+ var f=(act&&document.getElementById(act))||g.querySelector('input');if(f&&ACC.mode!=='unknown'){f.focus();try{if(pos!=null)f.setSelectionRange(pos,pos)}catch(e){}}}
+var _auth=auth;auth=function(j){_auth(j);gate()};
+document.addEventListener('keydown',function(e){if(e.key==='Tab'){var g=document.getElementById('gate');if(!g)return;var el=[].filter.call(g.querySelectorAll('input,button,a[href]'),function(x){return !x.disabled&&x.offsetParent});if(!el.length)return;var f=el[0],l=el[el.length-1];if(e.shiftKey&&document.activeElement===f){e.preventDefault();l.focus()}else if(!e.shiftKey&&document.activeElement===l){e.preventDefault();f.focus()}}});
+/* show the gate straight away on the web so protected screens never flash, then follow the server's answer */
+if(location.protocol!=='file:')gate();
+var _boot=boot;boot=function(){_boot();var t=setInterval(function(){gate();if(ACC.mode!=='unknown'){clearInterval(t)}},150)};
 
 boot();
 })();
@@ -3654,7 +3677,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 /* breadcrumb replaces the old segmented tabs */
 var _seg=seg;seg=function(list,key){if(key==='me'||key==='lib'){var t=(list.filter(function(x){return x[0]===sub[key]})[0]||[0,''])[1];return crumb(key,t)}return _seg.apply(this,arguments)};
 /* ---- Me ---- */
-function meRoot(){var L=lvInfo(),h='<div class="card prof2"><div class="row">'+mascot(S.cos.on.av,'happy',56)+'<div style="flex:1;min-width:0"><b class="pn">'+esc(S.nm||avOf(S.cos.on.av)[1])+'</b><div class="small mute">Level '+L.l+' · '+esc(L.name)+' · '+dayStreak()+' day streak</div></div></div></div>'+search('me','Search settings and profile')+'<div class="list2">';
+function meRoot(){var L=lvInfo(),h='<div class="card prof2"><div class="row">'+mascot(S.cos.on.av,'happy',56)+'<div style="flex:1;min-width:0"><b class="pn">'+esc(S.nm||avOf(S.cos.on.av)[1])+'</b><div class="small mute">Level '+L.l+' · '+esc(L.name)+' · '+dayStreak()+' day streak</div></div></div></div>'+(window.__ACC&&window.__ACC.me&&window.__ACC.me.username?'<div class="acout"><span>Signed in as <b>'+esc(window.__ACC.me.username)+'</b></span><button class="btn sec sm" data-so="1">Sign out</button></div>':'')+search('me','Search settings and profile')+'<div class="list2">';
  h+=row('me:profile','Profile','Progress, mastery and badges','user')+row('me:shop','Looks','Avatars, banners and titles','bag')+row('me:friends','Friends and account','Sign in, friends, reminders','users')+row('me:settings','Settings','Appearance, sound, accessibility, study times','gear','','theme dark text size motion contrast reminders voice sound dyslexia focus')+row('me:dev','Educator access','Access code, skip checks, preview plans','key','','teacher developer dev code skip unlock');
  return h+'</div><p class="empty" hidden>No matches</p>'}
 var _vm=viewMe;viewMe=function(){if(V.me==null)return meRoot();sub.me=V.me;return _vm.apply(this,arguments)};
