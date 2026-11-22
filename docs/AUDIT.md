@@ -148,3 +148,10 @@ Rewrote guest-mode text (sign-in is now required), added shared Skyvolt/Axiom ac
 
 ## Nov 22 — real Firefox/WebKit results
 The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Windows, macOS, ARM) revealed one real bug: the Library tab overflowed sideways at 280 px (foldable cover screens) in every engine; the topic rows now wrap. The Ubuntu jobs were failing at setup because `ubuntu-latest` moved to 26.04, which Playwright cannot install on; pinned to ubuntu-24.04.
+
+## Nov 22 security batch
+- Passwords: 12+ chars, number-or-16+, distinct-character, repeat/run, site-word, common-list, email/username-part rules, HIBP k-anonymity check; live checklist in sign-up.
+- Email verification (6-digit OTP), optional 2-step sign-in, Turnstile CAPTCHA, SameSite=Strict cookies, enforced CSP + Report-Only trial with `/api/csp-report`, extra security headers, hashed rate-limit keys, unverified-account purge after 7 days.
+- Privacy policy/terms updated (email codes, Turnstile, Mailtrap, HIBP, CSP reports, GDPR rights and bases, 72 h notice). See `docs/SECURITY.md` for DNS/email/Mailtrap/PCI/GDPR steps.
+- Verified: backend t.mjs and t2.mjs pass; browser flow (checklist, verify, 2FA on, 2FA login) passes; question checks bad:0 on all four packs (1441/482/4099/2538); enforced CSP shows no violations (Report-Only flags inline styles by design).
+- Known: no password-reset flow yet; sweep shows 82 small-target notes (28x40 buttons) to review.

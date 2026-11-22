@@ -3,7 +3,7 @@
    Security: PBKDF2-SHA256 (per-user salt, server pepper), constant-time compare, HttpOnly __Host- session cookie
    (token stored only as SHA-256), double-submit CSRF + Origin check, rate limits, parameterized SQL, strict validation. */
 const enc = new TextEncoder();
-const J = (o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...h } });
+const J = (o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'cross-origin-resource-policy': 'same-origin', ...h } });
 const b64 = (u) => btoa(String.fromCharCode(...new Uint8Array(u)));
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const b64u = (s) => unb64(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '='));
@@ -24,14 +24,32 @@ async function checkPw(pw, stored, env) { const [, it, s, h] = stored.split('$')
 
 const ok_email = (e) => typeof e === 'string' && e.length <= 254 && /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']{2,}$/.test(e);
 const ok_user = (u) => typeof u === 'string' && /^[a-z0-9_]{3,16}$/.test(u) && !BAD_WORDS.some((w) => u.includes(w));
+const SITE_WORDS = ['voltaxis', 'skyvolt', 'axiom', 'quanta', 'voltaic', 'stratus', 'password', 'olympiad'];
+const RUNS = ['qwertyuiopasdfghjklzxcvbnm', 'abcdefghijklmnopqrstuvwxyz', '01234567890'];
+const hasRun = (l) => RUNS.some((r) => { const f = r, b = [...r].reverse().join(''); for (let i = 0; i + 5 <= l.length; i++) { const c = l.slice(i, i + 5); if (f.includes(c) || b.includes(c)) return true; } return false; });
+/* rules (12+ chars; a number or 16+ chars; no runs, repeats, site words, personal info, common or breached passwords) */
 function pwProblem(pw, email, user) {
-  if (typeof pw !== 'string' || pw.length < 10) return 'Use at least 10 characters.';
+  if (typeof pw !== 'string' || pw.length < 12) return 'Use at least 12 characters.';
   if (pw.length > 128) return 'Use at most 128 characters.';
   const l = pw.toLowerCase();
-  if (COMMON.includes(l) || /^(.)\1+$/.test(pw)) return 'That password is too common.';
+  if (!(pw.length >= 16 || (/[a-z]/i.test(pw) && /\d/.test(pw)))) return 'Add a number, or make it 16+ characters (four random words works well).';
+  if (new Set(l).size < 6) return 'Use more different characters.';
+  if (/(.)\1{3,}/.test(l)) return 'Avoid repeating one character four times in a row.';
+  if (hasRun(l)) return 'Avoid runs like 12345 or qwert.';
+  if (SITE_WORDS.some((w) => l.includes(w))) return 'Do not use the site name or the word "password".';
+  if (COMMON.includes(l)) return 'That password is too common.';
   if (email && l.includes(email.split('@')[0].toLowerCase()) && email.split('@')[0].length > 3) return 'Do not put your email in your password.';
   if (user && l.includes(user)) return 'Do not put your username in your password.';
   return null;
+}
+/* Have I Been Pwned range API: only the first 5 characters of the SHA-1 leave the Worker (k-anonymity). Fails open. */
+async function pwBreached(pw) {
+  try {
+    const h = hex(await crypto.subtle.digest('SHA-1', enc.encode(pw))).toUpperCase();
+    const r = await fetch('https://api.pwnedpasswords.com/range/' + h.slice(0, 5), { headers: { 'Add-Padding': 'true' }, signal: AbortSignal.timeout(2000) });
+    if (!r.ok) return false;
+    return (await r.text()).split('\n').some((x) => { const [sfx, n] = x.trim().split(':'); return sfx === h.slice(5) && +n > 0; });
+  } catch { return false; }
 }
 function weekKey(d = new Date()) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); const day = (t.getUTCDay() + 6) % 7; t.setUTCDate(t.getUTCDate() - day); return t.toISOString().slice(0, 10); }
 
@@ -45,9 +63,69 @@ async function rate(env, key, max, win) {
 }
 /* session cookies: no Max-Age, so the browser forgets them when it closes; the server also expires a session after SESSION_TTL */
 const SESSION_TTL = 8 * 3600;
-const cookie = (name, val, age, http) => `${name}=${val}; Path=/;${age === null ? '' : ` Max-Age=${age};`} Secure; SameSite=Lax${http ? '; HttpOnly' : ''}`;
+const cookie = (name, val, age, http) => `${name}=${val}; Path=/;${age === null ? '' : ` Max-Age=${age};`} Secure; SameSite=Strict${http ? '; HttpOnly' : ''}`;
 function getCookie(req, n) { const m = (req.headers.get('cookie') || '').split(/;\s*/).find((c) => c.startsWith(n + '=')); return m ? m.slice(n.length + 1) : null; }
 
+/* ---- schema self-migration: adds email verification and 2FA without a manual D1 step. Existing accounts count as verified. ---- */
+let schemaOk = false;
+async function ensureSchema(env) {
+  if (schemaOk) return;
+  try {
+    await env.DB.prepare('CREATE TABLE IF NOT EXISTS otp(uid INTEGER NOT NULL,kind TEXT NOT NULL,h TEXT NOT NULL,ch TEXT,exp INTEGER NOT NULL,tries INTEGER NOT NULL DEFAULT 0,sent INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(uid,kind))').run();
+    await env.DB.prepare('CREATE INDEX IF NOT EXISTS otp_ch ON otp(ch)').run();
+    for (const c of ['ver INTEGER NOT NULL DEFAULT 1', 'tfa INTEGER NOT NULL DEFAULT 0']) { try { await env.DB.prepare('ALTER TABLE users ADD COLUMN ' + c).run(); } catch (e) { /* already present */ } }
+    schemaOk = true;
+  } catch (e) { console.error('schema', e && e.message); }
+}
+/* ---- email: Mailtrap Email API (MAILTRAP_API_TOKEN) or the Cloudflare EMAIL binding; MAIL_FROM must be on a verified domain ---- */
+const mailOk = (env) => !!(env.MAIL_FROM && (env.MAILTRAP_API_TOKEN || env.EMAIL));
+async function sendMail(env, to, subject, text, html) {
+  if (env.MAILTRAP_API_TOKEN) {
+    const m = /^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/.exec(env.MAIL_FROM), from = m ? { email: m[2].trim(), name: m[1].trim() || undefined } : { email: env.MAIL_FROM.trim() };
+    const r = await fetch('https://send.api.mailtrap.io/api/send', { method: 'POST', headers: { authorization: 'Bearer ' + env.MAILTRAP_API_TOKEN, 'content-type': 'application/json' }, body: JSON.stringify({ from, to: [{ email: to }], subject, text, html, category: 'account' }), signal: AbortSignal.timeout(6000) });
+    if (!r.ok) throw new Error('mail ' + r.status);
+    return;
+  }
+  await env.EMAIL.send({ to, from: env.MAIL_FROM, subject, text, html });
+}
+/* ---- one-time email codes: 6 digits, 10 minutes, 5 tries, stored only as a peppered hash ---- */
+const code6 = () => { const u = new Uint32Array(1); let n; do { crypto.getRandomValues(u); n = u[0]; } while (n >= 4294000000); return String(n % 1000000).padStart(6, '0'); };
+const otpHash = (env, uid, kind, code) => sha((env.PEPPER || '') + '|otp|' + uid + '|' + kind + '|' + code);
+const WHY = { ver: 'confirm your email', login: 'finish signing in', tfa: 'turn on sign-in codes' };
+async function sendOtp(env, uid, email, kind, ch) {
+  const row = await env.DB.prepare('SELECT sent FROM otp WHERE uid=? AND kind=?').bind(uid, kind).first();
+  if (row && kind !== 'login' && Date.now() - row.sent < 60000) return 'wait';
+  const code = code6(), now = Date.now();
+  await env.DB.prepare('INSERT INTO otp(uid,kind,h,ch,exp,tries,sent) VALUES(?,?,?,?,?,0,?) ON CONFLICT(uid,kind) DO UPDATE SET h=excluded.h,ch=excluded.ch,exp=excluded.exp,tries=0,sent=excluded.sent').bind(uid, kind, await otpHash(env, uid, kind, code), ch ? await sha(ch) : null, now + 600000, now).run();
+  const brand = env.BRAND || 'Voltaxis';
+  await sendMail(env, email, brand + ' code: ' + code, 'Your code to ' + WHY[kind] + ' is ' + code + '.\n\nIt works for 10 minutes. If you did not ask for it, ignore this email. Nobody can get in without it.\n', '<p>Your code to ' + WHY[kind] + ':</p><p style="font:700 28px monospace;letter-spacing:6px">' + code + '</p><p style="color:#555">It works for 10 minutes. If you did not ask for it, ignore this email.</p>');
+  return 'sent';
+}
+async function checkOtp(env, uid, kind, code) {
+  const row = await env.DB.prepare('SELECT h,exp,tries FROM otp WHERE uid=? AND kind=?').bind(uid, kind).first();
+  if (!row || row.exp < Date.now() || row.tries >= 5) return false;
+  await env.DB.prepare('UPDATE otp SET tries=tries+1 WHERE uid=? AND kind=?').bind(uid, kind).run();
+  if (!/^\d{6}$/.test(String(code || '')) || row.h !== (await otpHash(env, uid, kind, String(code)))) return false;
+  await env.DB.prepare('DELETE FROM otp WHERE uid=? AND kind=?').bind(uid, kind).run();
+  return true;
+}
+const maskEmail = (e) => { const [n, d] = e.split('@'); return n.slice(0, 2) + '***@' + d; };
+/* ---- Cloudflare Turnstile (CAPTCHA). Off until TURNSTILE_SECRET is set. ---- */
+async function captchaOk(env, b, req, ip) {
+  if (!env.TURNSTILE_SECRET) return true;
+  const tok = String(b.cf || '').slice(0, 2048); if (!tok) return false;
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: tok, remoteip: ip }), signal: AbortSignal.timeout(5000) });
+    const j = await r.json(); return !!j.success && (!j.hostname || j.hostname === new URL(req.url).hostname);
+  } catch { return false; }
+}
+/* accounts that never confirmed their email are deleted after 7 days (data minimisation) */
+async function purgeUnverified(env) {
+  const t = Date.now() - 7 * 864e5, sub = '(SELECT id FROM users WHERE ver=0 AND created<?)';
+  await env.DB.prepare('DELETE FROM sessions WHERE uid IN ' + sub).bind(t).run();
+  await env.DB.prepare('DELETE FROM otp WHERE uid IN ' + sub).bind(t).run();
+  await env.DB.prepare('DELETE FROM users WHERE ver=0 AND created<?').bind(t).run();
+}
 async function newSession(env, uid) {
   const tok = hex(rnd(32)), csrf = hex(rnd(16)), exp = Math.floor(Date.now() / 1000) + SESSION_TTL;
   await env.DB.prepare('INSERT INTO sessions(h,uid,exp,csrf) VALUES(?,?,?,?)').bind(await sha(tok), uid, exp, csrf).run();
@@ -59,7 +137,7 @@ function out(o, s, h) { const res = J(o, s); if (h && h['set-cookie']) h['set-co
 
 async function auth(req, env) {
   const tok = getCookie(req, '__Host-sid'); if (!tok) return null;
-  const s = await env.DB.prepare('SELECT s.uid,s.exp,s.csrf,u.username,u.email,u.pub,u.shared FROM sessions s JOIN users u ON u.id=s.uid WHERE s.h=?').bind(await sha(tok)).first();
+  const s = await env.DB.prepare('SELECT s.uid,s.exp,s.csrf,u.username,u.email,u.pub,u.shared,u.ver,u.tfa,(u.pw IS NOT NULL) AS haspw FROM sessions s JOIN users u ON u.id=s.uid WHERE s.h=?').bind(await sha(tok)).first();
   if (!s || s.exp < Date.now() / 1000) return null;
   return s;
 }
@@ -87,7 +165,7 @@ async function googleVerify(cred, env) {
 const clampN = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(+v) || 0));
 async function meObj(env, s) {
   const saves = (await env.DB.prepare('SELECT pack,xp,upd FROM saves WHERE uid=?').bind(s.uid).all()).results;
-  return { username: s.username, email: s.email, needUsername: !s.username, packs: saves, shared: JSON.parse(s.shared || '{}'), pub: JSON.parse(s.pub || '{}'), csrf: s.csrf };
+  return { username: s.username, email: s.email, needUsername: !s.username, packs: saves, shared: JSON.parse(s.shared || '{}'), pub: JSON.parse(s.pub || '{}'), csrf: s.csrf, verified: s.ver !== 0, tfa: !!s.tfa, canTfa: mailOk(env) && !!s.haspw && s.ver !== 0 };
 }
 
 const R = {};
@@ -97,21 +175,40 @@ R['POST /signup'] = async (req, env, ip) => {
   if (!ok_email(email)) return J({ error: 'Enter a valid email.' }, 400);
   if (!ok_user(user)) return J({ error: 'Username: 3-16 letters, numbers or _. Do not use your real name.' }, 400);
   const pr = pwProblem(b.password, email, user); if (pr) return J({ error: pr }, 400);
+  if (!(await captchaOk(env, b, req, ip))) return J({ error: 'Please complete the security check.' }, 400);
+  if (await pwBreached(b.password)) return J({ error: 'That password appears in known data breaches. Choose a different one.' }, 400);
   const ex = await env.DB.prepare('SELECT 1 FROM users WHERE email=? OR username=?').bind(email, user).first();
   if (ex) return J({ error: 'That email or username is already in use.' }, 409);
-  const r = await env.DB.prepare('INSERT INTO users(email,username,pw,created) VALUES(?,?,?,?)').bind(email, user, await hashPw(b.password, env), Date.now()).run();
-  const uid = r.meta.last_row_id; const h = await newSession(env, uid);
+  const r = await env.DB.prepare('INSERT INTO users(email,username,pw,created,ver) VALUES(?,?,?,?,?)').bind(email, user, await hashPw(b.password, env), Date.now(), mailOk(env) ? 0 : 1).run();
+  const uid = r.meta.last_row_id;
+  if (mailOk(env)) { await purgeUnverified(env); try { await sendOtp(env, uid, email, 'ver'); } catch (e) { console.error('verify mail', e && e.message); } } const h = await newSession(env, uid);
   const s = await auth(new Request(req.url, { headers: { cookie: h['set-cookie'][0].split(';')[0] } }), env);
   return out(await meObj(env, s), 200, h);
 };
 R['POST /login'] = async (req, env, ip) => {
   const b = await body(req); const id = String(b.id || '').trim().toLowerCase();
   if (!(await rate(env, 'li:' + ip, 30, 900)) || !(await rate(env, 'lu:' + id.slice(0, 64), 10, 900))) return J({ error: 'Too many attempts. Wait 15 minutes.' }, 429);
-  const u = await env.DB.prepare('SELECT id,pw FROM users WHERE email=? OR username=?').bind(id, id).first();
+  if (!(await captchaOk(env, b, req, ip))) return J({ error: 'Please complete the security check.' }, 400);
+  const u = await env.DB.prepare('SELECT id,pw,email,tfa FROM users WHERE email=? OR username=?').bind(id, id).first();
   const dummy = 'pbkdf2$100000$AAAAAAAAAAAAAAAAAAAAAA==$' + b64(new Uint8Array(32));
   const good = await checkPw(String(b.password || '').slice(0, 128), u && u.pw ? u.pw : dummy, env);
   if (!u || !u.pw || !good) return J({ error: 'Wrong email/username or password.' }, 401);
+  if (u.tfa && mailOk(env)) { /* 2FA: password was right, now an emailed code finishes the sign-in */
+    const ch = hex(rnd(16));
+    try { await sendOtp(env, u.id, u.email, 'login', ch); } catch (e) { console.error('2fa mail', e && e.message); return J({ error: 'We could not send your code. Try again in a minute.' }, 503); }
+    return J({ need2fa: true, ch, to: maskEmail(u.email) });
+  }
   const h = await newSession(env, u.id);
+  const s = await auth(new Request(req.url, { headers: { cookie: h['set-cookie'][0].split(';')[0] } }), env);
+  return out(await meObj(env, s), 200, h);
+};
+R['POST /login/2fa'] = async (req, env, ip) => {
+  if (!(await rate(env, 'l2:' + ip, 20, 900))) return J({ error: 'Too many attempts. Wait 15 minutes.' }, 429);
+  const b = await body(req, 1024), ch = String(b.ch || '');
+  if (!/^[a-f0-9]{32}$/.test(ch)) return J({ error: 'That code did not work.' }, 401);
+  const row = await env.DB.prepare("SELECT uid FROM otp WHERE kind='login' AND ch=?").bind(await sha(ch)).first();
+  if (!row || !(await checkOtp(env, row.uid, 'login', b.code))) return J({ error: 'That code did not work. Check it or sign in again for a new one.' }, 401);
+  const h = await newSession(env, row.uid);
   const s = await auth(new Request(req.url, { headers: { cookie: h['set-cookie'][0].split(';')[0] } }), env);
   return out(await meObj(env, s), 200, h);
 };
@@ -120,16 +217,47 @@ R['POST /google'] = async (req, env, ip) => {
   const b = await body(req, 4096); let g;
   try { g = await googleVerify(b.credential, env); } catch (e) { return J({ error: e.message === 'nogoogle' ? 'Google sign-in is not set up.' : 'Google sign-in failed.' }, 401); }
   let u = await env.DB.prepare('SELECT id FROM users WHERE gsub=?').bind(g.sub).first();
-  if (!u) { u = await env.DB.prepare('SELECT id FROM users WHERE email=?').bind(g.email).first(); if (u) await env.DB.prepare('UPDATE users SET gsub=?, pw=NULL WHERE id=?').bind(g.sub, u.id).run(); /* pw cleared: stops pre-registration takeover of an email nobody verified */ }
+  if (!u) { u = await env.DB.prepare('SELECT id FROM users WHERE email=?').bind(g.email).first(); if (u) await env.DB.prepare('UPDATE users SET gsub=?, pw=NULL, ver=1, tfa=0 WHERE id=?').bind(g.sub, u.id).run(); /* pw cleared: stops pre-registration takeover of an email nobody verified */ }
   if (!u) { const r = await env.DB.prepare('INSERT INTO users(email,gsub,created) VALUES(?,?,?)').bind(g.email, g.sub, Date.now()).run(); u = { id: r.meta.last_row_id }; }
   const h = await newSession(env, u.id);
   const s = await auth(new Request(req.url, { headers: { cookie: h['set-cookie'][0].split(';')[0] } }), env);
   return out(await meObj(env, s), 200, h);
 };
-R['GET /config'] = async (req, env) => J({ google: env.GOOGLE_CLIENT_ID || null });
+R['GET /config'] = async (req, env) => J({ google: env.GOOGLE_CLIENT_ID || null, turnstile: env.TURNSTILE_SITE_KEY || null, verify: mailOk(env), tfa: mailOk(env) });
 /* authenticated */
 const A = {};
+const UNVERIFIED_OK = new Set(['GET /me', 'POST /logout', 'POST /verify', 'POST /verify/resend', 'POST /delete']);
 A['GET /me'] = async (req, env, s) => J(await meObj(env, s));
+A['POST /verify'] = async (req, env, s) => {
+  if (s.ver !== 0) return J({ ok: 1 });
+  if (!(await rate(env, 'vc:' + s.uid, 12, 900))) return J({ error: 'Too many tries. Wait 15 minutes.' }, 429);
+  const b = await body(req, 512);
+  if (!(await checkOtp(env, s.uid, 'ver', b.code))) return J({ error: 'That code did not work. Check it or send a new one.' }, 400);
+  await env.DB.prepare('UPDATE users SET ver=1 WHERE id=?').bind(s.uid).run(); return J({ ok: 1 });
+};
+A['POST /verify/resend'] = async (req, env, s) => {
+  if (s.ver !== 0) return J({ ok: 1 });
+  if (!mailOk(env)) return J({ error: 'Email is not set up.' }, 503);
+  if (!(await rate(env, 'vr:' + s.uid, 6, 3600))) return J({ error: 'Too many emails. Try again in an hour.' }, 429);
+  try { return (await sendOtp(env, s.uid, s.email, 'ver')) === 'wait' ? J({ error: 'Wait a minute before asking again.' }, 429) : J({ ok: 1, to: maskEmail(s.email) }); } catch (e) { console.error('verify mail', e && e.message); return J({ error: 'We could not send the email. Try again soon.' }, 503); }
+};
+A['POST /2fa/start'] = async (req, env, s) => {
+  if (!mailOk(env) || !s.haspw) return J({ error: 'Sign-in codes are not available for this account.' }, 400);
+  if (!(await rate(env, 'tf:' + s.uid, 6, 3600))) return J({ error: 'Too many emails. Try again in an hour.' }, 429);
+  try { return (await sendOtp(env, s.uid, s.email, 'tfa')) === 'wait' ? J({ error: 'Wait a minute before asking again.' }, 429) : J({ ok: 1, to: maskEmail(s.email) }); } catch (e) { console.error('2fa mail', e && e.message); return J({ error: 'We could not send the email. Try again soon.' }, 503); }
+};
+A['POST /2fa/confirm'] = async (req, env, s) => {
+  if (!(await rate(env, 'tc:' + s.uid, 12, 900))) return J({ error: 'Too many tries. Wait 15 minutes.' }, 429);
+  const b = await body(req, 512);
+  if (!(await checkOtp(env, s.uid, 'tfa', b.code))) return J({ error: 'That code did not work.' }, 400);
+  await env.DB.prepare('UPDATE users SET tfa=1 WHERE id=?').bind(s.uid).run(); return J({ ok: 1 });
+};
+A['POST /2fa/off'] = async (req, env, s) => {
+  if (!(await rate(env, 'to:' + s.uid, 8, 900))) return J({ error: 'Too many tries. Wait 15 minutes.' }, 429);
+  const b = await body(req, 1024), u = await env.DB.prepare('SELECT pw FROM users WHERE id=?').bind(s.uid).first();
+  if (!u || !u.pw || !(await checkPw(String(b.password || '').slice(0, 128), u.pw, env))) return J({ error: 'Wrong password.' }, 401);
+  await env.DB.prepare('UPDATE users SET tfa=0 WHERE id=?').bind(s.uid).run(); return J({ ok: 1 });
+};
 A['POST /logout'] = async (req, env, s) => { await env.DB.prepare('DELETE FROM sessions WHERE uid=? AND csrf=?').bind(s.uid, s.csrf).run(); return out({ ok: 1 }, 200, { 'set-cookie': [cookie('__Host-sid', '', 0, true), cookie('__Host-csrf', '', 0, false)] }); };
 A['POST /username'] = async (req, env, s) => {
   const b = await body(req); const user = String(b.username || '').trim().toLowerCase();
@@ -139,7 +267,7 @@ A['POST /username'] = async (req, env, s) => {
   await env.DB.prepare('UPDATE users SET username=? WHERE id=?').bind(user, s.uid).run(); return J({ username: user });
 };
 A['POST /delete'] = async (req, env, s) => {
-  const b = [['DELETE FROM sessions WHERE uid=?'], ['DELETE FROM saves WHERE uid=?'], ['DELETE FROM weekly WHERE uid=?'], ['DELETE FROM notify WHERE uid=?'], ['DELETE FROM friends WHERE a=? OR b=?', 2], ['DELETE FROM users WHERE id=?']];
+  const b = [['DELETE FROM sessions WHERE uid=?'], ['DELETE FROM saves WHERE uid=?'], ['DELETE FROM weekly WHERE uid=?'], ['DELETE FROM notify WHERE uid=?'], ['DELETE FROM otp WHERE uid=?'], ['DELETE FROM friends WHERE a=? OR b=?', 2], ['DELETE FROM users WHERE id=?']];
   for (const [q, n] of b) await env.DB.prepare(q).bind(...Array(n || 1).fill(s.uid)).run();
   return out({ ok: 1 }, 200, { 'set-cookie': [cookie('__Host-sid', '', 0, true), cookie('__Host-csrf', '', 0, false)] });
 };
@@ -536,6 +664,10 @@ export async function onRequest({ request, env }) {
   try {
     const ip = request.headers.get('cf-connecting-ip') || 'x';
     if (request.method === 'POST') { const o = request.headers.get('origin'); if (o && o !== url.origin) return J({ error: 'forbidden' }, 403); }
+    if (request.method === 'POST' && path === '/csp-report') { /* browsers send CSP violation reports here (report-only trial); logged briefly, never stored */
+      try { console.log('csp-report', (await request.text()).slice(0, 3000).replace(/\s+/g, ' ')); } catch { /* ignore */ }
+      return new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } });
+    }
     if (request.method === 'GET' && path === '/unsub') { if (!env.DB) return J({ error: 'Not available.' }, 503); return await unsubPage(request, env); }
     if (G[key]) { /* online play needs only the database: guests may play without accounts */
       if (!env.DB) return J({ error: 'Online play is not available here.' }, 503);
@@ -543,10 +675,12 @@ export async function onRequest({ request, env }) {
       return await G[key](request, env, ip);
     }
     if (!env.DB || !env.PEPPER) return J({ error: 'Accounts are not configured.' }, 503);
+    await ensureSchema(env);
     if (R[key]) { if (request.method === 'POST' && !(request.headers.get('content-type') || '').startsWith('application/json')) return J({ error: 'bad type' }, 415); return await R[key](request, env, ip); }
     if (A[key]) {
       const s = await auth(request, env); if (!s) return J({ error: 'Sign in required.' }, 401);
       if (request.method === 'POST' && !csrfOk(request, s)) return J({ error: 'forbidden' }, 403);
+      if (s.ver === 0 && !UNVERIFIED_OK.has(key)) return J({ error: 'Confirm your email first.', verify: true }, 403);
       return await A[key](request, env, s);
     }
     return J({ error: 'Not found' }, 404);
