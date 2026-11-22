@@ -138,3 +138,10 @@ Rewrote guest-mode text (sign-in is now required), added shared Skyvolt/Axiom ac
 - Questions: arithmetic recheck of 2,286 worked equations (0 real errors); show/value match on 4,057 numeric keys (0); expert read of 210 stratified questions found 4 certain issues.
 - Real bug class found and fixed: for prefixed units (mA, kΩ, ms, µF, kWh) some answers were stored in the displayed unit while the grader expects base units, so a correct typed answer could be marked wrong and the "Answer:" line was nonsense (e.g. 20000 ms). `src/unitfix.py` now normalises at build (21 Circuit questions). Fuse-rating questions now list the standard ratings (exact match); binary-sum answers graded exactly; est-014/kvl-092/cir-031 keys corrected; cir-151 reason fixed; Apex wording fixes (lm-010, sr-009, ra-123, tc-098).
 - Not changed (judgement calls): some Quanta/Apex items go beyond Division B (calculus, Gauss's law); a few level labels look one step high.
+
+## Nov 22 — mega audit, part 2
+- CSP: both sites and all four trainers load with the production Content-Security-Policy and produce zero violations (all tabs, arcade, online menu).
+- Backend review: parameterized SQL only, double-submit CSRF plus Origin check, per-route rate limits (keys now hashed), PBKDF2-SHA256 100k (the Workers maximum) with per-user salt and pepper, body-size caps, 8 h sessions. No findings.
+- Cross-browser: Firefox/WebKit cannot be installed in the build sandbox, so only Chromium was run. Static audit: every modern CSS feature has a fallback (added one for the Host/Versus tile gradients). Real-device check on Safari/iOS and Firefox is still recommended.
+- Site: added top-right search (client-side, over pages and topic names), breadcrumbs on inner pages, and fixed zero side gutters on phones (header, legal pages, hero) that the symmetry test could not see.
+- Docs: README/ACCOUNTS deploy steps now describe Workers (not Pages).

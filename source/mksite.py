@@ -55,7 +55,7 @@ a{color:var(--acc);text-underline-offset:3px}a:hover{text-decoration-thickness:2
 .skip{position:absolute;left:12px;top:-60px;background:var(--pri);color:var(--onpri);padding:10px 16px;border-radius:10px;z-index:99;font-weight:700}.skip:focus{top:12px}
 .wrap{width:min(1080px,100%%);margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-header .in{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0}
+header .in{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
 .logo{display:flex;align-items:center;gap:10px;color:var(--tx);text-decoration:none;font-weight:800;font-size:1.25rem}
 .logo svg{width:34px;height:34px}
 nav ul{display:flex;gap:4px 16px;flex-wrap:wrap;list-style:none;margin:0;padding:0}nav a{color:var(--tx);text-decoration:none;font-weight:600;padding:10px 4px;display:inline-block;min-height:44px}nav a:hover,nav a[aria-current]{color:var(--acc);text-decoration:underline}
@@ -64,7 +64,7 @@ nav ul{display:flex;gap:4px 16px;flex-wrap:wrap;list-style:none;margin:0;padding
 .btn:hover{transform:translateY(1px);box-shadow:0 3px 0 color-mix(in srgb,var(--pri) 55%%,#000)}.btn:active{transform:translateY(4px);box-shadow:none}
 .btn.sec{background:transparent;color:var(--tx);border-color:var(--line);box-shadow:none}.btn.sec:hover{border-color:var(--pri)}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
-.hero{padding:56px 0 40px;display:grid;gap:32px;grid-template-columns:1.1fr .9fr;align-items:center}
+.hero{padding-block:56px 40px;display:grid;gap:32px;grid-template-columns:1.1fr .9fr;align-items:center}
 h1{font-size:clamp(2rem,5.5vw,3.4rem);line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}h2{font-size:clamp(1.5rem,3.6vw,2.1rem);line-height:1.2;margin:0 0 12px}h3{font-size:1.15rem;margin:0 0 6px}
 .lead{font-size:1.2rem;color:var(--mut);max-width:34em}.cta{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 8px}
 .pill{display:inline-block;background:var(--soft);color:var(--tx);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.9rem;font-weight:600}
@@ -77,7 +77,7 @@ a.trk{display:block;color:var(--tx);text-decoration:none}a.trk:hover{border-colo
 .stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:20px}.stats div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:center}.stats b{display:block;font-size:1.8rem;line-height:1.1}.stats span{color:var(--mut);font-size:.9rem}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0;padding:0;list-style:none}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--mut);font-size:.95rem}footer ul{display:flex;flex-wrap:wrap;gap:4px 20px;list-style:none;padding:0;margin:0 0 10px}footer a{color:var(--tx);display:inline-block;padding:8px 0}
-.doc{max-width:760px;margin:0 auto;padding:36px 0 56px}.doc h2{margin-top:32px;font-size:1.45rem}.doc li{margin:6px 0}.doc table{border-collapse:collapse;width:100%%;font-size:.95rem}.doc th,.doc td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.doc th{background:var(--soft)}
+.doc{max-width:760px;margin:0 auto;padding-block:36px 56px}.doc h2{margin-top:32px;font-size:1.45rem}.doc li{margin:6px 0}.doc table{border-collapse:collapse;width:100%%;font-size:.95rem}.doc th,.doc td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.doc th{background:var(--soft)}
 input[type=checkbox]{width:22px;height:22px;accent-color:var(--acc)}.note a{color:var(--tx);font-weight:700}.note{background:var(--soft);border-left:5px solid var(--pri);border-radius:10px;padding:12px 16px;margin:16px 0}
 form.acc{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:24px;max-width:460px;margin:0 auto}
 .fld{display:block;margin:0 0 14px}.fld span{display:block;font-weight:700;margin-bottom:4px}.fld small{color:var(--mut)}
@@ -88,6 +88,10 @@ input:focus{border-color:var(--pri)}input[aria-invalid=true]{border-color:#c4302
 .msg{min-height:1.5em;margin:10px 0;font-weight:600}.msg.bad{color:#c4302b}@media(prefers-color-scheme:dark){.msg.bad{color:#ff8f8a}input[aria-invalid=true]{border-color:#ff8f8a}}
 .or{display:flex;align-items:center;gap:12px;color:var(--mut);margin:16px 0}.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
 @media(max-width:700px){header.top{position:static}header .in nav{order:3;width:100%%}header .in .btn{min-height:44px;padding:0 14px}nav a{padding:6px 2px;min-height:32px}}
+header .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}input[type=search]{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 14px;min-height:44px;width:190px;box-sizing:border-box}input[type=search]:focus{outline:3px solid var(--pri);outline-offset:1px}
+.srch{position:relative;margin:0}.srch ul{position:absolute;right:0;top:calc(100%% + 6px);width:min(320px,86vw);margin:0;padding:6px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.15);z-index:30}.srch li a{display:block;padding:10px 12px;border-radius:8px;color:var(--tx);text-decoration:none;min-height:24px}.srch li a:hover,.srch li a:focus{background:var(--soft)}.srch li small{display:block;color:var(--mut)}
+.crumbs{width:min(1080px,100%%);margin:0 auto;padding:14px max(16px,env(safe-area-inset-left)) 0;box-sizing:border-box}.crumbs ol{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0;font-size:.9rem;color:var(--mut)}.crumbs li+li:before{content:"/";margin-right:6px}.crumbs a{color:var(--mut)}
+@media(max-width:520px){header .in>.btn:not(.sec){display:none}}@media(max-width:700px){.srch{order:4;flex:1 1 100%%}.srch input{width:100%%}.srch ul{left:0;right:auto;width:100%%}}
 @media(max-width:820px){.hero{grid-template-columns:1fr;padding-top:32px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{header.top,.cta,.skip{display:none}}
@@ -97,13 +101,15 @@ NAV=[('/#how','How it works'),('/#topics','Topics')]
 def page(path,title,body,desc='',cur='',head='',tail=''):
     nav=''.join(f'<li><a href="{h}"{" aria-current=page" if h==cur else ""}>{t}</a></li>' for h,t in NAV)
     d=html.escape(desc or B['sub'],quote=True)
+    ct=html.escape(title.split(' · ')[0])
+    crumb='' if path in('index','hub','404') else f'<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">{ct}</li></ol></nav>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="{B['pri']}">
 <title>{html.escape(title)}</title><meta name="description" content="{d}"><meta property="og:title" content="{html.escape(title)}"><meta property="og:description" content="{d}"><meta property="og:type" content="website">
 <link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="stylesheet" href="/site.css">{head}</head><body>
 <a class="skip" href="#main">Skip to main content</a>
-<header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
-<main id="main" tabindex="-1">{body}</main>
+<header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><form class="srch" role="search" onsubmit="return false"><label class="sr" for="sq">Search {N}</label><input id="sq" type="search" placeholder="Search" autocomplete="off" aria-controls="sres" maxlength="60"><ul id="sres" hidden></ul></form><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
+<main id="main" tabindex="-1">{crumb}{body}</main>
 <footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li></ul></nav>
 <p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom). <span data-sister-wrap hidden>Also try <a data-sister href="#">{SIS}: {SISD}</a>.</span></p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc.</p></div></footer>
 {'<script src="/account.js" defer></script>' if path=='account' else ''}<script src="/nav.js" defer></script>{tail}
@@ -233,6 +239,16 @@ def account():
 </div>'''
     return page('account',f'Sign in · {N}',b,f'Sign in to {N}, or create a free account.')
 NAVJS=r'''(function(){"use strict";
+(function(){var i=document.getElementById("sq"),l=document.getElementById("sres"),ix=null,sel=-1;if(!i||!l)return;
+function load(c){if(ix)return c();fetch("/search.json").then(function(r){return r.json()}).then(function(j){ix=j;c()}).catch(function(){ix=[];c()})}
+function show(q){q=q.trim().toLowerCase();l.innerHTML="";sel=-1;if(q.length<2){l.hidden=true;return}
+var r=ix.map(function(e){var t=e.t.toLowerCase(),d=(e.d||"").toLowerCase(),s=t.indexOf(q)===0?3:t.indexOf(q)>=0?2:d.indexOf(q)>=0?1:0;return[s,e]}).filter(function(x){return x[0]}).sort(function(a,b){return b[0]-a[0]}).slice(0,6);
+if(!r.length){var n=document.createElement("li");n.textContent="No matches. Try a topic name.";n.style.padding="10px 12px";l.appendChild(n)}
+r.forEach(function(x){var li=document.createElement("li"),a=document.createElement("a"),sm=document.createElement("small");a.href=x[1].u;a.textContent=x[1].t;sm.textContent=x[1].d||"";a.appendChild(sm);li.appendChild(a);l.appendChild(li)});l.hidden=false}
+i.addEventListener("input",function(){load(function(){show(i.value)})});
+i.addEventListener("keydown",function(e){var a=[].slice.call(l.querySelectorAll("a"));if(e.key==="Escape"){l.hidden=true;return}if(e.key==="ArrowDown"&&a.length){e.preventDefault();sel=Math.min(sel+1,a.length-1);a[sel].focus()}if(e.key==="Enter"&&a.length){location.href=a[0].href}});
+l.addEventListener("keydown",function(e){var a=[].slice.call(l.querySelectorAll("a"));if(e.key==="ArrowDown"){e.preventDefault();sel=Math.min(sel+1,a.length-1);a[sel].focus()}if(e.key==="ArrowUp"){e.preventDefault();sel--;if(sel<0){i.focus()}else a[sel].focus()}if(e.key==="Escape"){l.hidden=true;i.focus()}});
+document.addEventListener("click",function(e){if(!e.target.closest(".srch"))l.hidden=true})})();
 (function(){var h=location.hostname.toLowerCase(),me="__ME__",ot="__OT__";if(h.indexOf(me)<0)return;var u=location.protocol+"//"+h.replace(me,ot)+(location.port?":"+location.port:"")+"/";[].forEach.call(document.querySelectorAll("[data-sister]"),function(a){a.href=u;a.rel="noopener"});[].forEach.call(document.querySelectorAll("[data-sister-wrap]"),function(w){w.hidden=false})})();
 function ck(){var m=document.cookie.split("; ").filter(function(c){return c.indexOf("__Host-csrf=")===0})[0];return m?m.slice(12):""}
 fetch("/api/me",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/json/.test(r.headers.get("content-type")||""))throw 0;return r.json()}).then(function(j){if(!j||!j.username)return;
@@ -301,6 +317,12 @@ W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.
 W('app/index.html',hub())
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
 W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS.replace('__ME__',N.lower()).replace('__OT__',SIS.lower()));shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
+import json as _j
+_ix=[{'t':'Sign in','u':'/account/','d':'Account and progress sync'},{'t':'Privacy policy','u':'/privacy/','d':'What we collect and your choices'},{'t':'Terms of service','u':'/terms/','d':'The rules for using '+N},{'t':'Accessibility','u':'/accessibility/','d':'How '+N+' supports all learners'},{'t':'AI disclosure','u':'/ai-disclosure/','d':'How AI was used and checked'}]
+for _n,_s,_c,_t in B['tracks']:
+    _ix.append({'t':_n,'u':'/app/','d':_s})
+    for _x in _t:_ix.append({'t':_x,'u':'/app/','d':'Topic in '+_n})
+W('search.json',_j.dumps(_ix,ensure_ascii=False))
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client https://cdn.jsdelivr.net/npm/katex@0.16.11/; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style https://cdn.jsdelivr.net/npm/katex@0.16.11/; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net/npm/katex@0.16.11/; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
