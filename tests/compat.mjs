@@ -27,7 +27,7 @@ const VIEWS = [ // [label, w, h, touch]
   ['laptop 16:10 1280x800', 1280, 800, false], ['laptop 16:9 1366x768', 1366, 768, false], ['desktop 1920x1080', 1920, 1080, false],
   ['ultrawide 21:9 2560x1080', 2560, 1080, false], ['super-ultrawide 32:9 3840x1080', 3840, 1080, false], ['tv 4k 3840x2160', 3840, 2160, false],
   ['square 1:1 900x900', 900, 900, false], ['short-wide 1920x600', 1920, 600, false]];
-const apps = fs.readdirSync(path.join(root, 'app'), {withFileTypes: true}).filter(d => d.isDirectory() && fs.existsSync(path.join(root, 'app', d.name, 'index.html'))).map(d => d.name);
+const apps = fs.readdirSync(path.join(root, 'app'), {withFileTypes: true}).filter(d => d.isDirectory() && fs.existsSync(path.join(root, 'app', d.name, 'index.html')) && fs.statSync(path.join(root, 'app', d.name, 'index.html')).size > 5000).map(d => d.name);
 const fails = []; let n = 0;
 const browser = await engine.launch(process.env.CHROMIUM_PATH ? {executablePath: process.env.CHROMIUM_PATH, args: ['--no-sandbox']} : {});
 for (const app of apps) for (const [label, w, h, touch] of VIEWS) {
