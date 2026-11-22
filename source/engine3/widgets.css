@@ -309,3 +309,5 @@ html.rm .arcard,html.rm .arboss.hit{transition:none;animation:none}html.rm .arba
 .ogcard p{max-width:100%;overflow-wrap:anywhere}
 .arcard{align-content:start}
 .allxl{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}.allxl li{display:flex;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:12px;background:var(--sunk)}
+
+.rw2.static{flex-wrap:wrap}.rw2.static .rt{flex:1 1 150px}

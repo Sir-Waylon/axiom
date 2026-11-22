@@ -145,3 +145,6 @@ Rewrote guest-mode text (sign-in is now required), added shared Skyvolt/Axiom ac
 - Cross-browser: Firefox/WebKit cannot be installed in the build sandbox, so only Chromium was run. Static audit: every modern CSS feature has a fallback (added one for the Host/Versus tile gradients). Real-device check on Safari/iOS and Firefox is still recommended.
 - Site: added top-right search (client-side, over pages and topic names), breadcrumbs on inner pages, and fixed zero side gutters on phones (header, legal pages, hero) that the symmetry test could not see.
 - Docs: README/ACCOUNTS deploy steps now describe Workers (not Pages).
+
+## Nov 22 — real Firefox/WebKit results
+The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Windows, macOS, ARM) revealed one real bug: the Library tab overflowed sideways at 280 px (foldable cover screens) in every engine; the topic rows now wrap. The Ubuntu jobs were failing at setup because `ubuntu-latest` moved to 26.04, which Playwright cannot install on; pinned to ubuntu-24.04.
