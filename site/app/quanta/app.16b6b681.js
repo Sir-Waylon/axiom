@@ -1,3 +1,22 @@
+/* CSP helper: the Content-Security-Policy forbids inline style="" attributes and inline <style> elements.
+   This keeps pages that build HTML strings working: style attributes in HTML inserted with innerHTML,
+   outerHTML or insertAdjacentHTML are moved into data-cs and applied through the CSSOM (el.style), which CSP allows.
+   It also sends plain-HTTP visits (not localhost) to HTTPS so passwords are never typed on an unencrypted page. */
+(function(){
+try{var L=location;if(L.protocol==='http:'&&!/^(localhost|127\.|\[::1\]|.*\.localhost)/.test(L.hostname))L.replace('https://'+L.host+L.pathname+L.search+L.hash)}catch(e){}
+var TAG=/<[a-zA-Z][^\s>\/]*(?:"[^"]*"|'[^']*'|[^>"'])*>/g,ATT=/(\s)style\s*=\s*(?:"([^"]*)"|'([^']*)')/i;
+function strip(h){return h.replace(TAG,function(t){return t.indexOf('style')<0?t:t.replace(ATT,function(m,sp,a,b){return sp+'data-cs="'+(a!==undefined?a:(b||'').replace(/"/g,'&quot;'))+'"'})})}
+function fix(r){if(!r)return;var n=r.nodeType;if(n!==1&&n!==11)return;if(n===1&&r.hasAttribute('data-cs'))one(r);var l=r.querySelectorAll('[data-cs]');for(var i=0;i<l.length;i++)one(l[i])}
+function one(e){var v=e.getAttribute('data-cs');e.removeAttribute('data-cs');try{e.style.cssText=v}catch(x){}}
+function wrap(name){var d=Object.getOwnPropertyDescriptor(Element.prototype,name);if(!d||!d.set)return;
+ Object.defineProperty(Element.prototype,name,{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){var s=String(v);if(s.indexOf('style')<0){d.set.call(this,v);return}
+  var p=name==='outerHTML'?this.parentNode:null;d.set.call(this,strip(s));fix(name==='outerHTML'?p:(this.content||this))}})}
+wrap('innerHTML');wrap('outerHTML');
+var ia=Element.prototype.insertAdjacentHTML;
+Element.prototype.insertAdjacentHTML=function(w,h){var s=String(h);if(s.indexOf('style')<0)return ia.call(this,w,h);ia.call(this,w,strip(s));fix(w==='afterbegin'||w==='beforeend'?this:(this.parentNode||this))};
+document.addEventListener('DOMContentLoaded',function(){fix(document.documentElement)});
+})();
+
 var __SIB=[{"slug": "apex", "brand": "Apex", "tag": "Algebra 1 to Calculus III", "acc": "#BC4749"}, {"slug": "quanta", "brand": "Quanta", "tag": "Electrical engineering and physics", "acc": "#0F4C5C"}];
 /* Open-mode storage: no passcode. Tamper-EVIDENT checksum (casual edits are discarded), not tamper-proof. */
 var __SEC=(function(){
@@ -3723,7 +3742,7 @@ var CSS='#prt{position:fixed;inset:0;z-index:90;background:#fff;color:#111;overf
 +'#prt .nt .card,#prt .nt details{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:4px 0!important}#prt .nt .f{display:block;font-family:ui-monospace,Menlo,Consolas,monospace;border:1px solid #888;border-radius:6px;padding:3px 8px;margin:3px 0}'
 +'#prt .ck li{list-style:"☐  ";margin:3px 0}#prt .ft{margin-top:10px;font-size:10.5px;color:#555;border-top:1px solid #aaa;padding-top:4px}'
 +'@media print{body>*:not(#prt){display:none!important}#prt{position:static!important;overflow:visible!important;inset:auto!important}#prt .pbar{display:none!important}#prt .pg{border:0;margin:0;padding:0;max-width:none;break-after:page}#prt .pg:last-child{break-after:auto}@page{size:letter;margin:.5in}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
-var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
+try{var sh=new CSSStyleSheet();sh.replaceSync(CSS);document.adoptedStyleSheets=(document.adoptedStyleSheets||[]).concat([sh])}catch(e){var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st)}
 function E(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function head(t){return '<h1>'+E(P.meta.title)+' '+E(P.meta.division||'')+'</h1><div class="sub">'+t+' · Voltaxis study kit · printed '+new Date().toLocaleDateString()+'</div>'}
 var FT='<div class="ft">Check the official rules and your event supervisor for what is allowed in the room. Study aid only; not an official rules document.</div>';
@@ -5388,7 +5407,7 @@ window.__graphParse=compile;window.__graphPresets=PRE;window.__graphGeo={tri:tri
    skip the placement check, preview every learning plan, unlock every cosmetic, add coins. It changes this device's saved progress only.
    It is a convenience, not a security boundary, and it is clearly labelled while it is on. */
 (function(){
-var SALT='voltaxis-dev-v1',HASH='4aa5032ac37d0ba62b88bad4a14c03b8f00b5011379373603ac82fc106a111ae';
+var SALT='voltaxis-dev-de9724ad',HASH='9b684a0796040200cfd9e1509c7779ba740f121e47842dd50f04f3dd449beb17';
 var K256=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
 function sha256(str){var b=[],i,j;for(i=0;i<str.length;i++){var c=str.charCodeAt(i);if(c<128)b.push(c);else if(c<2048)b.push(192|c>>6,128|c&63);else b.push(224|c>>12,128|(c>>6)&63,128|c&63)}
  var l=b.length*8;b.push(128);while(b.length%64!==56)b.push(0);for(i=7;i>=0;i--)b.push(i>3?0:(l>>>(i*8))&255);
@@ -5429,5 +5448,53 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='devk'){var b=document.querySelector('[data-dev="unlock"]');b&&b.click()}});
 var _r=route;route=function(){var r=_r.apply(this,arguments);chip();return r};
 window.__sha256=sha256;chip();
+})();
+
+/* ===== Optional cookie + optional diagnostics (both OFF until the person turns them on in Me > Settings) =====
+   1. Progress cookie "vx_pg": a tiny first-party summary (trainer, level, XP, answers) so the home page can say "Welcome back".
+      Your full progress stays in your account / on this device. Turning it off deletes the cookie.
+   2. Diagnostics: measures this device (cores, memory, screen, connection, a short speed test) and keeps the last few
+      errors on this device only. Nothing is sent unless you press "Send to developer". */
+(function(){
+var CK='vx:consent',DK='vx:diag',C={pg:0,dg:0};
+try{C=Object.assign(C,JSON.parse(localStorage.getItem(CK)||'{}'))}catch(e){}
+function sc(){try{localStorage.setItem(CK,JSON.stringify(C))}catch(e){}}
+function slug(){var m=/\/app\/([a-z0-9-]+)\//.exec(location.pathname);return m?m[1]:''}
+function setCookie(on){var s=location.protocol==='https:'?'; Secure':'';
+ if(!on){document.cookie='vx_pg=; Max-Age=0; Path=/; SameSite=Lax'+s;return}
+ try{var o={s:slug(),l:lvInfo().l,x:Math.round(S.xp||0),t:S.total||0,d:new Date().toISOString().slice(0,10)};
+  document.cookie='vx_pg='+encodeURIComponent(JSON.stringify(o))+'; Max-Age=15552000; Path=/; SameSite=Lax'+s}catch(e){}}
+var last=0,_sv=save;save=function(){_sv.apply(this,arguments);if(C.pg&&Date.now()-last>5000){last=Date.now();setCookie(1)}};
+/* ---- diagnostics ---- */
+function base(u){return String(u||'').replace(/^.*[\/\\]/,'').replace(/[?#].*$/,'')}
+function log(){try{return JSON.parse(localStorage.getItem(DK)||'[]')}catch(e){return[]}}
+function add(m,src,ln,col,st){if(!C.dg)return;var l=log();l.push({t:new Date().toISOString().slice(0,19),m:String(m).slice(0,200),f:base(src)+':'+(ln||0)+':'+(col||0),k:String(st||'').replace(/https?:\/\/[^\s)]*\//g,'').slice(0,500),a:slug(),w:innerWidth+'x'+innerHeight});
+ try{localStorage.setItem(DK,JSON.stringify(l.slice(-15)))}catch(e){}}
+addEventListener('error',function(e){add(e.message,e.filename,e.lineno,e.colno,e.error&&e.error.stack)});
+addEventListener('unhandledrejection',function(e){var r=e.reason;add('Promise: '+(r&&r.message||r),'',0,0,r&&r.stack)});
+var longT=0;try{new PerformanceObserver(function(l){longT+=l.getEntries().length}).observe({entryTypes:['longtask']})}catch(e){}
+function bench(){var t=performance.now(),x=0;for(var i=0;i<3e6;i++)x+=Math.sqrt(i)*Math.sin(i);return Math.round(performance.now()-t)}
+function gpu(){try{var c=document.createElement('canvas'),g=c.getContext('webgl'),e=g&&g.getExtension('WEBGL_debug_renderer_info');return e?String(g.getParameter(e.UNMASKED_RENDERER_WEBGL)).slice(0,80):'hidden by browser'}catch(e){return'unavailable'}}
+function scan(){var n=navigator,cn=n.connection||{},nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{},ms=bench();
+ var r={cores:n.hardwareConcurrency||0,memGB:n.deviceMemory||0,screen:screen.width+'x'+screen.height,dpr:window.devicePixelRatio||1,viewport:innerWidth+'x'+innerHeight,net:cn.effectiveType||'unknown',saveData:!!cn.saveData,
+  loadMs:Math.round(nav.loadEventEnd||nav.duration||0),longTasks:longT,speedTestMs:ms,gpu:gpu(),touch:n.maxTouchPoints||0,app:slug(),ua:String(n.userAgent).slice(0,160)};
+ r.rating=(ms>350||(r.cores&&r.cores<=2)||(r.memGB&&r.memGB<=2))?'slow':ms>150?'ok':'fast';return r}
+function tips(r){var t=[];if(r.rating==='slow')t.push('Turn on Reduce motion in Settings and close other tabs.');if(r.net==='slow-2g'||r.net==='2g')t.push('The connection is slow; the trainer keeps working offline after the first load.');if(r.saveData)t.push('Data saver is on.');if(!t.length)t.push('This device looks fine.');return t}
+var res=null;
+function card(){var e=log();
+ return '<div class="card set"><h3>Cookies and diagnostics (optional)</h3><p class="small mute">Both are off until you choose. Neither is needed to study.</p>'
+ +'<label><input type="checkbox" id="cs-pg"'+(C.pg?' checked':'')+'> Remember a small progress summary on this device (cookie <code>vx_pg</code>, 180 days)</label>'
+ +'<label><input type="checkbox" id="cs-dg"'+(C.dg?' checked':'')+'> Check this device&rsquo;s speed and keep recent error details to help fix bugs</label>'
+ +(C.dg?'<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sec sm" id="cs-run">Run device check</button><button class="btn sec sm" id="cs-send"'+((res||e.length)?'':' disabled')+'>Send to developer</button><button class="btn sec sm" id="cs-clr">Clear</button></div>'
+  +(res?'<div class="small" id="cs-out" role="status"><b>Device: '+res.rating+'</b> · '+res.cores+' cores · '+(res.memGB?res.memGB+' GB memory · ':'')+res.screen+' @'+res.dpr+'x · network '+res.net+' · speed test '+res.speedTestMs+' ms<br>GPU: '+esc(res.gpu)+'<br>'+tips(res).map(esc).join(' ')+'</div>':'')
+  +'<p class="small mute">'+e.length+' recent error'+(e.length===1?'':'s')+' saved on this device'+(e.length?': latest &ldquo;'+esc(e[e.length-1].m)+'&rdquo; in '+esc(e[e.length-1].f):'')+'. Nothing is sent unless you press Send. Reports hold device details and error text only, never your answers, name or email.</p>':'')+'</div>'}
+var _vm=viewMe;viewMe=function(){var h=_vm.apply(this,arguments);return sub.me==='settings'?h+card():h};
+var _am=afterMe;afterMe=function(){_am.apply(this,arguments);if(sub.me!=='settings'||!$('cs-pg'))return;
+ $('cs-pg').onchange=function(){C.pg=this.checked?1:0;sc();setCookie(C.pg);toast(C.pg?'Progress cookie on':'Progress cookie deleted')};
+ $('cs-dg').onchange=function(){C.dg=this.checked?1:0;sc();if(!C.dg){try{localStorage.removeItem(DK)}catch(e){}res=null}route()};
+ if($('cs-run'))$('cs-run').onclick=function(){res=scan();route()};
+ if($('cs-clr'))$('cs-clr').onclick=function(){try{localStorage.removeItem(DK)}catch(e){}res=null;route()};
+ if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'09503aa2'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
+if(C.pg)setCookie(1);
 })();
 

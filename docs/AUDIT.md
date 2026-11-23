@@ -155,3 +155,11 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - Privacy policy/terms updated (email codes, Turnstile, Mailtrap, HIBP, CSP reports, GDPR rights and bases, 72 h notice). See `docs/SECURITY.md` for DNS/email/Mailtrap/PCI/GDPR steps.
 - Verified: backend t.mjs and t2.mjs pass; browser flow (checklist, verify, 2FA on, 2FA login) passes; question checks bad:0 on all four packs (1441/482/4099/2538); enforced CSP shows no violations (Report-Only flags inline styles by design).
 - Known: no password-reset flow yet; sweep shows 82 small-target notes (28x40 buttons) to review.
+
+## Nov 23: CSP, HTTPS, landing questions, optional cookie and diagnostics
+- `style-src` no longer has `'unsafe-inline'`. Static page styles moved to `/s.css` (generated classes); trainer theme colours moved to `app.<hash>.theme.css`; run-time HTML styles go through `cspstyle.js` (CSSOM); print sheet uses a constructable stylesheet. t140 shows zero enforced violations on all pages and trainers. Report-Only now trials Trusted Types only.
+- HTTP to HTTPS: Worker 308 redirect for non-localhost hosts, `cs.js` / `cspstyle.js` page-level redirect, HSTS 2 years on pages and API, TLS/EU/PCI steps in `docs/SECURITY.md` section 7.
+- Landing page: the generic hero drawing is replaced by 12 real, answerable questions from each site's own banks (multiple choice and typed number), horizontal scroll with Back/Next, balanced across both tracks. Header menu is now 5 items (Try a question, How it works, Topics, Features, Trainers) with the search box and Sign in.
+- Optional (off by default): progress cookie `vx_pg` with "Welcome back" on the landing page; device check (cores, memory, screen, network, speed test, GPU name) plus local error log, sent only on request to `/api/diag` (bounded, rate limited, logged not stored). Privacy policy updated.
+- Educator access code rotated (hash only in source).
+- Note: cardsweep reports 9 "bad text" hits for the word "undefined" inside a legitimate sentence (rational functions); not a defect.

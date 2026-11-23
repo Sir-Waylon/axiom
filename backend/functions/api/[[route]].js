@@ -3,7 +3,7 @@
    Security: PBKDF2-SHA256 (per-user salt, server pepper), constant-time compare, HttpOnly __Host- session cookie
    (token stored only as SHA-256), double-submit CSRF + Origin check, rate limits, parameterized SQL, strict validation. */
 const enc = new TextEncoder();
-const J = (o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'cross-origin-resource-policy': 'same-origin', ...h } });
+const J = (o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'strict-transport-security': 'max-age=63072000; includeSubDomains', 'cross-origin-resource-policy': 'same-origin', ...h } });
 const b64 = (u) => btoa(String.fromCharCode(...new Uint8Array(u)));
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const b64u = (s) => unb64(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '='));
@@ -222,6 +222,14 @@ R['POST /google'] = async (req, env, ip) => {
   const h = await newSession(env, u.id);
   const s = await auth(new Request(req.url, { headers: { cookie: h['set-cookie'][0].split(';')[0] } }), env);
   return out(await meObj(env, s), 200, h);
+};
+/* Optional device/error report, sent only when a person presses "Send to developer" in Settings. Bounded, rate limited, logged briefly, never stored. */
+R['POST /diag'] = async (req, env, ip) => {
+  if (!(await rate(env, 'dg:' + ip, 6, 3600))) return J({ error: 'Too many reports. Try later.' }, 429);
+  const b = await body(req, 6000), d = b.device && typeof b.device === 'object' ? b.device : {}, pick = (k, n) => String(d[k] == null ? '' : d[k]).slice(0, n);
+  const errs = (Array.isArray(b.errors) ? b.errors : []).slice(-15).map((e) => ({ t: String(e.t || '').slice(0, 19), m: String(e.m || '').slice(0, 200), f: String(e.f || '').slice(0, 80), k: String(e.k || '').slice(0, 500), a: String(e.a || '').slice(0, 24) }));
+  console.log('diag', JSON.stringify({ v: String(b.v || '').slice(0, 12), cores: pick('cores', 4), mem: pick('memGB', 4), screen: pick('screen', 12), dpr: pick('dpr', 5), net: pick('net', 10), loadMs: pick('loadMs', 7), longTasks: pick('longTasks', 5), speed: pick('speedTestMs', 6), gpu: pick('gpu', 80), rating: pick('rating', 6), app: pick('app', 24), ua: pick('ua', 160), errs }));
+  return J({ ok: 1 });
 };
 R['GET /config'] = async (req, env) => J({ google: env.GOOGLE_CLIENT_ID || null, turnstile: env.TURNSTILE_SITE_KEY || null, verify: mailOk(env), tfa: mailOk(env) });
 /* authenticated */
@@ -661,6 +669,8 @@ export async function runReminders(env) {
 
 export async function onRequest({ request, env }) {
   const url = new URL(request.url), path = url.pathname.replace(/^\/api/, '') || '/', key = request.method + ' ' + path;
+  /* plain HTTP is never served: send it to HTTPS (Cloudflare's Always Use HTTPS does the same at the edge for pages) */
+  if (url.protocol === 'http:' && !/^(localhost|127\.\d+\.\d+\.\d+|\[::1\]|.+\.localhost)$/.test(url.hostname)) { url.protocol = 'https:'; return Response.redirect(url.toString(), 308); }
   try {
     const ip = request.headers.get('cf-connecting-ip') || 'x';
     if (request.method === 'POST') { const o = request.headers.get('origin'); if (o && o !== url.origin) return J({ error: 'forbidden' }, 403); }

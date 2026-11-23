@@ -55,7 +55,7 @@ a{color:var(--acc);text-underline-offset:3px}a:hover{text-decoration-thickness:2
 .skip{position:absolute;left:12px;top:-60px;background:var(--pri);color:var(--onpri);padding:10px 16px;border-radius:10px;z-index:99;font-weight:700}.skip:focus{top:12px}
 .wrap{width:min(1080px,100%%);margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-header .in{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
+header .in{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;padding-block:10px}
 .logo{display:flex;align-items:center;gap:10px;color:var(--tx);text-decoration:none;font-weight:800;font-size:1.25rem}
 .logo svg{width:34px;height:34px}
 nav ul{display:flex;gap:4px 16px;flex-wrap:wrap;list-style:none;margin:0;padding:0}nav a{color:var(--tx);text-decoration:none;font-weight:600;padding:10px 4px;display:inline-block;min-height:44px}nav a:hover,nav a[aria-current]{color:var(--acc);text-decoration:underline}
@@ -97,7 +97,7 @@ header .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 
 @media print{header.top,.cta,.skip{display:none}}
 '''%B
 BOLT=('<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="var(--pri)"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>' if site=='skyvolt' else '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0 0h64v44L44 64H0z" fill="var(--pri)"/><path d="M32 10 52 52H12z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="miter"/><path d="M22 40h20" stroke="#ffd23f" stroke-width="4"/><circle cx="32" cy="28" r="3.5" fill="#ffd23f"/></svg>')
-NAV=[('/#how','How it works'),('/#topics','Topics')]
+NAV=[('/#try','Try a question'),('/#how','How it works'),('/#topics','Topics'),('/#features','Features'),('/app/','Trainers')]
 def page(path,title,body,desc='',cur='',head='',tail=''):
     nav=''.join(f'<li><a href="{h}"{" aria-current=page" if h==cur else ""}>{t}</a></li>' for h,t in NAV)
     d=html.escape(desc or B['sub'],quote=True)
@@ -106,9 +106,9 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="{B['pri']}">
 <title>{html.escape(title)}</title><meta name="description" content="{d}"><meta property="og:title" content="{html.escape(title)}"><meta property="og:description" content="{d}"><meta property="og:type" content="website">
-<link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="stylesheet" href="/site.css">{head}</head><body>
+<link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><script src="/cs.js"></script><link rel="stylesheet" href="/site.css">{head}</head><body>
 <a class="skip" href="#main">Skip to main content</a>
-<header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><form class="srch" role="search" onsubmit="return false"><label class="sr" for="sq">Search {N}</label><input id="sq" type="search" placeholder="Search" autocomplete="off" aria-controls="sres" maxlength="60"><ul id="sres" hidden></ul></form><a class="btn sec" href="/account/">Sign in</a><a class="btn" href="/app/">Start learning</a></div></header>
+<header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><form class="srch" role="search"><label class="sr" for="sq">Search {N}</label><input id="sq" type="search" placeholder="Search" autocomplete="off" aria-controls="sres" maxlength="60"><ul id="sres" hidden></ul></form><a class="btn" href="/account/">Sign in</a></div></header>
 <main id="main" tabindex="-1">{crumb}{body}</main>
 <footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li></ul></nav>
 <p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom). <span data-sister-wrap hidden>Also try <a data-sister href="#">{SIS}: {SISD}</a>.</span></p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc.</p></div></footer>
@@ -118,6 +118,79 @@ def chips(l):return '<ul class="chips">'+''.join(f'<li><span class="pill">{html.
 ART='''<svg viewBox="0 0 320 220" role="img" aria-label="Example of an interactive question: drag the ray to make a 50 degree angle"><rect x="0" y="0" width="320" height="220" rx="14" fill="none"/><text x="16" y="28" font-size="15" font-weight="700" fill="var(--tx)">Drag the ray to make a 50° angle</text><path d="M50 170H260" stroke="var(--tx)" stroke-width="3" stroke-linecap="round"/><path d="M50 170 200 83" stroke="var(--pri)" stroke-width="6" stroke-linecap="round"/><circle cx="200" cy="83" r="12" fill="var(--pri)"/><path d="M110 170A60 60 0 0 0 98 134" fill="none" stroke="var(--gold)" stroke-width="4" stroke-linecap="round"/><text x="116" y="158" font-size="15" font-weight="800" fill="var(--tx)">50°</text><rect x="16" y="188" width="288" height="16" rx="8" fill="var(--soft)"/><rect x="16" y="188" width="170" height="16" rx="8" fill="var(--pri)"/></svg>'''
 REPO=CFG.get('repo',{}).get(site,'')
 REPOLINK=f' · <a href="{REPO}" rel="noopener">View the source code on GitHub</a>' if REPO else ''
+
+import random as _rnd
+TRYCSS='''
+.art{padding:14px;min-width:0}.trynav .btn{font:inherit;font-weight:700}.hero>*{min-width:0}.try{min-width:0}.tryhd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
+.trylist{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding:2px 2px 10px;scrollbar-width:thin}
+.tq{flex:0 0 100%;min-width:0;scroll-snap-align:start;background:var(--bg);border:1px solid var(--line);border-top:6px solid var(--pri);border-radius:14px;padding:14px 16px;min-height:300px;display:flex;flex-direction:column}
+.tqh{margin:.2em 0;font:700 1.25rem 'Inter Display','Inter',system-ui,sans-serif}.tqm{margin:0 0 8px}.tqm .pill{font-size:.8rem}.tqq{font-weight:700;font-size:1.05rem;line-height:1.45;margin:0 0 10px;max-width:60ch}
+.tqb{display:block;width:100%;text-align:left;min-height:44px;margin:6px 0;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;cursor:pointer}
+.tqb:hover:not(:disabled){border-color:var(--pri)}.tqb:disabled{cursor:default;opacity:1}
+.tqb.ok{border-color:#1a7f4b;background:color-mix(in srgb,#1a7f4b 16%,var(--card));font-weight:700}.tqb.ok::before{content:"\\2713  "}
+.tqb.no{border-color:#b3261e;background:color-mix(in srgb,#b3261e 14%,var(--card))}.tqb.no::before{content:"\\2717  "}
+.tqn{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.tqn input{flex:1 1 130px;min-height:44px;padding:8px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;min-width:0}
+.tqu{font-weight:600;color:var(--mut)}.tqf{margin-top:auto;padding-top:10px;font-size:.95rem;line-height:1.5}.tqf b{display:block}
+.tqe{justify-content:center;text-align:center;align-items:center}
+.trynav{display:flex;justify-content:space-between;gap:8px;margin-top:6px}.trynav .btn{min-width:96px}
+.tr1{border-color:var(--acc)}@media(min-width:701px){.srch input{width:150px}}
+'''
+TRYJS='''(function(){"use strict";var m=/(?:^|; )vx_pg=([^;]*)/.exec(document.cookie),h=document.querySelector(".try .tryhd");if(m&&h){try{var o=JSON.parse(decodeURIComponent(m[1]));if(/^[a-z0-9-]+$/.test(o.s||"")){var p=document.createElement("p"),a=document.createElement("a");p.className="small wb";p.appendChild(document.createTextNode("Welcome back. You are level "+(+o.l||1)+" with "+(+o.x||0)+" XP. "));a.href="/app/"+o.s+"/";a.textContent="Continue practicing";p.appendChild(a);h.parentNode.insertBefore(p,h)}}catch(e){}}})();
+(function(){"use strict";var L=document.querySelector(".trylist");if(!L)return;var C=[].slice.call(L.querySelectorAll(".tq")),ct=document.getElementById("tryc"),rm=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function idx(){var w=C[0].offsetWidth+12;return Math.max(0,Math.min(C.length-1,Math.round(L.scrollLeft/w)))}
+function upd(){if(ct)ct.textContent=(idx()+1)+" of "+C.length}
+function go(d){var i=Math.max(0,Math.min(C.length-1,idx()+d));L.scrollTo({left:C[i].offsetLeft-C[0].offsetLeft,behavior:rm?"auto":"smooth"})}
+document.getElementById("tryp").addEventListener("click",function(){go(-1)});document.getElementById("tryn").addEventListener("click",function(){go(1)});
+L.addEventListener("scroll",function(){clearTimeout(L._t);L._t=setTimeout(upd,60)});
+function say(c,ok,t){var f=c.querySelector(".tqf");f.querySelector("b").textContent=t;f.hidden=false}
+C.forEach(function(c){
+ [].forEach.call(c.querySelectorAll(".tqb"),function(b){b.addEventListener("click",function(){var all=c.querySelectorAll(".tqb");if(c.dataset.done)return;c.dataset.done=1;
+  var good=b.hasAttribute("data-ok");[].forEach.call(all,function(x){x.disabled=true;if(x.hasAttribute("data-ok"))x.classList.add("ok")});if(!good)b.classList.add("no");say(c,good,good?"Correct!":"Not quite. The right answer is marked.")})});
+ var k=c.querySelector(".tqc");if(k){var inp=c.querySelector("input"),run=function(){if(c.dataset.done)return;var raw=inp.value.replace(/[\\s,]/g,"").replace(/\u2212/g,"-");if(!raw||isNaN(Number(raw))){say(c,0,"Type a number first.");return}
+  var v=Number(inp.dataset.v),x=Number(raw),tol=Number(inp.dataset.tol),ok=Math.abs(x-v)<=Math.max(Math.abs(v)*tol,1e-9);c.dataset.done=1;inp.disabled=true;k.disabled=true;say(c,ok,ok?"Correct!":"Not quite.")};
+  k.addEventListener("click",run);inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();run()}})}
+});upd()})();
+'''
+def tryq():
+    BAD=re.compile(r'[$\\^]|diagram|figure|shown|below|above|table|graph|picture|image|map|chart',re.I)
+    cards=[];per=[]
+    for pi,pk in enumerate(packs):
+        tn={t['id']:t['name'] for t in pk['topics']};lst=[]
+        for t in [x for x in pk['topics'] if x['id']!='hist']:
+            qs=[q for q in pk['questions'] if q.get('t')==t['id'] and len(q['q'])<=170 and not BAD.search(q['q']) and str(q.get('l')) in('1','2','3')]
+            m=[q for q in qs if q['type']=='mcq' and 3<=len(q['o'])<=5 and all(len(o)<=70 and not BAD.search(o) for o in q['o']) and q.get('w')]
+            n=[]
+            for q in qs:
+                nm=q.get('num') if q['type']=='short' else None
+                if not nm or 'pi' in nm or ('u' in nm and 'show' not in nm):continue
+                sh=str(nm.get('show',nm['v']));mt=re.match(r'^(-?[\d.]+)\s*(.*)$',sh)
+                if not mt or not q.get('sol'):continue
+                n.append((q,float(mt.group(1)),mt.group(2),nm.get('tol',.01)))
+            if m or n:lst.append((t,m,n))
+        k=min(6,len(lst));idx=sorted({round(i*(len(lst)-1)/max(k-1,1)) for i in range(k)})
+        pick=[]
+        for j,i in enumerate(idx):
+            t,m,n=lst[i];r=_rnd.Random(f'{site}{t["id"]}')
+            if (j%2==0 and m) or not n:pick.append(('m',pi,t,r.choice(m)))
+            else:pick.append(('n',pi,t,r.choice(n)))
+        per.append(pick)
+    order=[x for grp in zip(*per) for x in grp]+[x for pk in per for x in pk[min(map(len,per)):]]
+    for ci,(kind,pi,t,q) in enumerate(order):
+        tr=B['tracks'][pi][0];cid=f'tq{ci}'
+        head=f'<p class="tqm"><span class="pill tr{pi}">{html.escape(tr)} · {html.escape(t["name"][:48])}</span></p>'
+        if kind=='m':
+            o=list(q['o']);_rnd.Random(f'{site}{q["id"]}').shuffle(o)
+            bt=''.join(f'<button type="button" class="tqb"{" data-ok=1" if x==q["o"][0] else ""}>{html.escape(x)}</button>' for x in o)
+            body=f'<div class="tqo" role="group" aria-label="Answer choices">{bt}</div>'
+            why=html.escape(q['w'])
+        else:
+            qq,v,u,tol=q
+            body=f'<div class="tqn"><label class="sr" for="{cid}i">Your answer</label><input id="{cid}i" inputmode="decimal" autocomplete="off" data-v="{v}" data-tol="{max(tol,.01)}" placeholder="Type a number"><span class="tqu">{html.escape(u)}</span><button class="btn tqc" type="button">Check</button></div>'
+            why=html.escape('Answer: '+(str(qq['num'].get('show',v)))+'. '+' '.join(str(x) for x in qq['sol'][-2:])[:230])
+            q=qq
+        cards.append(f'<article class="tq" aria-label="Question {ci+1}">{head}<p class="tqq">{html.escape(q["q"])}</p>{body}<div class="tqf" role="status" aria-live="polite" hidden><b></b> <span>{why}</span></div></article>')
+    cards.append(f'<article class="tq tqe" aria-label="Start practicing"><p class="tqh">Like these?</p><p>{fmt(nq)} questions, with worked steps after every miss.</p><p><a class="btn" href="/app/">Start learning</a></p></article>')
+    return f'<div class="try" id="try"><div class="tryhd"><span class="pill">Try real questions</span><span class="small mute" id="tryc" aria-live="polite">1 of {len(cards)}</span></div><div class="trylist" role="region" aria-label="Sample questions from {N}. Scroll sideways or use the arrows." tabindex="0">{"".join(cards)}</div><div class="trynav"><button class="btn sec" type="button" id="tryp" aria-label="Previous question">&larr; Back</button><button class="btn sec" type="button" id="tryn" aria-label="Next question">Next &rarr;</button></div><noscript><p class="small mute">Turn on JavaScript to check your answers.</p></noscript></div>'
 def landing():
     tr=''.join(f'<div class="card" style="border-top:6px solid {c}"><h3>{html.escape(n)}</h3><p>{html.escape(s)}</p>{chips(t)}</div>' for n,s,c,t in B['tracks'])
     st=''
@@ -131,7 +204,7 @@ def landing():
     fh=''.join(f'<div class="card"><h3>{a}</h3><p>{b}</p></div>' for a,b in feats)+st
     body=f'''<div class="wrap"><section class="hero"><div><p><span class="pill">Free · No ads · Any device</span></p><h1>{B['h1']}</h1><p class="lead">{B['sub']}</p>
 <div class="cta"><a class="btn" href="/app/">Start learning</a><a class="btn sec" href="/account/">Sign in</a></div><p class="lead" style="font-size:1rem">Sign in each time you open {N}. Free accounts save your progress on every device and unlock friends.</p></div>
-<div class="art" aria-hidden="false">{ART}</div></section></div>
+<div class="art">{tryq()}</div></section></div>
 <section class="s alt" id="how"><div class="wrap"><h2>How a lesson works</h2><div class="grid">
 <div class="card"><span class="num">1</span><h3>Learn it</h3><p>A short idea with a diagram you can manipulate.</p></div>
 <div class="card"><span class="num">2</span><h3>Try it</h3><p>Answer right away. Questions get harder as you get them right.</p></div>
@@ -139,12 +212,12 @@ def landing():
 <div class="card"><span class="num">4</span><h3>Retain it</h3><p>Earlier topics return on a spaced schedule, just before they fade.</p></div></div></div></section>
 <section class="s"><div class="wrap"><div class="stats"><div><b>{fmt(nq)}</b><span>questions</span></div><div><b>{nt}</b><span>topics</span></div><div><b>{nl}</b><span>lessons</span></div>{f'<div><b>{npf}</b><span>proofs</span></div>' if npf else ''}</div></div></section>
 <section class="s alt" id="topics"><div class="wrap"><h2>What you will learn</h2><p class="lead">{B['what'][0].upper()+B['what'][1:]}.</p><div class="grid">{tr}</div></div></section>
-<section class="s"><div class="wrap"><h2>Features</h2><div class="grid">{fh}</div></div></section>
+<section class="s" id="features"><div class="wrap"><h2>Features</h2><div class="grid">{fh}</div></div></section>
 <section class="s"><div class="wrap"><div class="note" role="note"><b>Created with AI assistance.</b> The lessons, questions, explanations and code were produced with an AI model (Claude, by Anthropic) under the direction of a Science Olympiad coach, and checked with automated tests. Errors are still possible, so confirm important facts with your textbook or teacher. <a href="/ai-disclosure/">Read the full disclosure</a>{REPOLINK}.</div></div></section>
 <section class="s" data-sister-wrap hidden><div class="wrap" style="text-align:center"><h2>Also from Voltaxis</h2><p class="lead" style="font-size:1rem">{SISD}, with the same account.</p><div class="cta" style="justify-content:center"><a class="btn sec" data-sister href="#">Visit {SIS}</a></div></div></section>
 <section class="s alt"><div class="wrap" style="text-align:center"><h2>Start practicing today.</h2><div class="cta" style="justify-content:center"><a class="btn" href="/app/">Start learning</a><a class="btn sec" href="/account/">Sign in</a></div></div></section>'''
     body=body.replace('{REPOLINK}',REPOLINK)
-    return page('index',f'{N}: {B["h1"]}',body,cur='/')
+    return page('index',f'{N}: {B["h1"]}',body,cur='/',tail='<script src="/try.js" defer></script>')
 def legal(kind):
     P=CONTACT
     if kind=='privacy':
@@ -163,9 +236,10 @@ def legal(kind):
 <tr><td>One-time email codes (only when email verification or sign-in codes are on)</td><td>To confirm your email and, if you opt in, to add a second step at sign-in. We store only a one-way hash of the 6-digit code, for 10 minutes or until used, plus a count of tries. We keep whether your email is confirmed and whether sign-in codes are on.</td></tr>
 <tr><td>Bot-check result (only when the CAPTCHA is on)</td><td>When you sign up or sign in, Cloudflare Turnstile checks that you are a person. Your browser sends Cloudflare standard browser and network data; we receive only a pass or fail. We store nothing from it.</td></tr>
 <tr><td>Browser security reports</td><td>If your browser reports that it blocked something on our pages, the report (page address and the blocked item) goes to our server and is written to a short-lived log. It carries no account data.</td></tr>
+<tr><td>Progress cookie and device report (only if you turn them on in Settings)</td><td>To greet you on return and to help fix bugs on slow devices. See Cookies below. Both are optional and off by default.</td></tr>
 <tr><td>Session cookie and anti-forgery cookie</td><td>To keep you signed in securely. The session ends when you close your browser, or after 8 hours, and you sign in again next time.</td></tr></table>
 <h2>What we do not do</h2><ul><li>No advertising, no ad networks, no analytics or tracking scripts, no fingerprinting.</li><li>We never sell, rent or share your data for marketing.</li><li>We do not ask for your real name, phone number, address, school or photo.</li><li>We do not use your answers to train AI models.</li><li>Your data is not end-to-end encrypted: it is protected in transit (HTTPS) and at rest by our host, and the people who run the service could technically read it. Please do not put anything sensitive in a username or nickname.</li></ul>
-<h2>Cookies and local storage</h2><p>Only essential ones: a sign-in session cookie (<code>__Host-sid</code>, HttpOnly), an anti-forgery cookie (<code>__Host-csrf</code>) and local storage for your progress and settings. No consent banner is needed because there are no optional cookies.</p>
+<h2>Cookies and local storage</h2><p>Essential: a sign-in session cookie (<code>__Host-sid</code>, HttpOnly, Secure, SameSite=Strict), an anti-forgery cookie (<code>__Host-csrf</code>) and local storage for your progress and settings. These are needed to run the service, so they are set without asking.</p><p><b>Optional, off by default, in Me → Settings → Cookies and diagnostics:</b></p><ul><li><b>Progress cookie</b> (<code>vx_pg</code>, first-party, Secure, SameSite=Lax, 180 days): a small summary (trainer, level, XP, number of answers, date) so the home page can say “Welcome back”. It is never sent to our server by us; your browser attaches it to ordinary page requests to this site. Turning the option off deletes it.</li><li><b>Device check and error details</b>: if you turn this on, the app reads standard browser values (number of processor cores, approximate memory, screen size, network type, graphics renderer name if your browser shares it) and runs a one-second speed test, and it keeps the last few error messages in local storage on your device. Nothing is sent unless you press “Send to developer”. A report contains that device information and error text, never your answers, name or email. We log it briefly to fix bugs and do not store it in the account database; it is limited to 6 reports an hour. Clear removes the saved errors.</li></ul>
 <h2>Voice assistant</h2><p>Reading aloud uses the speech voices built into your browser or device. The text is not sent to us. Some browsers use online voices run by the browser or device maker; their policies then apply. You can turn the voice off in Settings.</p>
 <h2>Other companies involved</h2><ul><li><b>jsDelivr (content delivery network)</b> serves the KaTeX math-display library to the study apps. Your browser requests those files from jsDelivr, which can see your IP address and browser type like any web server. We send it no account or progress data. If it is blocked, math shows as plain text.</li><li><b>Cloudflare</b> hosts the site and database. Like any host it processes technical data such as your IP address to deliver pages and block abuse. <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare privacy policy</a>.</li><li><b>Email delivery service (Mailtrap)</b>, only when email verification or sign-in codes are switched on: we send your email address and the code message to it so it can deliver the email. It acts for us as a processor. Accounts made before this was switched on are treated as confirmed.</li><li><b>Cloudflare Turnstile</b> (bot check), only on the sign-up and sign-in screens when turned on. It runs in a Cloudflare frame and may set a short-lived token in your browser.</li><li><b>Have I Been Pwned</b>: when you choose a password, the first 5 characters of its SHA-1 hash are sent to this service to check whether the password appears in known breaches. The password itself and your account details are never sent. If the service is down, sign-up continues.</li><li><b>Google</b>, only if you press the Google button: the sign-in button loads from Google, which then receives standard browser data. <a href="https://policies.google.com/privacy">Google privacy policy</a>.</li></ul>
 <h2>Children and students</h2><p>{N} is designed for students aged 13 and up. If you are under 13, please ask a parent or teacher for permission before creating an account. We do not knowingly collect personal information from children under 13 without verifiable parental consent; if you believe we have, contact us and we will delete it. {N} is not a school record and is not run by a school.</p>
@@ -314,12 +388,32 @@ def notfound():
     return page('404',f'Page not found · {N}',f'<div class="wrap doc" style="text-align:center"><h1>Page not found</h1><p>The address may be mistyped or the page may have moved.</p><p><a class="btn" href="/">Go home</a> <a class="btn sec" href="/app/">Open the trainer</a></p></div>')
 if os.path.exists(out):shutil.rmtree(out)
 shutil.copytree(appdir,out+'/app',ignore=shutil.ignore_patterns('_headers'))
-W=lambda p,s:(os.makedirs(os.path.dirname(out+'/'+p),exist_ok=True),open(out+'/'+p,'w',encoding='utf8').write(s))
+import hashlib as _hl
+SX={}
+_TAG=re.compile(r"""<[a-zA-Z][^\s>/]*(?:"[^"]*"|'[^']*'|[^>"'])*>""")
+_ST=re.compile(r"""\sstyle\s*=\s*(?:"([^"]*)"|'([^']*)')""",re.I)
+def _fixtag(t):
+    m=_ST.search(t)
+    if not m:return t
+    v=html.unescape(m.group(1) if m.group(1) is not None else m.group(2)).strip().rstrip(';')
+    cn='sx'+_hl.sha1(v.encode()).hexdigest()[:7];SX[cn]=v
+    t=t[:m.start()]+t[m.end():]
+    cm=re.search(r'\sclass\s*=\s*"([^"]*)"',t)
+    return t[:cm.start()]+' class="'+cm.group(1)+' '+cn+'"'+t[cm.end():] if cm else re.sub(r'^(<[^\s>/]+)',r'\1 class="'+cn+'"',t,count=1)
+def deinline(h):
+    if '<head>' not in h:return h
+    h=_TAG.sub(lambda m:_fixtag(m.group(0)) if 'style' in m.group(0) else m.group(0),h)
+    return h.replace('</head>','<link rel="stylesheet" href="/s.css"></head>',1)
+def W(p,s):
+    os.makedirs(os.path.dirname(out+'/'+p),exist_ok=True)
+    if p.endswith('.html'):s=deinline(s)
+    open(out+'/'+p,'w',encoding='utf8').write(s)
 W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/index.html',legal('terms'));W('accessibility/index.html',access())
 W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
-W('site.css',CSS);W('account.js',ACCJS);W('nav.js',NAVJS.replace('__ME__',N.lower()).replace('__OT__',SIS.lower()));shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
+CSS+=TRYCSS
+W('site.css',CSS);W('cs.js',open(K+'engine3/cspstyle.js',encoding='utf8').read());W('try.js',TRYJS);W('account.js',ACCJS);W('nav.js',NAVJS.replace('__ME__',N.lower()).replace('__OT__',SIS.lower()));shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
 import json as _j
 _ix=[{'t':'Sign in','u':'/account/','d':'Account and progress sync'},{'t':'Privacy policy','u':'/privacy/','d':'What we collect and your choices'},{'t':'Terms of service','u':'/terms/','d':'The rules for using '+N},{'t':'Accessibility','u':'/accessibility/','d':'How '+N+' supports all learners'},{'t':'AI disclosure','u':'/ai-disclosure/','d':'How AI was used and checked'}]
 for _n,_s,_c,_t in B['tracks']:
@@ -329,14 +423,15 @@ W('search.json',_j.dumps(_ix,ensure_ascii=False))
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP_STYLE="https://accounts.google.com/gsi/style https://cdn.jsdelivr.net/npm/katex@0.16.11/"
-CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client https://challenges.cloudflare.com https://cdn.jsdelivr.net/npm/katex@0.16.11/; style-src 'self' 'unsafe-inline' "+CSP_STYLE+"; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net/npm/katex@0.16.11/; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/ https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests; report-uri /api/csp-report; report-to csp"
+CSP="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client https://challenges.cloudflare.com https://cdn.jsdelivr.net/npm/katex@0.16.11/; style-src 'self' "+CSP_STYLE+"; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net/npm/katex@0.16.11/; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/ https://challenges.cloudflare.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests; report-uri /api/csp-report; report-to csp"
 # Report-Only trial of a stricter policy: no inline style attributes and Trusted Types for DOM sinks. Violations are reported to /api/csp-report, nothing is blocked.
-CSP_RO=CSP.replace("style-src 'self' 'unsafe-inline' "+CSP_STYLE,"style-src 'self' "+CSP_STYLE+"; style-src-attr 'none'")+"; require-trusted-types-for 'script'"
+CSP_RO=CSP.replace("; upgrade-insecure-requests","")+"; require-trusted-types-for 'script'"
+W('s.css','/* inline style attributes from page markup, moved here so the Content-Security-Policy can forbid inline styles */\n'+''.join(f'.{k}.{k}.{k}{{{v}}}\n' for k,v in sorted(SX.items())))
 W('_headers',f"""/*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
   Cross-Origin-Opener-Policy: same-origin-allow-popups
   Cross-Origin-Resource-Policy: same-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), browsing-topics=(), interest-cohort=()
@@ -356,6 +451,12 @@ W('_headers',f"""/*
 /app/sw.js
   Cache-Control: no-cache
 /site.css
+  Cache-Control: public, max-age=3600
+/s.css
+  Cache-Control: public, max-age=3600
+/cs.js
+  Cache-Control: public, max-age=3600
+/try.js
   Cache-Control: public, max-age=3600
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable

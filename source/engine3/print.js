@@ -11,7 +11,7 @@ var CSS='#prt{position:fixed;inset:0;z-index:90;background:#fff;color:#111;overf
 +'#prt .nt .card,#prt .nt details{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:4px 0!important}#prt .nt .f{display:block;font-family:ui-monospace,Menlo,Consolas,monospace;border:1px solid #888;border-radius:6px;padding:3px 8px;margin:3px 0}'
 +'#prt .ck li{list-style:"☐  ";margin:3px 0}#prt .ft{margin-top:10px;font-size:10.5px;color:#555;border-top:1px solid #aaa;padding-top:4px}'
 +'@media print{body>*:not(#prt){display:none!important}#prt{position:static!important;overflow:visible!important;inset:auto!important}#prt .pbar{display:none!important}#prt .pg{border:0;margin:0;padding:0;max-width:none;break-after:page}#prt .pg:last-child{break-after:auto}@page{size:letter;margin:.5in}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
-var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
+try{var sh=new CSSStyleSheet();sh.replaceSync(CSS);document.adoptedStyleSheets=(document.adoptedStyleSheets||[]).concat([sh])}catch(e){var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st)}
 function E(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function head(t){return '<h1>'+E(P.meta.title)+' '+E(P.meta.division||'')+'</h1><div class="sub">'+t+' · Voltaxis study kit · printed '+new Date().toLocaleDateString()+'</div>'}
 var FT='<div class="ft">Check the official rules and your event supervisor for what is allowed in the room. Study aid only; not an official rules document.</div>';

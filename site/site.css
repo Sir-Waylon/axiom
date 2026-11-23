@@ -16,7 +16,7 @@ a{color:var(--acc);text-underline-offset:3px}a:hover{text-decoration-thickness:2
 .skip{position:absolute;left:12px;top:-60px;background:var(--pri);color:var(--onpri);padding:10px 16px;border-radius:10px;z-index:99;font-weight:700}.skip:focus{top:12px}
 .wrap{width:min(1080px,100%);margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-header .in{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
+header .in{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;padding-block:10px}
 .logo{display:flex;align-items:center;gap:10px;color:var(--tx);text-decoration:none;font-weight:800;font-size:1.25rem}
 .logo svg{width:34px;height:34px}
 nav ul{display:flex;gap:4px 16px;flex-wrap:wrap;list-style:none;margin:0;padding:0}nav a{color:var(--tx);text-decoration:none;font-weight:600;padding:10px 4px;display:inline-block;min-height:44px}nav a:hover,nav a[aria-current]{color:var(--acc);text-decoration:underline}
@@ -57,3 +57,16 @@ header .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{header.top,.cta,.skip{display:none}}
 .um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}
+.art{padding:14px;min-width:0}.trynav .btn{font:inherit;font-weight:700}.hero>*{min-width:0}.try{min-width:0}.tryhd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
+.trylist{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding:2px 2px 10px;scrollbar-width:thin}
+.tq{flex:0 0 100%;min-width:0;scroll-snap-align:start;background:var(--bg);border:1px solid var(--line);border-top:6px solid var(--pri);border-radius:14px;padding:14px 16px;min-height:300px;display:flex;flex-direction:column}
+.tqh{margin:.2em 0;font:700 1.25rem 'Inter Display','Inter',system-ui,sans-serif}.tqm{margin:0 0 8px}.tqm .pill{font-size:.8rem}.tqq{font-weight:700;font-size:1.05rem;line-height:1.45;margin:0 0 10px;max-width:60ch}
+.tqb{display:block;width:100%;text-align:left;min-height:44px;margin:6px 0;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;cursor:pointer}
+.tqb:hover:not(:disabled){border-color:var(--pri)}.tqb:disabled{cursor:default;opacity:1}
+.tqb.ok{border-color:#1a7f4b;background:color-mix(in srgb,#1a7f4b 16%,var(--card));font-weight:700}.tqb.ok::before{content:"\2713  "}
+.tqb.no{border-color:#b3261e;background:color-mix(in srgb,#b3261e 14%,var(--card))}.tqb.no::before{content:"\2717  "}
+.tqn{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.tqn input{flex:1 1 130px;min-height:44px;padding:8px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;min-width:0}
+.tqu{font-weight:600;color:var(--mut)}.tqf{margin-top:auto;padding-top:10px;font-size:.95rem;line-height:1.5}.tqf b{display:block}
+.tqe{justify-content:center;text-align:center;align-items:center}
+.trynav{display:flex;justify-content:space-between;gap:8px;margin-top:6px}.trynav .btn{min-width:96px}
+.tr1{border-color:var(--acc)}@media(min-width:701px){.srch input{width:150px}}
