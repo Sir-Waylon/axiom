@@ -167,3 +167,7 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 ## Nov 23 (later): trainer pages, icons, geometry merge
 - Tab icons, apple-touch icons, manifest icons, the site header logo and the sign-in gate now use one icon family: rounded square in the track colour, white main glyph, the site's gold accent (Voltaic uses the same gold bolt as the Skyvolt icon).
 - /app/ hubs show the track icon, area chips (Apex: Algebra 1, Geometry, Algebra 2, Trigonometry, Precalculus, Calculus, AP Statistics, Calculus III) and topic/question counts. Geometry is part of Apex everywhere; the old /app/geometry/ address only redirects to Apex. The repo README no longer lists Vertex as a separate trainer.
+
+## Nov 23 (evening): KaTeX self-hosted, service worker
+- KaTeX 0.16.47 is now served from `/app/katex/` (vendor/katex, MIT licence included, woff2 fonts only). No jsDelivr requests; CSP script/style/font sources no longer list a CDN; the privacy policy no longer names jsDelivr. The plain-text fallback for unsupported browsers stays.
+- Service worker: page loads are now network-first (cache only when offline), so a new release shows on the next load instead of the second.

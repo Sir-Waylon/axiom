@@ -5109,7 +5109,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 })();
 
 /* ===== math.js: renders LaTeX with KaTeX wherever it appears =====
-   KaTeX (jsDelivr, version-pinned) is injected here after the page has loaded, so a slow or blocked CDN can never delay first paint or DOMContentLoaded.
+   KaTeX (self-hosted at /app/katex/, v0.16.47) is injected here after the page has loaded, so a slow or blocked CDN can never delay first paint or DOMContentLoaded.
    This file watches the page and typesets new text as screens change. Delimiters: \( ... \)  \[ ... \]  $$ ... $$
    (single $ is NOT a delimiter, because the questions use $ for money). If KaTeX is blocked or offline, readable plain text is shown instead (see plainTeX below), so no screen ever shows raw LaTeX or goes blank. */
 (function(){
@@ -5140,11 +5140,11 @@ function plainTeX(t){var guard=0;
 function fbNode(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,{acceptNode:function(x){var p=x.parentNode;return p&&!/^(SCRIPT|STYLE|TEXTAREA|CODE|PRE|OPTION)$/.test(p.nodeName)&&has(x.nodeValue)?1:3}}),L=[],x;while((x=w.nextNode()))L.push(x);
  L.forEach(function(x){x.nodeValue=x.nodeValue.replace(/\$\$([\s\S]+?)\$\$/g,function(_,a){return plainTeX(a)}).replace(/\\\[([\s\S]+?)\\\]/g,function(_,a){return plainTeX(a)}).replace(/\\\(([\s\S]+?)\\\)/g,function(_,a){return plainTeX(a)})})}
 window.plainTeX=plainTeX;
-var CDN='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/';
+var CDN='../katex/';
 function load(){if(window.katex||document.getElementById('katexcss'))return;
- var l=document.createElement('link');l.rel='stylesheet';l.id='katexcss';l.href=CDN+'katex.min.css';l.crossOrigin='anonymous';document.head.appendChild(l);
- var a=document.createElement('script');a.async=true;a.crossOrigin='anonymous';a.src=CDN+'katex.min.js';
- a.onerror=function(){FB=true;sched(document.body)};a.onload=function(){var b=document.createElement('script');b.async=true;b.crossOrigin='anonymous';b.src=CDN+'contrib/auto-render.min.js';document.head.appendChild(b)};
+ var l=document.createElement('link');l.rel='stylesheet';l.id='katexcss';l.href=CDN+'katex.min.css';document.head.appendChild(l);
+ var a=document.createElement('script');a.async=true;a.src=CDN+'katex.min.js';
+ a.onerror=function(){FB=true;sched(document.body)};a.onload=function(){var b=document.createElement('script');b.async=true;b.src=CDN+'contrib/auto-render.min.js';document.head.appendChild(b)};
  document.head.appendChild(a)}
 function start(){if(document.readyState==='complete')setTimeout(load,0);else window.addEventListener('load',function(){setTimeout(load,0)});
  obs=new MutationObserver(function(ms){if(!ready()&&!FB)return;ms.forEach(function(m){if(m.type==='characterData')sched(m.target);else m.addedNodes.forEach(sched)})});
@@ -5494,7 +5494,7 @@ var _am=afterMe;afterMe=function(){_am.apply(this,arguments);if(sub.me!=='settin
  $('cs-dg').onchange=function(){C.dg=this.checked?1:0;sc();if(!C.dg){try{localStorage.removeItem(DK)}catch(e){}res=null}route()};
  if($('cs-run'))$('cs-run').onclick=function(){res=scan();route()};
  if($('cs-clr'))$('cs-clr').onclick=function(){try{localStorage.removeItem(DK)}catch(e){}res=null;route()};
- if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'827e1fc7'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
+ if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'8a48b564'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
 if(C.pg)setCookie(1);
 })();
 
