@@ -163,3 +163,7 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - Optional (off by default): progress cookie `vx_pg` with "Welcome back" on the landing page; device check (cores, memory, screen, network, speed test, GPU name) plus local error log, sent only on request to `/api/diag` (bounded, rate limited, logged not stored). Privacy policy updated.
 - Educator access code rotated (hash only in source).
 - Note: cardsweep reports 9 "bad text" hits for the word "undefined" inside a legitimate sentence (rational functions); not a defect.
+
+## Nov 23 (later): trainer pages, icons, geometry merge
+- Tab icons, apple-touch icons, manifest icons, the site header logo and the sign-in gate now use one icon family: rounded square in the track colour, white main glyph, the site's gold accent (Voltaic uses the same gold bolt as the Skyvolt icon).
+- /app/ hubs show the track icon, area chips (Apex: Algebra 1, Geometry, Algebra 2, Trigonometry, Precalculus, Calculus, AP Statistics, Calculus III) and topic/question counts. Geometry is part of Apex everywhere; the old /app/geometry/ address only redirects to Apex. The repo README no longer lists Vertex as a separate trainer.

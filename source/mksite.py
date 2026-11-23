@@ -96,7 +96,7 @@ header .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{header.top,.cta,.skip{display:none}}
 '''%B
-BOLT=('<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="var(--pri)"/><path d="M34 8 18 36h12l-4 20 20-30H33z" fill="#ffd23f" stroke="#1b1464" stroke-width="3" stroke-linejoin="round"/></svg>' if site=='skyvolt' else '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M0 0h64v44L44 64H0z" fill="var(--pri)"/><path d="M32 10 52 52H12z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="miter"/><path d="M22 40h20" stroke="#ffd23f" stroke-width="4"/><circle cx="32" cy="28" r="3.5" fill="#ffd23f"/></svg>')
+BOLT=open(appdir+'/icon.svg',encoding='utf8').read().replace('<svg ','<svg aria-hidden="true" focusable="false" ',1).replace('<rect width="64" height="64" rx="16" fill="'+B['pri']+'"','<rect width="64" height="64" rx="16" fill="var(--pri)"')  # header logo is the same artwork as the browser-tab icon
 NAV=[('/#try','Try a question'),('/#how','How it works'),('/#topics','Topics'),('/#features','Features'),('/app/','Trainers')]
 def page(path,title,body,desc='',cur='',head='',tail=''):
     nav=''.join(f'<li><a href="{h}"{" aria-current=page" if h==cur else ""}>{t}</a></li>' for h,t in NAV)
@@ -133,7 +133,7 @@ TRYCSS='''
 .tqu{font-weight:600;color:var(--mut)}.tqf{margin-top:auto;padding-top:10px;font-size:.95rem;line-height:1.5}.tqf b{display:block}
 .tqe{justify-content:center;text-align:center;align-items:center}
 .trynav{display:flex;justify-content:space-between;gap:8px;margin-top:6px}.trynav .btn{min-width:96px}
-.tr1{border-color:var(--acc)}@media(min-width:701px){.srch input{width:150px}}
+.tr1{border-color:var(--acc)}.trk .ti{float:right;border-radius:12px}.trk h2{margin-top:0}@media(min-width:701px){.srch input{width:150px}}
 '''
 TRYJS='''(function(){"use strict";var m=/(?:^|; )vx_pg=([^;]*)/.exec(document.cookie),h=document.querySelector(".try .tryhd");if(m&&h){try{var o=JSON.parse(decodeURIComponent(m[1]));if(/^[a-z0-9-]+$/.test(o.s||"")){var p=document.createElement("p"),a=document.createElement("a");p.className="small wb";p.appendChild(document.createTextNode("Welcome back. You are level "+(+o.l||1)+" with "+(+o.x||0)+" XP. "));a.href="/app/"+o.s+"/";a.textContent="Continue practicing";p.appendChild(a);h.parentNode.insertBefore(p,h)}}catch(e){}}})();
 (function(){"use strict";var L=document.querySelector(".trylist");if(!L)return;var C=[].slice.call(L.querySelectorAll(".tq")),ct=document.getElementById("tryc"),rm=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -369,7 +369,18 @@ fetch("/api/config",{credentials:"same-origin"}).then(function(r){if(!r.ok||!/js
 
 SLUGS=['circuit','meteorology'] if site=='skyvolt' else ['apex','quanta']
 def hub():
-    cards=''.join(f'<a class="card trk" href="/app/{slug}/" style="border-top:6px solid {c}"><h2>{n}</h2><p><b>{html.escape(s)}</b></p>{chips(t[:6])}<p style="margin-top:12px;color:{c};font-weight:700">Open {n} →</p></a>' for (n,s,c,t),slug in zip(B['tracks'],SLUGS))
+    def _ar(pk):
+        seen=[]
+        for t in pk['topics']:
+            x=t.get('area')
+            if x and x not in seen:seen.append(x)
+        return seen
+    cl=[]
+    for (n,s_,c,t),slug,pk in zip(B['tracks'],SLUGS,packs):
+        ar=[x for x in _ar(pk) if x!='Bridge']
+        ch=chips(ar) if len(ar)>1 else chips(t[:6])
+        cl.append(f'<a class="card trk" href="/app/{slug}/" style="border-top:6px solid {c}"><img class="ti" src="/app/{slug}/icon.svg" width="48" height="48" alt=""><h2>{n}</h2><p><b>{html.escape(s_)}</b></p>{ch}<p class="small mute">{len(pk["topics"])} topics · {fmt(len(pk["questions"]))} questions</p><p style="margin-top:12px;color:{c};font-weight:700">Open {n} →</p></a>')
+    cards=''.join(cl)
     b=f'''<div class="wrap" style="padding:40px 0 56px"><h1 style="font-size:2.2rem">Choose a track</h1><p class="lead">Both tracks share one account, so you can switch at any time. Your progress in each track is saved separately.</p><div class="grid" style="margin-top:24px">{cards}</div><p style="margin-top:24px"><a href="/">Back to the {N} home page</a> · <a href="/account/">Account and friends</a></p></div>'''
     return page('hub',f'Choose a track · {N}',b,'Choose a track to open.',head='<link rel="manifest" href="/app/manifest.webmanifest">',tail='<script src="/app/reg.js"></script>')
 

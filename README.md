@@ -1,6 +1,6 @@
 # Axiom
 
-Part of **Voltaxis**, a family of free study trainers (Skyvolt and Axiom). Free, open study trainers for Science Olympiad Division B students and anyone learning along: **Vertex** (Algebra 1 to Honors Geometry), **Apex** (Algebra 2, Trigonometry, Precalculus, Intro Calculus) and **Quanta** (electrical engineering and physics).
+Part of **Voltaxis**, a family of free study trainers (Skyvolt and Axiom). Free, open study trainers for Science Olympiad Division B students and anyone learning along: **Apex** (Algebra 1 through Geometry, Algebra 2, Trigonometry, Precalculus and Calculus) and **Quanta** (electrical engineering and physics).
 
 Short lessons, typed answers, worked solutions, interactive question types, and practice that adapts to each student. Everything runs in the browser. Progress and personalization stay on the device unless the student signs in to sync.
 

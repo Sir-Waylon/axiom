@@ -313,3 +313,5 @@ html.rm .arcard,html.rm .arboss.hit{transition:none;animation:none}html.rm .arba
 .rw2.static{flex-wrap:wrap}.rw2.static .rt{flex:1 1 150px}
 
 .pwr{list-style:none;margin:6px 0 10px;padding:0;font-size:.85rem;text-align:left}.pwr li{padding:2px 0;color:var(--mute)}.pwr li.ok{color:var(--good,#0a7d3b);font-weight:600}.tsw{display:flex;justify-content:center;min-height:65px;margin:6px 0}#tsm{text-align:center;min-height:1.2em}#acg:disabled{opacity:.55;cursor:not-allowed}#code{letter-spacing:.35em;text-align:center;font-size:1.4rem}
+
+.gcard .gico{display:block;margin:0 auto 10px;border-radius:14px}
