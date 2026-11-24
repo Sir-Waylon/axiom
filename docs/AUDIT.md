@@ -176,3 +176,7 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - New `pop.css` / `pop.js`: six-colour accent palette (bright fills, darker text shades), lesson cards coloured by mode (new, building up, revision), animated multi-colour progress bar, coloured worked-example steps, "Go deeper" and formula boxes tinted, a "Halfway there" cheer with confetti (respects reduced motion).
 - Labs: "LIVE LAB" stage with a dotted-grid scene, gradient readout bar, each slider gets its own colour (label stripe, value, filled track, big knob), colourful option chips and toolbar. Axe colour-contrast: 0 issues in light and dark on lessons and labs for all four trainers; lab sweep 0 issues; question checks bad:0.
 - Not done: colour inside each lab's own drawing (circuit, weather, graphs) is still per-lab artwork.
+
+## Nov 24 – level ring and thin solutions
+- Header level ring: inner number now centred (button padding removed, box-sizing fixed).
+- 141 one-line Apex solutions (functions, rates of change, discriminants, polynomials, triangles, circles/ellipses/parabolas, trig identities) rewritten as concept-first worked steps. Every number is computed from the question text and checked against the stored answer by src/mkthin.py.

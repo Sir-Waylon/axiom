@@ -44,3 +44,4 @@ details.dd>summary::before{content:"\1F4A1  "}
 .labbar{border:2px solid color-mix(in srgb,var(--pk5) 35%,var(--line));background:color-mix(in srgb,var(--pk5) 6%,var(--surface))}
 @media(prefers-reduced-motion:reduce){.prog i,.lesson-card svg:first-child,.lesson-card .mascot{animation:none}.pkhalf{animation-duration:.01s;opacity:1}}
 a[href$="/"]>span>small{color:color-mix(in srgb,var(--mute) 70%,var(--ink))}
+.lvring{padding:0;box-sizing:border-box;line-height:1}.lvring span{margin:0;padding:0;line-height:1;font-variant-numeric:tabular-nums}
