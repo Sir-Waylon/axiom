@@ -1,5 +1,5 @@
-const V='tr-8a48b564-ba1f59';
-const PRE=["./", "icon.svg", "manifest.webmanifest", "hub.css", "reg.js", "fonts/inter-400.woff", "fonts/inter-600.woff", "fonts/inter-700.woff", "fonts/interd-700.woff", "apex/", "apex/app.f189ad30.js", "apex/app.8a48b564.css", "apex/app.8a48b564.theme.css", "quanta/", "quanta/app.3f9716f7.js", "quanta/app.8a48b564.css", "quanta/app.8a48b564.theme.css"];
+const V='tr-0c7aaa20-3c775c';
+const PRE=["./", "icon.svg", "manifest.webmanifest", "hub.css", "reg.js", "fonts/inter-400.woff", "fonts/inter-600.woff", "fonts/inter-700.woff", "fonts/interd-700.woff", "apex/", "apex/app.8ff17341.js", "apex/app.0c7aaa20.css", "apex/app.0c7aaa20.theme.css", "quanta/", "quanta/app.2f950831.js", "quanta/app.0c7aaa20.css", "quanta/app.0c7aaa20.theme.css"];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(PRE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin||new URL(r.url).pathname.startsWith('/api/'))return;

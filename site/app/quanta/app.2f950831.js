@@ -5494,7 +5494,14 @@ var _am=afterMe;afterMe=function(){_am.apply(this,arguments);if(sub.me!=='settin
  $('cs-dg').onchange=function(){C.dg=this.checked?1:0;sc();if(!C.dg){try{localStorage.removeItem(DK)}catch(e){}res=null}route()};
  if($('cs-run'))$('cs-run').onclick=function(){res=scan();route()};
  if($('cs-clr'))$('cs-clr').onclick=function(){try{localStorage.removeItem(DK)}catch(e){}res=null;route()};
- if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'8a48b564'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
+ if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'0c7aaa20'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
 if(C.pg)setCookie(1);
+})();
+
+/* ===== pop.js: lesson colour by mode, and a "halfway" cheer ===== */
+(function(){
+var _d=drawSess;drawSess=function(){var r=_d.apply(this,arguments);try{pop()}catch(e){}return r};
+function pop(){var z=Z;if(!z||z.fin||z.kind!=='lesson')return;var c=document.querySelector('#sess .lesson-card');if(c)c.setAttribute('data-m',z.lmode||'new');
+ var n=z.steps.length;if(!z._half&&n>=6&&z.i>=Math.floor(n/2)){z._half=1;var t=document.createElement('div');t.className='pkhalf';t.setAttribute('role','status');t.textContent='Halfway there! Keep going';document.body.appendChild(t);setTimeout(function(){t.remove()},2300);try{burst(false)}catch(e){}}}
 })();
 

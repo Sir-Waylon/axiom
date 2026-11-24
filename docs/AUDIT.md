@@ -171,3 +171,8 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 ## Nov 23 (evening): KaTeX self-hosted, service worker
 - KaTeX 0.16.47 is now served from `/app/katex/` (vendor/katex, MIT licence included, woff2 fonts only). No jsDelivr requests; CSP script/style/font sources no longer list a CDN; the privacy policy no longer names jsDelivr. The plain-text fallback for unsupported browsers stays.
 - Service worker: page loads are now network-first (cache only when offline), so a new release shows on the next load instead of the second.
+
+## Nov 24: more colour in lessons and labs
+- New `pop.css` / `pop.js`: six-colour accent palette (bright fills, darker text shades), lesson cards coloured by mode (new, building up, revision), animated multi-colour progress bar, coloured worked-example steps, "Go deeper" and formula boxes tinted, a "Halfway there" cheer with confetti (respects reduced motion).
+- Labs: "LIVE LAB" stage with a dotted-grid scene, gradient readout bar, each slider gets its own colour (label stripe, value, filled track, big knob), colourful option chips and toolbar. Axe colour-contrast: 0 issues in light and dark on lessons and labs for all four trainers; lab sweep 0 issues; question checks bad:0.
+- Not done: colour inside each lab's own drawing (circuit, weather, graphs) is still per-lab artwork.

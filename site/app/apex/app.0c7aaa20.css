@@ -705,3 +705,49 @@ html.rm .arcard,html.rm .arboss.hit{transition:none;animation:none}html.rm .arba
 .pwr{list-style:none;margin:6px 0 10px;padding:0;font-size:.85rem;text-align:left}.pwr li{padding:2px 0;color:var(--mute)}.pwr li.ok{color:var(--good,#0a7d3b);font-weight:600}.tsw{display:flex;justify-content:center;min-height:65px;margin:6px 0}#tsm{text-align:center;min-height:1.2em}#acg:disabled{opacity:.55;cursor:not-allowed}#code{letter-spacing:.35em;text-align:center;font-size:1.4rem}
 
 .gcard .gico{display:block;margin:0 auto 10px;border-radius:14px}
+/* ===== pop.css: more colour in lessons and labs. Fills are bright, text colours are darker shades so contrast stays WCAG AA. ===== */
+:root{--pk1:#2f6fed;--pk1t:#1d4ed8;--pk2:#f0593e;--pk2t:#c2410c;--pk3:#f5a524;--pk3t:#92400e;--pk4:#8b5cf6;--pk4t:#6d28d9;--pk5:#14b8a6;--pk5t:#0f766e;--pk6:#ec4899;--pk6t:#be185d}
+:root[data-theme="dark"]{--pk1t:#93c5fd;--pk2t:#fdba74;--pk3t:#fcd34d;--pk4t:#c4b5fd;--pk5t:#5eead4;--pk6t:#f9a8d4}
+@media(prefers-color-scheme:dark){:root[data-theme="auto"]{--pk1t:#93c5fd;--pk2t:#fdba74;--pk3t:#fcd34d;--pk4t:#c4b5fd;--pk5t:#5eead4;--pk6t:#f9a8d4}}
+/* ---------- lessons ---------- */
+.prog{height:16px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.prog i{background:linear-gradient(90deg,var(--pk1),var(--pk4) 40%,var(--pk6) 70%,var(--pk3));background-size:200% 100%;animation:pkflow 6s linear infinite}
+@keyframes pkflow{to{background-position:-200% 0}}
+.lesson-card{border-top:7px solid var(--pri);background:linear-gradient(180deg,color-mix(in srgb,var(--pri) 7%,var(--surface)),var(--surface) 55%)}
+.lesson-card[data-m=new]{border-top-color:var(--pk1)}.lesson-card[data-m=build]{border-top-color:var(--pk3)}.lesson-card[data-m=review]{border-top-color:var(--pk4)}
+.lesson-card .tag{background:color-mix(in srgb,var(--pri) 16%,var(--surface))}
+.lesson-card[data-m=new] .tag{background:color-mix(in srgb,var(--pk1) 16%,var(--surface));color:var(--pk1t)}
+.lesson-card[data-m=build] .tag{background:color-mix(in srgb,var(--pk3) 24%,var(--surface));color:var(--pk3t)}
+.lesson-card[data-m=review] .tag{background:color-mix(in srgb,var(--pk4) 16%,var(--surface));color:var(--pk4t)}
+.lesson-card h2{font-size:1.5rem;line-height:1.2}
+.lesson-card .lc{font-size:1.12rem;line-height:1.55}
+.lesson-card svg:first-child,.lesson-card .mascot{animation:pkbounce .7s .15s both}
+@keyframes pkbounce{0%{transform:scale(.6) rotate(-8deg);opacity:0}60%{transform:scale(1.12) rotate(3deg);opacity:1}100%{transform:none}}
+.fml{background:linear-gradient(135deg,color-mix(in srgb,var(--pk1) 12%,var(--surface)),color-mix(in srgb,var(--pk4) 14%,var(--surface)));border-left:6px solid var(--pk4);color:var(--ink)}
+details.dd{border:2px solid color-mix(in srgb,var(--pk4) 40%,var(--line));background:color-mix(in srgb,var(--pk4) 6%,var(--surface))}
+details.dd>summary{color:var(--pk4t);font-weight:800}
+details.dd>summary::before{content:"\1F4A1  "}
+.step{border-left:6px solid var(--pk1)}.explain .step:nth-of-type(5n+2){border-left-color:var(--pk2)}.explain .step:nth-of-type(5n+3){border-left-color:var(--pk3)}.explain .step:nth-of-type(5n+4){border-left-color:var(--pk5)}.explain .step:nth-of-type(5n+5){border-left-color:var(--pk4)}
+.explain .step:nth-of-type(5n+1) b{color:var(--pk1t)}.explain .step:nth-of-type(5n+2) b{color:var(--pk2t)}.explain .step:nth-of-type(5n+3) b{color:var(--pk3t)}.explain .step:nth-of-type(5n+4) b{color:var(--pk5t)}.explain .step:nth-of-type(5n+5) b{color:var(--pk4t)}
+.explain{border-top:7px solid var(--pk2)}
+.pkhalf{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:80;padding:10px 18px;border-radius:99px;font-weight:800;color:#fff;background:linear-gradient(90deg,#1d4ed8,#6d28d9);box-shadow:0 8px 24px -6px rgba(0,0,0,.4);animation:pkdrop 2.2s both;pointer-events:none}
+@keyframes pkdrop{0%{opacity:0;transform:translate(-50%,-20px) scale(.9)}12%{opacity:1;transform:translate(-50%,0) scale(1.06)}20%{transform:translate(-50%,0) scale(1)}85%{opacity:1}100%{opacity:0}}
+/* ---------- labs (more like a hands-on simulator) ---------- */
+.lstage{position:relative;padding-top:38px;border:2px solid color-mix(in srgb,var(--pk1) 30%,var(--line));background:radial-gradient(circle at 1px 1px,color-mix(in srgb,var(--pk1) 14%,transparent) 1px,transparent 1.5px) 0 0/18px 18px,linear-gradient(180deg,color-mix(in srgb,var(--pk1) 9%,var(--surface)),color-mix(in srgb,var(--pk5) 7%,var(--surface)))}
+.lstage::before{content:"LIVE LAB";position:absolute;left:12px;top:10px;padding:3px 12px;border-radius:99px;font:800 11px/1.6 var(--sans);letter-spacing:.1em;color:#fff;background:linear-gradient(90deg,#1d4ed8,#6d28d9)}
+.lstage .lintro{font-weight:600}
+.ltot{background:linear-gradient(135deg,#142033,#2a2159);box-shadow:0 6px 18px -8px rgba(42,33,89,.6)}.ltot .labr b{color:#ffd23f}
+.lpanel{border:2px solid color-mix(in srgb,var(--pk4) 28%,var(--line))}
+.lph{color:var(--pk4t);border-bottom:0;background:linear-gradient(90deg,var(--pk1),var(--pk4),var(--pk6)) bottom/100% 3px no-repeat;padding-bottom:7px}
+.lpanel .lst:nth-of-type(6n+1){--lc:var(--pk1);--lt:var(--pk1t)}.lpanel .lst:nth-of-type(6n+2){--lc:var(--pk2);--lt:var(--pk2t)}.lpanel .lst:nth-of-type(6n+3){--lc:var(--pk5);--lt:var(--pk5t)}
+.lpanel .lst:nth-of-type(6n+4){--lc:var(--pk4);--lt:var(--pk4t)}.lpanel .lst:nth-of-type(6n+5){--lc:var(--pk3);--lt:var(--pk3t)}.lpanel .lst:nth-of-type(6n+6){--lc:var(--pk6);--lt:var(--pk6t)}
+.lst>span{border-left:6px solid var(--lc,var(--pri));padding-left:9px;border-radius:3px}
+.lst>output{color:var(--lt,var(--pri-t))}
+.ltrk i{background:var(--lc,var(--pri));opacity:.9}
+.ltrk b{background:var(--lc,var(--pri));width:30px;height:30px;margin:-15px 0 0 -15px;border:4px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.lstb{color:var(--lt,var(--pri-t));border-color:color-mix(in srgb,var(--lc,var(--pri)) 50%,var(--line))}
+.lpanel .chip,.lpanel [data-lc]{border:2px solid color-mix(in srgb,var(--pk1) 35%,var(--line))}
+.lpanel .chip.on,.lpanel .chip[aria-pressed=true],.lpanel [data-lc].on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.labbar{border:2px solid color-mix(in srgb,var(--pk5) 35%,var(--line));background:color-mix(in srgb,var(--pk5) 6%,var(--surface))}
+@media(prefers-reduced-motion:reduce){.prog i,.lesson-card svg:first-child,.lesson-card .mascot{animation:none}.pkhalf{animation-duration:.01s;opacity:1}}
+a[href$="/"]>span>small{color:color-mix(in srgb,var(--mute) 70%,var(--ink))}
