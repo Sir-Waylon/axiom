@@ -5494,7 +5494,7 @@ var _am=afterMe;afterMe=function(){_am.apply(this,arguments);if(sub.me!=='settin
  $('cs-dg').onchange=function(){C.dg=this.checked?1:0;sc();if(!C.dg){try{localStorage.removeItem(DK)}catch(e){}res=null}route()};
  if($('cs-run'))$('cs-run').onclick=function(){res=scan();route()};
  if($('cs-clr'))$('cs-clr').onclick=function(){try{localStorage.removeItem(DK)}catch(e){}res=null;route()};
- if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'baa5cd81'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
+ if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'1eda043a'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
 if(C.pg)setCookie(1);
 })();
 
