@@ -5153,6 +5153,26 @@ function start(){if(document.readyState==='complete')setTimeout(load,0);else win
 window.typeset=function(el){sched(el||document.body)};
 if(document.body)start();else document.addEventListener('DOMContentLoaded',start)})();
 
+/* New-topic primer: before practice on a topic the student has never answered a question in, show a short explanation (big idea, everyday picture, key ideas, common trap).
+   It can be skipped at any time, and switched off for good. Shown once per topic. */
+var _ssP=startSess;
+function primerTopic(o){if(!o||o.kind!=='quick'||(S.pro&&S.pro.off))return null;var ts=o.topics||[];
+ for(var i=0;i<ts.length;i++){var t=ts[i];if(mastery(t).n===0&&!(S.pro&&S.pro[t])&&window.WHY&&WHY[t])return t}return null}
+function primerShow(t,go){
+ var u=UN.filter(function(x){return x.id===t})[0],w=WHY[t],nm=(u&&u.title)||t,cards=[];
+ if(u)u.lessons.forEach(function(L){L.cards.forEach(function(c){if(cards.length<4&&c.h&&c.t)cards.push(c)})});
+ S.pro=S.pro||{};S.pro[t]=1;save();
+ var m=document.createElement('div');m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','New topic: '+nm);
+ var h='<div class="mbox pmx"><p class="small mute">New topic</p><h3>'+esc(nm)+'</h3><p class="small mute">A short explanation before you practise. You can skip it any time.</p>'
+  +'<h4>The big idea</h4><p>'+esc(w[0])+'</p><h4>Think of it like this</h4><p>'+esc(w[1])+'</p>';
+ if(cards.length)h+='<h4>Key ideas</h4><ul>'+cards.map(function(c){return '<li><b>'+esc(c.h)+'.</b> '+esc(c.t)+'</li>'}).join('')+'</ul>';
+ h+='<h4>Watch out</h4><p>'+esc(w[2])+'</p><div class="row"><button class="btn" id="prgo">Got it, start</button><button class="btn sec" id="prsk">Skip explanation</button></div><p class="small"><button class="lnk" id="proff">Do not show explanations for new topics</button></p></div>';
+ m.innerHTML=h;document.body.appendChild(m);
+ function done(){m.remove();go()}
+ m.addEventListener('click',function(e){var id=e.target&&e.target.id;if(id==='prgo'||id==='prsk'||e.target===m)done();else if(id==='proff'){S.pro.off=1;save();toast('Explanations off. Turn them on again in Me, Settings.');done()}});
+ m.addEventListener('keydown',function(e){if(e.key==='Escape')done()});var b=m.querySelector('#prgo');if(b)b.focus()}
+startSess=function(o){var t=primerTopic(o);if(!t)return _ssP.apply(this,arguments);var self=this,a=arguments;primerShow(t,function(){_ssP.apply(self,a)})};
+
 /* ===== Graphing calculator (a Desmos-style tool built in house: no outside service, works offline) =====
    Functions y=f(x), implicit curves (x^2+y^2=9), inequalities (y>x^2), points (draggable), vertical lines,
    tables with curve fitting, sliders (with play), and a geometry set for triangles. Every preset is a normal row you can edit. */
@@ -5482,7 +5502,7 @@ function scan(){var n=navigator,cn=n.connection||{},nav=(performance.getEntriesB
 function tips(r){var t=[];if(r.rating==='slow')t.push('Turn on Reduce motion in Settings and close other tabs.');if(r.net==='slow-2g'||r.net==='2g')t.push('The connection is slow; the trainer keeps working offline after the first load.');if(r.saveData)t.push('Data saver is on.');if(!t.length)t.push('This device looks fine.');return t}
 var res=null;
 function card(){var e=log();
- return '<div class="card set"><h3>Cookies and diagnostics (optional)</h3><p class="small mute">Both are off until you choose. Neither is needed to study.</p>'
+ return '<div class="card set"><h3>New-topic explanations</h3><label><input type="checkbox" id="cs-pr"'+((S.pro&&S.pro.off)?'':' checked')+'> Show a short explanation before I practise a topic for the first time (you can always skip it)</label></div><div class="card set"><h3>Cookies and diagnostics (optional)</h3><p class="small mute">Both are off until you choose. Neither is needed to study.</p>'
  +'<label><input type="checkbox" id="cs-pg"'+(C.pg?' checked':'')+'> Remember a small progress summary on this device (cookie <code>vx_pg</code>, 180 days)</label>'
  +'<label><input type="checkbox" id="cs-dg"'+(C.dg?' checked':'')+'> Check this device&rsquo;s speed and keep recent error details to help fix bugs</label>'
  +(C.dg?'<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sec sm" id="cs-run">Run device check</button><button class="btn sec sm" id="cs-send"'+((res||e.length)?'':' disabled')+'>Send to developer</button><button class="btn sec sm" id="cs-clr">Clear</button></div>'
@@ -5490,11 +5510,12 @@ function card(){var e=log();
   +'<p class="small mute">'+e.length+' recent error'+(e.length===1?'':'s')+' saved on this device'+(e.length?': latest &ldquo;'+esc(e[e.length-1].m)+'&rdquo; in '+esc(e[e.length-1].f):'')+'. Nothing is sent unless you press Send. Reports hold device details and error text only, never your answers, name or email.</p>':'')+'</div>'}
 var _vm=viewMe;viewMe=function(){var h=_vm.apply(this,arguments);return sub.me==='settings'?h+card():h};
 var _am=afterMe;afterMe=function(){_am.apply(this,arguments);if(sub.me!=='settings'||!$('cs-pg'))return;
+ $('cs-pr').onchange=function(){S.pro=S.pro||{};S.pro.off=this.checked?0:1;save();toast(this.checked?'Explanations on':'Explanations off')};
  $('cs-pg').onchange=function(){C.pg=this.checked?1:0;sc();setCookie(C.pg);toast(C.pg?'Progress cookie on':'Progress cookie deleted')};
  $('cs-dg').onchange=function(){C.dg=this.checked?1:0;sc();if(!C.dg){try{localStorage.removeItem(DK)}catch(e){}res=null}route()};
  if($('cs-run'))$('cs-run').onclick=function(){res=scan();route()};
  if($('cs-clr'))$('cs-clr').onclick=function(){try{localStorage.removeItem(DK)}catch(e){}res=null;route()};
- if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'1eda043a'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
+ if($('cs-send'))$('cs-send').onclick=function(){var o={device:res||scan(),errors:log(),v:'0d78ab08'};fetch('/api/diag',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify(o)}).then(function(r){toast(r.ok?'Thanks, sent':'Could not send right now')}).catch(function(){toast('Could not send right now')})}};
 if(C.pg)setCookie(1);
 })();
 

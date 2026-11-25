@@ -180,3 +180,9 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 ## Nov 24 – level ring and thin solutions
 - Header level ring: inner number now centred (button padding removed, box-sizing fixed).
 - 141 one-line Apex solutions (functions, rates of change, discriminants, polynomials, triangles, circles/ellipses/parabolas, trig identities) rewritten as concept-first worked steps. Every number is computed from the question text and checked against the stored answer by src/mkthin.py.
+
+## 27.0 – contact, hovercraft guide, new-topic explanations
+- Contact email skyvolt.axiom@gmail.com on privacy/terms, footer, /.well-known/security.txt.
+- Skyvolt: Hovercraft B guide at /guides/hovercraft/ (rules in brief, score, lift-pressure, battery and relay-timing calculators, team build notes; formulas checked against the team spreadsheet).
+- All trainers: first-time practice on a topic shows a short explanation (big idea, everyday picture, key ideas, trap) with Skip and a Settings switch.
+- Version history added (src/docs/VERSIONS.md).

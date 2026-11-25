@@ -45,3 +45,5 @@ details.dd>summary::before{content:"\1F4A1  "}
 @media(prefers-reduced-motion:reduce){.prog i,.lesson-card svg:first-child,.lesson-card .mascot{animation:none}.pkhalf{animation-duration:.01s;opacity:1}}
 a[href$="/"]>span>small{color:color-mix(in srgb,var(--mute) 70%,var(--ink))}
 .lvring{padding:0;box-sizing:border-box;line-height:1}.lvring span{margin:0;padding:0;line-height:1;font-variant-numeric:tabular-nums}
+
+.mbox.pmx{max-width:560px;max-height:86vh;overflow-y:auto;box-sizing:border-box}.pmx h4{margin:14px 0 4px}.pmx ul{padding-left:20px}.pmx li{margin:6px 0;line-height:1.5}

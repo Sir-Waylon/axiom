@@ -110,7 +110,7 @@ def page(path,title,body,desc='',cur='',head='',tail=''):
 <a class="skip" href="#main">Skip to main content</a>
 <header class="top"><div class="wrap in"><a class="logo" href="/" aria-label="{N} home">{BOLT}<span>{N}</span></a><nav aria-label="Main"><ul>{nav}</ul></nav><span class="sp"></span><form class="srch" role="search"><label class="sr" for="sq">Search {N}</label><input id="sq" type="search" placeholder="Search" autocomplete="off" aria-controls="sres" maxlength="60"><ul id="sres" hidden></ul></form><a class="btn" href="/account/">Sign in</a></div></header>
 <main id="main" tabindex="-1">{crumb}{body}</main>
-<footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li></ul></nav>
+<footer><div class="wrap"><nav aria-label="Footer"><ul><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms</a></li><li><a href="/accessibility/">Accessibility</a></li><li><a href="/ai-disclosure/">AI disclosure</a></li><li><a href="/account/">Account</a></li>{'<li><a href="/guides/hovercraft/">Hovercraft guide</a></li>' if N=='Skyvolt' else ''}<li><a href="mailto:skyvolt.axiom@gmail.com">Contact</a></li></ul></nav>
 <p>{N} is part of <strong>Voltaxis</strong>, a family of free study trainers (Skyvolt and Axiom). <span data-sister-wrap hidden>Also try <a data-sister href="#">{SIS}: {SISD}</a>.</span></p><p>{N} was created with AI assistance. <a href="/ai-disclosure/">Read the AI disclosure</a>.</p><p class="small">Science Olympiad&reg; is a registered trademark of Science Olympiad, Inc. {N} is an independent study aid and is not affiliated with or endorsed by Science Olympiad, Inc.</p></div></footer>
 {'<script src="/account.js" defer></script>' if path=='account' else ''}<script src="/nav.js" defer></script>{tail}
 </body></html>'''
@@ -381,7 +381,7 @@ def hub():
         ch=chips(ar) if len(ar)>1 else chips(t[:6])
         cl.append(f'<a class="card trk" href="/app/{slug}/" style="border-top:6px solid {c}"><img class="ti" src="/app/{slug}/icon.svg" width="48" height="48" alt=""><h2>{n}</h2><p><b>{html.escape(s_)}</b></p>{ch}<p class="small mute">{len(pk["topics"])} topics · {fmt(len(pk["questions"]))} questions</p><p style="margin-top:12px;color:{c};font-weight:700">Open {n} →</p></a>')
     cards=''.join(cl)
-    b=f'''<div class="wrap" style="padding:40px 0 56px"><h1 style="font-size:2.2rem">Choose a track</h1><p class="lead">Both tracks share one account, so you can switch at any time. Your progress in each track is saved separately.</p><div class="grid" style="margin-top:24px">{cards}</div><p style="margin-top:24px"><a href="/">Back to the {N} home page</a> · <a href="/account/">Account and friends</a></p></div>'''
+    b=f'''<div class="wrap" style="padding:40px 0 56px"><h1 style="font-size:2.2rem">Choose a track</h1><p class="lead">Both tracks share one account, so you can switch at any time. Your progress in each track is saved separately.</p><div class="grid" style="margin-top:24px">{cards}</div><p style="margin-top:24px"><a href="/">Back to the {N} home page</a> · <a href="/account/">Account and friends</a>{' · <a href="/guides/hovercraft/">Hovercraft B guide</a>' if N=='Skyvolt' else ''}</p></div>'''
     return page('hub',f'Choose a track · {N}',b,'Choose a track to open.',head='<link rel="manifest" href="/app/manifest.webmanifest">',tail='<script src="/app/reg.js"></script>')
 
 def aidisc():
@@ -422,6 +422,10 @@ def W(p,s):
 W('index.html',landing());W('privacy/index.html',legal('privacy'));W('terms/index.html',legal('terms'));W('accessibility/index.html',access())
 W('ai-disclosure/index.html',aidisc());W('account/index.html',account());W('404.html',notfound())
 W('app/index.html',hub())
+if N=='Skyvolt':
+    import sys as _sy;_sy.path.insert(0,K+'src');import hovercraft as _hc
+    CSS+=_hc.CSS
+    W('guides/hovercraft/index.html',page('guides/hovercraft','Hovercraft B guide · '+N,_hc.BODY,'Hovercraft B guide: rules in brief, score, lift, battery and relay-timing calculators, and build notes.',tail='<script src="/hc.js"></script>'));W('hc.js',_hc.JS)
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
 CSS+=TRYCSS
 W('site.css',CSS);W('cs.js',open(K+'engine3/cspstyle.js',encoding='utf8').read());W('try.js',TRYJS);W('account.js',ACCJS);W('nav.js',NAVJS.replace('__ME__',N.lower()).replace('__OT__',SIS.lower()));shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
@@ -430,7 +434,9 @@ _ix=[{'t':'Sign in','u':'/account/','d':'Account and progress sync'},{'t':'Priva
 for _n,_s,_c,_t in B['tracks']:
     _ix.append({'t':_n,'u':'/app/','d':_s})
     for _x in _t:_ix.append({'t':_x,'u':'/app/','d':'Topic in '+_n})
+if N=='Skyvolt':_ix.append({'t':'Hovercraft B guide','u':'/guides/hovercraft/','d':'Rules, score calculator, lift, battery and relay timing'})
 W('search.json',_j.dumps(_ix,ensure_ascii=False))
+W('.well-known/security.txt','Contact: mailto:skyvolt.axiom@gmail.com\nExpires: 2027-11-24T00:00:00.000Z\nPreferred-Languages: en\n')
 W('robots.txt','User-agent: *\nAllow: /\nDisallow: /api/\n')
 W('sw.js',"/* retires the old root service worker (the app now lives in /app/) */\nself.addEventListener('install',function(){self.skipWaiting()});\nself.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}).then(function(){return self.registration.unregister()}).then(function(){return self.clients.matchAll()}).then(function(c){c.forEach(function(w){w.navigate(w.url)})}))});\n")
 CSP_STYLE="https://accounts.google.com/gsi/style"
