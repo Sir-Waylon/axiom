@@ -290,7 +290,7 @@ function stationLab(root){var s={T:18,Td:12,dir:225,kt:25,p:1013.2,oct:4};
 /* ---------- registry and view ---------- */
 var LABS=[{id:'proj',t:'Projectile launcher',d:'Aim, pick a world, add air',make:projectile,p:['quanta-physics']},{id:'swing',t:'Pendulum and spring',d:'Drag, release, measure the period',make:swing,p:['quanta-physics']},{id:'coll',t:'Collision lab',d:'Masses, speeds and bounciness',make:collide,p:['quanta-physics']},
  {id:'ohm',t:'Ohm\'s law and fuses',d:'Volts, ohms, amps and a fuse that blows',make:ohm,p:['circuit-lab-b','quanta-physics']},
- {id:'rc',t:'Charging a capacitor',d:'Watch the voltage curve and the time constant',make:rcLab,p:['circuit-lab-b','quanta-physics']},
+ {id:'rc',t:'Charging a capacitor',d:'Watch the voltage curve and the time constant',make:rcLab,p:['circuit-lab-b']},
  {id:'net',t:'Resistor networks',d:'Switch resistors in and out, find the total',make:netLab,p:['circuit-lab-b','quanta-physics']},
  {id:'mag',t:'Electromagnet',d:'Turns, current and a core',make:magLab,p:['circuit-lab-b','quanta-physics']},
  {id:'wind',t:'Pressure and wind',d:'Highs, lows, Coriolis and friction',make:windLab,p:['meteorology-b']},

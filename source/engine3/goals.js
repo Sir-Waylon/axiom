@@ -16,7 +16,7 @@ function RC(x,y,w,h,f,s,r){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" heigh
 function CI(x,y,r,f,s){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+(f||'none')+'" stroke="'+(s||'currentColor')+'" stroke-width="1.8"/>'}
 function PA(d,s,w,f,dash){return '<path d="'+d+'" fill="'+(f||'none')+'" stroke="'+(s||'#5b4bff')+'" stroke-width="'+(w||2.5)+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'}
 var PU='#5b4bff',OR='#e08a00',GR='#0b8f6a',RD='#d6336c',BL='#2a7de1';
-var LAB={};function add(pack,tp){(LAB[pack]=LAB[pack]||[]).push(tp)}
+var LAB={};var GONE={'quanta-physics':{rc:1,flt:1,dev:1,rot:1,sho:1,gas:1,gau:1,lor:1,mxw:1,cal:1,kvl:1,ac:1},'apex-math':{lm:1,dv:1,da:1,'in':1,st:1,mv:1,sr:1,pp:1,cn:1,ti:1,iv:1,id:1,tl:1}};function add(pack,tp){if(GONE[pack]&&GONE[pack][tp.t])return;(LAB[pack]=LAB[pack]||[]).push(tp)}
 window.__labAdd=add;window.__labKit={mul:mul,hs:hs,pk:pk,rd:rd,sg:sg,fm:fm,SV:SV,TX:TX,LN:LN,RC:RC,CI:CI,PA:PA,PU:PU,OR:OR,GR:GR,RD:RD,BL:BL,G:G};
 
 /* ---------- Quanta: its own set of labs (physics and electronics), not shared with the circuit-event trainer ---------- */

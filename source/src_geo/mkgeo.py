@@ -36,6 +36,16 @@ for p in proofs.PR:
         if v==2:pick2=sorted(idx[k:k+k]);hide=[[1] if i in pick2 else [] for i in range(n)];blanks=[rows[i][1] for i in pick2]
         if not any(hide):continue
         gen.put(dict(t=p['t'],l=3,type='proof',q=f"Complete the proof: {p['title']}. Given: {p['given']}. Prove: {p['prove']}. Fill each blank {'reason' if cols==[1] else 'statement'}{' (set '+str(v+1)+')' if v==2 else ''}.",rows=rows,hide=hide,extra=ex if v!=2 else [x for x in pool[:3]],sol=[p['idea'],'Each statement needs a reason: a definition, postulate, theorem or given.'],w=p['idea'],fp=f"pb-{p['id']}-{v}"))
+EXTRA=int(os.environ.get('GEOEXTRA','0'))
+if EXTRA:   # more algebra 1 and geometry practice: re-run the same question families after the originals so every existing id stays the same
+    gen.LOGGING[0]=False;_s=len(gen.OUT);_r=0
+    while len(gen.OUT)-_s<EXTRA and _r<8:
+        _r+=1
+        for _f,_n in list(gen.FAMLOG):
+            if len(gen.OUT)-_s>=EXTRA:break
+            gen.rep(_f,max(1,_n//2))
+    del gen.OUT[_s+EXTRA:]
+    print('extra',len(gen.OUT)-_s)
 Q=gen.OUT
 import figs_geo;print('figs',figs_geo.attach(Q))
 neg=re.compile(r'(?<![\w.)])-(?=\d)')

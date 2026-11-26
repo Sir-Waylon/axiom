@@ -127,6 +127,12 @@ T['quanta-physics']=[
   steps:['Time constant τ = R × C (kΩ × µF = ms).','R = '+tau+' ÷ '+C+' = '+Rr+' kΩ.'],ans:Rr+' kΩ'}}}];
 /* ---------- add to the question bank ---------- */
 T['apex-math']=(T['geometry-readiness']||[]).concat(T['apex-math']||[]);
+T['quanta-physics']=(T['quanta-physics']||[]).filter(function(x){return x.t!=='rc'}).concat([
+ {id:'lvr',t:'mac',l:2,ic:'⚖️',gen:function(r){var L,dl,F,d,k=0;do{L=pk(r,[20,30,40,50,60,80]);dl=pk(r,[0.5,1,1.5,2]);F=pk(r,[10,20,25,30,40,50]);d=L*dl/F;k++}while((d<0.2||d>5||Math.abs(d*100-Math.round(d*100))>1e-6)&&k<200);d=rd(d,2);
+  return{story:'A lever balances when force × distance is the same on both sides. A '+L+' N load sits '+dl+' m from the pivot. You push down with '+F+' N on the other side. How far from the pivot must you push to balance it?',
+  params:[{n:'d',l:'Distance from pivot',min:.1,max:5,step:.05,u:' m',s:1}],env:{F:F},out:{e:'F*d',l:'Your turning effect',u:' N·m',d:2},goal:{t:L*dl,rel:.02},
+  steps:['Balance: effort × distance = load × distance.',F+' × d = '+L+' × '+dl+' = '+(L*dl)+'.','d = '+(L*dl)+' ÷ '+F+' = '+d+' m.'],ans:d+' m'}}}]);
+T['apex-math']=T['apex-math'].filter(function(x){return {lm:1,dv:1,da:1,'in':1,st:1,mv:1,sr:1,pp:1,cn:1,ti:1,iv:1,id:1,tl:1}[x.t]!==1});
 var TL=T[PK]||[],NPER=10;
 TL.forEach(function(tp){var seen={};for(var i=0;i<NPER;i++){var id='sim-'+tp.id+'-'+(i<9?'0':'')+(i+1);if(QI[id]!==undefined)continue;var g=tp.gen(mul(hs(PK+tp.id+i)));if(seen[g.story]){continue}seen[g.story]=1;
  var q={id:id,t:tp.t,l:tp.l,type:'sim',ic:tp.ic,q:g.story,sim:g,sol:g.steps,w:g.steps[g.steps.length-1],fp:'sim-'+tp.id};QS.push(q);QI[id]=QS.length-1}});

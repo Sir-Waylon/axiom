@@ -186,3 +186,8 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - Skyvolt: Hovercraft B guide at /guides/hovercraft/ (rules in brief, score, lift-pressure, battery and relay-timing calculators, team build notes; formulas checked against the team spreadsheet).
 - All trainers: first-time practice on a topic shows a short explanation (big idea, everyday picture, key ideas, trap) with Skip and a Settings switch.
 - Version history added (src/docs/VERSIONS.md).
+
+## 28.0 – basic physics for Quanta, more algebra and geometry for Apex
+- Quanta: removed the advanced topics (rotation, oscillations, gas laws, Gauss, Lorentz, wave optics, calculus mechanics, capacitor transients, AC, filters, devices, network analysis) and the capacitor lab. Added four basic topics with detailed lesson cards and about 1,000 generated questions: work and simple machines, matter/density/pressure, temperature and heat, everyday energy. Added a lever balance sim. Total unchanged (2,538).
+- Apex: removed calculus, AP statistics, multivariable and the advanced trig identities (conics, polar/parametric and laws of sines/cosines stay). About 1,070 extra algebra 1 and geometry questions come from the same question families, appended so existing ids are unchanged. Total unchanged (4,099).
+- src/dropunknown.py drops leftover questions for removed topics.

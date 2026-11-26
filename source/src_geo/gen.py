@@ -33,7 +33,9 @@ def TX(t,l,fp,stem,ans,sol,svg=None):
     q=dict(t=t,l=l,type='short',q=stem,text=ans,sol=sol,w=sol[-1],fp=fp)
     if svg:q['svg']=svg
     return put(q)
+FAMLOG=[];LOGGING=[True]
 def rep(f,n):
+    if LOGGING[0]:FAMLOG.append((f,n))
     c=0;tries=0
     while c<n and tries<n*12:
         tries+=1
