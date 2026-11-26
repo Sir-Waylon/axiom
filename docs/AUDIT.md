@@ -197,3 +197,11 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - Demo rules followed (QUESTION_RULES.md §4): readouts update instantly, controls beside the canvas, one colour per variable, no decorative animation, prediction first.
 - CSP-safe: DOM/SVG built by /demo.js, no inline styles or scripts. Verified: t140 (CSP), t145 (carousel, no overflow at 1280/390), t156 (sliders), chkall (apex 4099, quanta 2538, circuit 1441, meteorology 482; bad 0).
 - QUESTION_RULES.md added to src/docs as the standing standard for every question, proof, demo and tutoring prompt.
+
+## 30.0 — 101 new proofs (132 total), ~930 new proof questions
+- New proofs in src_geo/proofs3.py (angles, logic, parallel lines, triangles, quadrilaterals), proofs4.py (similarity, trig, coordinates, transformations, constructions, circles, area), proofs5.py (algebra, exponents, factoring, radicals, quadratics, number theory, indirect proofs). Each has given/prove/steps with reasons, a strategy hint (idea), a deeper explanation, the common trap, and a tier (11–19 of the 20-tier taxonomy).
+- Every generated question carries a `[Subject | Subtopic: proofs | Tier n]` tag, hint, and a "Common trap" line (QUESTION_RULES §1.4).
+- Types per proof: ordering, matching, step-reason MCQ, three fill-the-blank two-column proofs. MCQ distractors are similar-sounding reasons from the same subject area (rule confusion); near-duplicate wordings of the right answer and "Given" steps are excluded so no option is arguably correct.
+- Generated after all earlier questions, so existing question ids and saved progress are unchanged.
+- Checks: chkall bad 0 on all four packs (merged geometry/algebra 6286 questions in total), contrast 0 issues, carousel and demos pass, no tag/option-format violations in the 927 new items.
+- Not yet done: Stratus/Voltaic level expansion.
