@@ -29,6 +29,8 @@
   Cache-Control: public, max-age=3600
 /try.js
   Cache-Control: public, max-age=3600
+/demo.js
+  Cache-Control: public, max-age=3600
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 /app/fonts/*

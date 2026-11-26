@@ -189,6 +189,14 @@ def tryq():
             why=html.escape('Answer: '+(str(qq['num'].get('show',v)))+'. '+' '.join(str(x) for x in qq['sol'][-2:])[:230])
             q=qq
         cards.append(f'<article class="tq" aria-label="Question {ci+1}">{head}<p class="tqq">{html.escape(q["q"])}</p>{body}<div class="tqf" role="status" aria-live="polite" hidden><b></b> <span>{why}</span></div></article>')
+    import sys as _s2;_s2.path.insert(0,K+'src');import demos as _dm
+    _ds=[c for _p,c in _dm.demo_cards(N)];_new=[];_di=0
+    for _i,_c in enumerate(cards):
+        _new.append(_c)
+        if (_i+1)%3==0 and _di<len(_ds):_new.append(_ds[_di]);_di+=1
+    _new+=_ds[_di:]
+    if N=='Axiom':_new+=_dm.proof_cards()
+    cards=_new
     cards.append(f'<article class="tq tqe" aria-label="Start practicing"><p class="tqh">Like these?</p><p>{fmt(nq)} questions, with worked steps after every miss.</p><p><a class="btn" href="/app/">Start learning</a></p></article>')
     return f'<div class="try" id="try"><div class="tryhd"><span class="pill">Try real questions</span><span class="small mute" id="tryc" aria-live="polite">1 of {len(cards)}</span></div><div class="trylist" role="region" aria-label="Sample questions from {N}. Scroll sideways or use the arrows." tabindex="0">{"".join(cards)}</div><div class="trynav"><button class="btn sec" type="button" id="tryp" aria-label="Previous question">&larr; Back</button><button class="btn sec" type="button" id="tryn" aria-label="Next question">Next &rarr;</button></div><noscript><p class="small mute">Turn on JavaScript to check your answers.</p></noscript></div>'
 def landing():
@@ -217,7 +225,7 @@ def landing():
 <section class="s" data-sister-wrap hidden><div class="wrap" style="text-align:center"><h2>Also from Voltaxis</h2><p class="lead" style="font-size:1rem">{SISD}, with the same account.</p><div class="cta" style="justify-content:center"><a class="btn sec" data-sister href="#">Visit {SIS}</a></div></div></section>
 <section class="s alt"><div class="wrap" style="text-align:center"><h2>Start practicing today.</h2><div class="cta" style="justify-content:center"><a class="btn" href="/app/">Start learning</a><a class="btn sec" href="/account/">Sign in</a></div></div></section>'''
     body=body.replace('{REPOLINK}',REPOLINK)
-    return page('index',f'{N}: {B["h1"]}',body,cur='/',tail='<script src="/try.js" defer></script>')
+    return page('index',f'{N}: {B["h1"]}',body,cur='/',tail='<script src="/demo.js" defer></script><script src="/try.js" defer></script>')
 def legal(kind):
     P=CONTACT
     if kind=='privacy':
@@ -428,6 +436,8 @@ if N=='Skyvolt':
     W('guides/hovercraft/index.html',page('guides/hovercraft','Hovercraft B guide · '+N,_hc.BODY,'Hovercraft B guide: rules in brief, score, lift, battery and relay-timing calculators, and build notes.',tail='<script src="/hc.js"></script>'));W('hc.js',_hc.JS)
 CSS+='''.um{position:relative;display:inline-block}.umm{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:6px;z-index:60}.umm a,.umm button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;color:var(--tx);background:none;border:0;font:inherit;text-decoration:none;cursor:pointer}.umm a:hover,.umm button:hover,.umm a:focus-visible,.umm button:focus-visible{background:var(--soft)}.umh{padding:8px 12px;font-weight:800;border-bottom:1px solid var(--line);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis}'''
 CSS+=TRYCSS
+import sys as _s3;_s3.path.insert(0,K+'src');import demos as _dm2
+CSS+=_dm2.CSS;W('demo.js',_dm2.JS)
 W('site.css',CSS);W('cs.js',open(K+'engine3/cspstyle.js',encoding='utf8').read());W('try.js',TRYJS);W('account.js',ACCJS);W('nav.js',NAVJS.replace('__ME__',N.lower()).replace('__OT__',SIS.lower()));shutil.copy(appdir+'/icon.svg',out+'/icon.svg');shutil.copy(appdir+'/apple-touch-icon.png',out+'/apple-touch-icon.png');shutil.copytree(appdir+'/fonts',out+'/fonts',dirs_exist_ok=True)
 import json as _j
 _ix=[{'t':'Sign in','u':'/account/','d':'Account and progress sync'},{'t':'Privacy policy','u':'/privacy/','d':'What we collect and your choices'},{'t':'Terms of service','u':'/terms/','d':'The rules for using '+N},{'t':'Accessibility','u':'/accessibility/','d':'How '+N+' supports all learners'},{'t':'AI disclosure','u':'/ai-disclosure/','d':'How AI was used and checked'}]
@@ -474,6 +484,8 @@ W('_headers',f"""/*
 /cs.js
   Cache-Control: public, max-age=3600
 /try.js
+  Cache-Control: public, max-age=3600
+/demo.js
   Cache-Control: public, max-age=3600
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable

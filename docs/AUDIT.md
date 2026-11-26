@@ -191,3 +191,9 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - Quanta: removed the advanced topics (rotation, oscillations, gas laws, Gauss, Lorentz, wave optics, calculus mechanics, capacitor transients, AC, filters, devices, network analysis) and the capacitor lab. Added four basic topics with detailed lesson cards and about 1,000 generated questions: work and simple machines, matter/density/pressure, temperature and heat, everyday energy. Added a lever balance sim. Total unchanged (2,538).
 - Apex: removed calculus, AP statistics, multivariable and the advanced trig identities (conics, polar/parametric and laws of sines/cosines stay). About 1,070 extra algebra 1 and geometry questions come from the same question families, appended so existing ids are unchanged. Total unchanged (4,099).
 - src/dropunknown.py drops leftover questions for removed topics.
+
+## 29.0 — Interactive homepage questions
+- Homepage "Try real questions" carousel now interleaves interactive demo cards (sliders, Predict → Observe → Explain) with the MCQ/numeric cards. Axiom: quadratic, Pythagorean, lever, projectile + 3 interactive proofs. Skyvolt: Ohm's law, parallel resistors, hovercraft timing, latch/relay.
+- Demo rules followed (QUESTION_RULES.md §4): readouts update instantly, controls beside the canvas, one colour per variable, no decorative animation, prediction first.
+- CSP-safe: DOM/SVG built by /demo.js, no inline styles or scripts. Verified: t140 (CSP), t145 (carousel, no overflow at 1280/390), t156 (sliders), chkall (apex 4099, quanta 2538, circuit 1441, meteorology 482; bad 0).
+- QUESTION_RULES.md added to src/docs as the standing standard for every question, proof, demo and tutoring prompt.
