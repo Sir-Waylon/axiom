@@ -212,3 +212,8 @@ The Compatibility workflow (Playwright: Chromium, Firefox, WebKit on Ubuntu, Win
 - Stratus: dry lapse rate, LCL, flash-to-bang, radar range, arrival time, relative humidity rule, velocity couplets, CAPE updraft, lapse rate, freezing level, snow ratio, bulk shear, temperature advection, plus conceptual items on CIN, veering, downbursts, hurricane quadrants, freezing rain, lake effect, dryline, EF and Saffir-Simpson scales.
 - Rules: tag `[Subject | Subtopic | Tier n]`, two hints plus a diagnostic solution with a named trap, clean numbers, each wrong option is one named misconception. Correct-answer-is-longest was reduced from 28/41 to 18/41 by rebalancing options.
 - Checks: chkall bad 0 (circuit 2123 total, meteorology 1027 total), contrast 0, carousel passes.
+
+## 31.1 — Hidden tiers on every question
+- src/addtier.py (run by rebuild.sh after applydd/unitfix) gives each question a numeric `tier` 1–20 (QUESTION_RULES §2). Students never see it: it is a data field only, the engine does not read it, and `[Subject | Subtopic | Tier n]` prefixes written into new question text are moved into the field and stripped.
+- Older questions are tiered from level, difficulty (b), type, number of solution steps, length and number count, ranked by percentile within each level (L1 → tiers 1–6, L2 → 5–13, L3 → 11–19, proofs 13–19) plus wording cues (definitions → 2, units → 5, thresholds → 9, error analysis → 13, limits → 16). This is a calibrated estimate, not a hand review of each item. Tier 20 is kept for open-ended proof construction.
+- Result: 12,000+ questions across five packs, none without a tier, none with a visible tag; chkall bad 0, contrast 0.
